@@ -7,17 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A195B852BEE209900B7AAC1 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B842BEE209900B7AAC1 /* Tracker.swift */; };
+		1A195B882BEE20BE00B7AAC1 /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B872BEE20BE00B7AAC1 /* TrackerCategory.swift */; };
+		1A195B8A2BEE20CF00B7AAC1 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B892BEE20CF00B7AAC1 /* TrackerRecord.swift */; };
 		1AA642352BE7E9AA002D6B32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA642342BE7E9AA002D6B32 /* AppDelegate.swift */; };
 		1AA642372BE7E9AA002D6B32 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA642362BE7E9AA002D6B32 /* SceneDelegate.swift */; };
 		1AA642392BE7E9AA002D6B32 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA642382BE7E9AA002D6B32 /* ViewController.swift */; };
 		1AA6423E2BE7E9AB002D6B32 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AA6423D2BE7E9AB002D6B32 /* Assets.xcassets */; };
 		1AA642412BE7E9AB002D6B32 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 1AA642402BE7E9AB002D6B32 /* Base */; };
-		1AA642492BE7F1E6002D6B32 /* TrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA642482BE7F1E6002D6B32 /* TrackerViewController.swift */; };
+		1AA642492BE7F1E6002D6B32 /* 111.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA642482BE7F1E6002D6B32 /* 111.swift */; };
 		1AA6424D2BE7FB4A002D6B32 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA6424C2BE7FB4A002D6B32 /* StatisticViewController.swift */; };
-		1AA6424F2BE7FE7C002D6B32 /* TracksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA6424E2BE7FE7C002D6B32 /* TracksView.swift */; };
+		1AA6424F2BE7FE7C002D6B32 /* TrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA6424E2BE7FE7C002D6B32 /* TrackerViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A195B842BEE209900B7AAC1 /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
+		1A195B872BEE20BE00B7AAC1 /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
+		1A195B892BEE20CF00B7AAC1 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
 		1AA642312BE7E9AA002D6B32 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1AA642342BE7E9AA002D6B32 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1AA642362BE7E9AA002D6B32 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -25,9 +31,9 @@
 		1AA6423D2BE7E9AB002D6B32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AA642402BE7E9AB002D6B32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1AA642422BE7E9AB002D6B32 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1AA642482BE7F1E6002D6B32 /* TrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewController.swift; sourceTree = "<group>"; };
+		1AA642482BE7F1E6002D6B32 /* 111.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = 111.swift; sourceTree = "<group>"; };
 		1AA6424C2BE7FB4A002D6B32 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
-		1AA6424E2BE7FE7C002D6B32 /* TracksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracksView.swift; sourceTree = "<group>"; };
+		1AA6424E2BE7FE7C002D6B32 /* TrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +47,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A195B832BEE200F00B7AAC1 /* Trackers */ = {
+			isa = PBXGroup;
+			children = (
+				1A195B862BEE209F00B7AAC1 /* Models */,
+			);
+			path = Trackers;
+			sourceTree = "<group>";
+		};
+		1A195B862BEE209F00B7AAC1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1A195B842BEE209900B7AAC1 /* Tracker.swift */,
+				1A195B872BEE20BE00B7AAC1 /* TrackerCategory.swift */,
+				1A195B892BEE20CF00B7AAC1 /* TrackerRecord.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		1AA642282BE7E9AA002D6B32 = {
 			isa = PBXGroup;
 			children = (
@@ -60,15 +84,16 @@
 		1AA642332BE7E9AA002D6B32 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
-				1AA642482BE7F1E6002D6B32 /* TrackerViewController.swift */,
+				1A195B832BEE200F00B7AAC1 /* Trackers */,
 				1AA6424C2BE7FB4A002D6B32 /* StatisticViewController.swift */,
-				1AA6424E2BE7FE7C002D6B32 /* TracksView.swift */,
+				1AA6424E2BE7FE7C002D6B32 /* TrackerViewController.swift */,
 				1AA642342BE7E9AA002D6B32 /* AppDelegate.swift */,
 				1AA642362BE7E9AA002D6B32 /* SceneDelegate.swift */,
 				1AA642382BE7E9AA002D6B32 /* ViewController.swift */,
 				1AA6423D2BE7E9AB002D6B32 /* Assets.xcassets */,
 				1AA6423F2BE7E9AB002D6B32 /* LaunchScreen.storyboard */,
 				1AA642422BE7E9AB002D6B32 /* Info.plist */,
+				1AA642482BE7F1E6002D6B32 /* 111.swift */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -144,11 +169,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				1AA642392BE7E9AA002D6B32 /* ViewController.swift in Sources */,
-				1AA642492BE7F1E6002D6B32 /* TrackerViewController.swift in Sources */,
+				1AA642492BE7F1E6002D6B32 /* 111.swift in Sources */,
+				1A195B882BEE20BE00B7AAC1 /* TrackerCategory.swift in Sources */,
 				1AA642352BE7E9AA002D6B32 /* AppDelegate.swift in Sources */,
-				1AA6424F2BE7FE7C002D6B32 /* TracksView.swift in Sources */,
+				1AA6424F2BE7FE7C002D6B32 /* TrackerViewController.swift in Sources */,
+				1A195B8A2BEE20CF00B7AAC1 /* TrackerRecord.swift in Sources */,
 				1AA6424D2BE7FB4A002D6B32 /* StatisticViewController.swift in Sources */,
 				1AA642372BE7E9AA002D6B32 /* SceneDelegate.swift in Sources */,
+				1A195B852BEE209900B7AAC1 /* Tracker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

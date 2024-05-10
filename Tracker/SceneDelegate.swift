@@ -15,11 +15,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        let tracksView = TracksView()
-        window.rootViewController = tracksView
+        let tabBarController = UITabBarController()
+        let trackerViewController = TrackerViewController()
+        let statisticViewController = StatisticViewController()
+        let trackNav = UINavigationController(rootViewController: trackerViewController)
+        let statisticNav = UINavigationController(rootViewController: statisticViewController)
+        trackNav.tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(systemName: "record.circle.fill"), tag: 0)
+        statisticNav.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(systemName: "hare.fill"), tag: 1)
+        tabBarController.viewControllers = [trackNav, statisticNav]
+
+        window.rootViewController = tabBarController
         self.window = window
-        window.makeKeyAndVisible()
-    }
+        window.makeKeyAndVisible()    }
 
     func sceneDidDisconnect(_ scene: UIScene) {
     }
