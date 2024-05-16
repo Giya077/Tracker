@@ -16,8 +16,3 @@ struct Tracker {
     let emoji: Character
     let schedule: [Days]
 }
-
-enum Days {
-    case everyday, weekends
-    case monday, tuesday, wednesday, thursday, friday, saturday, sunday
-}

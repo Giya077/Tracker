@@ -13,9 +13,26 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private var plusButton = UIButton()
     private var searchBar: UISearchBar!
     private var datePicker = UIDatePicker()
-    var imageView = UIImage(named: "error")
+    private var collectionView: UICollectionView!
+    var stubView: UIImageView!
     var textLabel = UILabel()
-    var categories: [TrackerCategory] = []
+    
+    private var categories: [TrackerCategory] = [] {
+          didSet {
+              // При изменении данных в categories перезагружаем коллекцию или обновляем интерфейс
+              if categories.isEmpty {
+                  // Если categories пустой, показываем stubView
+                  stubView.isHidden = false
+                  collectionView.isHidden = true
+              } else {
+                  // Если categories не пустой, скрываем stubView и показываем collectionView
+                  stubView.isHidden = true
+                  collectionView.isHidden = false
+                  collectionView.reloadData()
+              }
+          }
+      }
+    
     var completedTrackers: [TrackerRecord] = []
     
     weak var delegate: NewTrackerDelegate?
@@ -23,10 +40,30 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     override func viewDidLoad() {
         super.viewDidLoad()
         addPlusButton()
+        setupViews()
         setupUI()
         setupSearchBar()
         setupDatePicker()
         setupNavigationBar()
+    }
+    
+    private func setupViews() {
+        setupStubView()
+        setupCollectionView()
+        
+        // Проверяем categories и обновляем интерфейс соответственно
+        categories.isEmpty ? (stubView.isHidden = false) : (collectionView.isHidden = false)
+    }
+    
+    private func setupStubView() {
+        stubView = UIImageView(image: UIImage(named: "stubView"))
+        stubView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stubView)
+        
+        NSLayoutConstraint.activate([
+            stubView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            stubView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
     }
     
     private func setupDatePicker() {
@@ -34,16 +71,11 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
          datePicker.preferredDatePickerStyle = .compact
          datePicker.datePickerMode = .date
          datePicker.locale = Locale(identifier: "ru_RU")
-         datePicker.tintColor = .systemBlue
+         datePicker.tintColor = .black
          datePicker.date = Date()
          datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
          datePicker.translatesAutoresizingMaskIntoConstraints = false
          view.addSubview(datePicker)
-         
-         NSLayoutConstraint.activate([
-            datePicker.centerYAnchor.constraint(equalTo: trackerLabel.centerYAnchor),
-            datePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
-         ])
      }
     
     private func setupNavigationBar() {
@@ -52,37 +84,25 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         
         let plusNavButton = UIBarButtonItem(customView: plusButton)
         navigationItem.leftBarButtonItem = plusNavButton
+    }
         
-    }
-    
-    
-    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDate = sender.date
-        let selectedDayOfWeek = Calendar.current.component(.weekday, from: selectedDate) // Получаем день недели
-        print("Выбранная дата: \(selectedDate). День недели: \(selectedDayOfWeek)")
-        // Здесь добавьте логику для отображения трекеров привычек, соответствующих выбранному дню недели
-    }
-    
-    
     private func setupSearchBar() {
         searchBar = UISearchBar()
-        searchBar.placeholder = "Поиск"
         searchBar.delegate = self
         searchBar.showsCancelButton = false
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.layer.masksToBounds = true
         view.addSubview(searchBar)
         
-        searchBar.tintColor = .lightGray
-        searchBar.searchTextField.backgroundColor = UIColor.systemGray6
-        searchBar.searchTextField.textColor = .gray
-        searchBar.tintColor = .white // cancel color
+        searchBar.searchTextField.backgroundColor = UIColor.lightGray
         searchBar.searchTextField.tintColor = .lightGray
         searchBar.backgroundImage = UIImage()
         
         if let textField = searchBar.value(forKey: "searchField") as? UITextField {
-            textField.backgroundColor = UIColor.systemGray6 // Цвет фона текстового поля
-            textField.textColor = .white // Цвет текста
+            textField.backgroundColor = UIColor.secondarySystemFill // Цвет фона текстового поля
+            textField.textColor = .black
+            textField.tintColor = .black
+            textField.placeholder = "Поиск"
         }
         
         NSLayoutConstraint.activate([
@@ -107,13 +127,12 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         }
     }
     
-    private var collectionView: UICollectionView {
+    private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-        collectionView.backgroundColor = .clear
+        collectionView.backgroundColor = .lightGray
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
@@ -124,35 +143,33 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+    
+    private func addPlusButton() {
+        plusButton = UIButton(type: .system)
+        plusButton.setImage(UIImage(systemName: "plus"), for: .normal)
+        plusButton.tintColor = .black
+        plusButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(plusButton)
         
-        return collectionView
+        plusButton.addTarget(self, action: #selector(didTapPlusButton), for: .touchUpInside)
     }
     
     private func setupUI() {
         
-        view.backgroundColor = .black
+        view.backgroundColor = .white
         
         // TRACKER LABEL
         trackerLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(trackerLabel)
-        trackerLabel.textColor = .white
+        trackerLabel.textColor = .black
         trackerLabel.font = UIFont.boldSystemFont(ofSize: 34)
         trackerLabel.numberOfLines = 0
         trackerLabel.text = "Трекеры"
         
         NSLayoutConstraint.activate([
-            trackerLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 100),
+            trackerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             trackerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
-        ])
-        
-        // IMAGE
-        let starImage = UIImageView(image: imageView)
-        view.addSubview(starImage)
-        starImage.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            starImage.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            starImage.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
         // TEXT LABEL
@@ -160,28 +177,13 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         view.addSubview(textLabel)
         textLabel.numberOfLines = 0
         textLabel.text = "Что будем отслеживать?"
-        textLabel.textColor = .white
+        textLabel.textColor = .black
         textLabel.font = UIFont.systemFont(ofSize: 16)
         
         NSLayoutConstraint.activate([
-            textLabel.topAnchor.constraint(equalTo: starImage.bottomAnchor, constant: 20),
-            textLabel.centerXAnchor.constraint(equalTo: starImage.centerXAnchor),
+            textLabel.topAnchor.constraint(equalTo: stubView.bottomAnchor, constant: 20),
+            textLabel.centerXAnchor.constraint(equalTo: stubView.centerXAnchor),
         ])
-    }
-    
-    private func addPlusButton() {
-        plusButton = UIButton(type: .system)
-        plusButton.setImage(UIImage(systemName: "plus"), for: .normal)
-        plusButton.tintColor = .white
-        plusButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(plusButton)
-        
-//        NSLayoutConstraint.activate([
-//            plusButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-//            plusButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0)
-//        ])
-        
-        plusButton.addTarget(self, action: #selector(didTapPlusButton), for: .touchUpInside)
     }
     
     @objc
@@ -190,6 +192,13 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         viewController.delegate = self
         let nav = UINavigationController(rootViewController: viewController)
         present(nav,animated: true)
+    }
+    
+    @objc func datePickerValueChanged(_ sender: UIDatePicker) {
+        let selectedDate = sender.date
+        let selectedDayOfWeek = Calendar.current.component(.weekday, from: selectedDate)
+        print("Выбранная дата: \(selectedDate). День недели: \(selectedDayOfWeek)")
+        // Здесь добавьте логику для отображения трекеров привычек, соответствующих выбранному дню недели
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
@@ -211,8 +220,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath)
-        cell.backgroundColor = .white
-        // Настройте ячейку здесь, например, установите заголовок из categories[indexPath.item].title
+        cell.backgroundColor = .black
         return cell
     }
     
