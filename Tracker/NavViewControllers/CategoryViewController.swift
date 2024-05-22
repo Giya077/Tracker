@@ -9,10 +9,14 @@ import Foundation
 import UIKit
 
 class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
+        
+    weak var delegate: NewCategoryViewControllerDelegate? // для связи между AddCategoryViewController и CategoryViewController
+    
+    weak var habitDelegate: HabitViewController? // делегат для HabitViewController
+    
+    weak var categorySelectionDelegate: CategorySelectionDelegate?
     
     private var selectedCategories: Set<Int> = []
-    
-    weak var delegate: NewCategoryViewControllerDelegate? // для связи между AddCategoryViewController и CategoryViewController
 
     var categories: [TrackerCategory] = [] {
         didSet {
@@ -64,6 +68,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         setupStubView()
         setupTableView()
         updateViewVisibility()
+        addCategoryViewController()
     }
     
     private func setupView() {
@@ -81,6 +86,11 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
             addCategoryButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
+    }
+    
+    private func addCategoryViewController() {
+        let addCategoryViewController = AddCategoryViewController()
+        addCategoryViewController.delegate = self
     }
     
     private func setupStubView() {
@@ -153,12 +163,9 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-         tableView.deselectRow(at: indexPath, animated: true)
-         if selectedCategories.contains(indexPath.row) {
-             selectedCategories.remove(indexPath.row)
-         } else {
-             selectedCategories.insert(indexPath.row)
-         }
-         tableView.reloadRows(at: [indexPath], with: .automatic)
+        tableView.deselectRow(at: indexPath, animated: true)
+        let selectedCategory = categories[indexPath.row]
+        categorySelectionDelegate?.didSelectCategory(selectedCategory)
+        dismiss(animated: true)
      }
  }

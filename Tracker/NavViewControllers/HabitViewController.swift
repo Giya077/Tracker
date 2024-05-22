@@ -11,7 +11,7 @@ import UIKit
 class HabitViewController: UIViewController {
     
     var selectedDays: Set<Days> = []
-    
+    var selectedCategory: TrackerCategory?
     
     let newHabitLabel: UILabel = {
         let newHabitLabel = UILabel()
@@ -35,7 +35,7 @@ class HabitViewController: UIViewController {
         return trackNaming
     }()
     
-    let array = ["Категория", "Расписание"]
+    let arrayCells = ["Категория", "Расписание"]
     let cellIdentifier = "CellType1"
     let categoryAndScheduleCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -100,6 +100,14 @@ class HabitViewController: UIViewController {
         return createButton
     }()
     
+    let categoryLabel: UILabel = {
+        let categoryLabel = UILabel()
+        categoryLabel.textColor = .gray
+        categoryLabel.font = UIFont.systemFont(ofSize: 16)
+        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        return categoryLabel
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -115,6 +123,7 @@ class HabitViewController: UIViewController {
         emojiCollectionView.delegate = self
         emojiCollectionView.dataSource = self
         
+        view.addSubview(categoryLabel)
         view.addSubview(newHabitLabel)
         view.addSubview(trackNaming)
         view.addSubview(categoryAndScheduleCollectionView)
@@ -137,7 +146,11 @@ class HabitViewController: UIViewController {
             categoryAndScheduleCollectionView.heightAnchor.constraint(equalToConstant: 200),
             
             emojiTextLabel.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.bottomAnchor, constant: 20),
-            emojiTextLabel.leadingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.leadingAnchor)
+            emojiTextLabel.leadingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.leadingAnchor),
+            
+            categoryLabel.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.bottomAnchor, constant: 8),
+            categoryLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            categoryLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])
         
         //emojiCollectionView
@@ -180,6 +193,16 @@ class HabitViewController: UIViewController {
         ])
     }
     
+    private func updateCategoryLabel() {
+        guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? CellType1 else { return }
+        categoryCell.configure(title: "Категория", days: selectedCategory?.titles)
+    }
+    
+    func updateSelectedCategory(_ category: TrackerCategory) {
+        self.selectedCategory = category
+        categoryLabel.text = category.titles
+    }
+    
     @objc
     private func cancelButtonTapped() {
     }
@@ -194,7 +217,7 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == self.categoryAndScheduleCollectionView {
-            return array.count
+            return arrayCells.count
         } else if collectionView == emojiCollectionView {
             return emojiArray.count
         }
@@ -206,15 +229,15 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
             
             // Устанавливаем текст надписи "Категория"
-            cell.titleLabel.text = array[indexPath.item]
+            cell.titleLabel.text = arrayCells[indexPath.item]
             
             // Проверяем, является ли текущая ячейка "Расписанием"
             if indexPath.item == 1 {
                 let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
-                cell.configure(title: array[indexPath.item], days: daysText.isEmpty ? nil : daysText)
+                cell.configure(title: arrayCells[indexPath.item], days: daysText.isEmpty ? nil : daysText)
             } else {
                 // Если это не ячейка "Расписание", передаем nil для daysLabel
-                cell.configure(title: array[indexPath.item], days: nil)
+                cell.configure(title: arrayCells[indexPath.item], days: nil)
             }
             return cell
         } else if collectionView == emojiCollectionView {
@@ -243,6 +266,7 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
                 
             case 0:
                 let categoryViewController = CategoryViewController()
+                categoryViewController.categorySelectionDelegate = self
                 let nav = UINavigationController(rootViewController: categoryViewController)
                 present(nav, animated: true)
                 print("categoryViewController tapped")
@@ -267,7 +291,6 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
 extension HabitViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder() // Скрыть клавиатуру
-        // В этом месте выполните сохранение введенного текста или обработку по вашему усмотрению
         return true
     }
 }
@@ -284,6 +307,23 @@ extension HabitViewController: TimetableDelegate {
         DispatchQueue.main.async {
             self.categoryAndScheduleCollectionView.reloadData()
         }
+    }
+}
+
+extension HabitViewController: NewCategoryViewControllerDelegate {
+    func removeStubAndShowCategories() {
+    }
+    
+    func didAddCategory(_ category: TrackerCategory) {
+        selectedCategory = category
+        categoryLabel.text = category.titles
+    }
+}
+
+extension HabitViewController: CategorySelectionDelegate { // делегат для передачи выбранной категории от CategoryViewController к HabitViewController.
+    func didSelectCategory(_ category: TrackerCategory) {
+        self.selectedCategory = category
+        updateCategoryLabel()
     }
 }
 
