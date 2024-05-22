@@ -34,29 +34,15 @@ class ScheduleViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let scheduleLabel: UILabel = {
-        let scheduleLabel = UILabel()
-        scheduleLabel.text = "Новая привычка"
-        scheduleLabel.textColor = .black
-        scheduleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        scheduleLabel.translatesAutoresizingMaskIntoConstraints = false
-        return scheduleLabel
+    let label: UILabel = {
+        let label = BasicTextLabel(text: "Новая привычка")
+        return label
     }()
     
     private let doneButton: UIButton = {
-        let doneButton = UIButton(type: .system)
-        doneButton.setTitle("Готово", for: .normal)
+        let doneButton = BasicButton(title: "Готово")
         doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
-        doneButton.backgroundColor = .black
-        doneButton.tintColor = .white
-        doneButton.layer.cornerRadius = 12
-        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        doneButton.layer.shadowColor = UIColor.black.cgColor
-        doneButton.layer.shadowOffset = CGSize(width: 0, height: 2)
-        doneButton.layer.shadowOpacity = 0.5
-        doneButton.layer.shadowRadius = 4
         return doneButton
     }()
     
@@ -69,7 +55,7 @@ class ScheduleViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .white
-        view.addSubview(scheduleLabel)
+        view.addSubview(label)
         view.addSubview(doneButton)
         view.addSubview(tableView)
         
@@ -77,15 +63,14 @@ class ScheduleViewController: UIViewController {
         tableView.dataSource = self
         
         NSLayoutConstraint.activate([
-            scheduleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            scheduleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            doneButton.heightAnchor.constraint(equalToConstant: 75),
             doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             
-            tableView.topAnchor.constraint(equalTo: scheduleLabel.bottomAnchor, constant: 10),
+            tableView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -10),

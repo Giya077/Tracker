@@ -13,29 +13,15 @@ class AddCategoryViewController: UIViewController {
     
     weak var delegate: NewCategoryViewControllerDelegate?
     
-    private let categoryLabel: UILabel = {
-        let categoryLabel = UILabel()
-        categoryLabel.text = "Новая категория"
-        categoryLabel.textColor = .black
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        return categoryLabel
+    private let label: UILabel = {
+        let label = BasicTextLabel(text: "Новая категория")
+        return label
     }()
     
     private let doneButton: UIButton = {
-        let doneButton = UIButton(type: .system)
-        doneButton.setTitle("Готово", for: .normal)
+        let doneButton = BasicButton(title: "Готово")
         doneButton.addTarget(self, action: #selector(addCategory), for: .touchUpInside)
-        doneButton.backgroundColor = .black
-        doneButton.tintColor = .white
-        doneButton.layer.cornerRadius = 12
-        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        doneButton.layer.shadowColor = UIColor.black.cgColor
-        doneButton.layer.shadowOffset = CGSize(width: 0, height: 2)
-        doneButton.layer.shadowOpacity = 0.5
-        doneButton.layer.shadowRadius = 4
         return doneButton
     }()
     
@@ -63,20 +49,19 @@ class AddCategoryViewController: UIViewController {
     private func setupView() {
         view.backgroundColor = .white
         
-        view.addSubview(categoryLabel)
+        view.addSubview(label)
         view.addSubview(doneButton)
         view.addSubview(categoryNameTextField)
         
         NSLayoutConstraint.activate([
-            categoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            categoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            categoryNameTextField.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 50),
+            categoryNameTextField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
             categoryNameTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             categoryNameTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             categoryNameTextField.heightAnchor.constraint(equalToConstant: 100),
             
-            doneButton.heightAnchor.constraint(equalToConstant: 75),
             doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             doneButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)

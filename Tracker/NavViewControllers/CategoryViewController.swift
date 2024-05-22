@@ -27,29 +27,15 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
 
     private let stubView = StubView(text: "Привычки и события можно\nобъединить по смыслу")
     
-    private let categoryLabel: UILabel = {
-        let categoryLabel = UILabel()
-        categoryLabel.text = "Категория"
-        categoryLabel.textColor = .black
-        categoryLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        return categoryLabel
+    private let label: UILabel = {
+        let label = BasicTextLabel(text: "Категория")
+        return label
     }()
-    
-    private let addCategoryButton: UIButton = {
-        let addCategoryButton = UIButton(type: .system)
-        addCategoryButton.setTitle("Добавить категорию", for: .normal)
-        addCategoryButton.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
-        addCategoryButton.backgroundColor = .black
-        addCategoryButton.tintColor = .white
-        addCategoryButton.layer.cornerRadius = 16
-        addCategoryButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        addCategoryButton.translatesAutoresizingMaskIntoConstraints = false
         
-        addCategoryButton.layer.shadowColor = UIColor.black.cgColor
-        addCategoryButton.layer.shadowOffset = CGSize(width: 0, height: 2)
-        addCategoryButton.layer.shadowOpacity = 0.5
-        addCategoryButton.layer.shadowRadius = 4
+    private let addCategoryButton: UIButton = {
+        let addCategoryButton = BasicButton(title: "Добавить категорию")
+        addCategoryButton.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
+        addCategoryButton.translatesAutoresizingMaskIntoConstraints = false
         return addCategoryButton
     }()
     
@@ -74,14 +60,13 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     private func setupView() {
         view.backgroundColor = .white
         
-        view.addSubview(categoryLabel)
+        view.addSubview(label)
         view.addSubview(addCategoryButton)
         
         NSLayoutConstraint.activate([
-            categoryLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            categoryLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            addCategoryButton.heightAnchor.constraint(equalToConstant: 75),
             addCategoryButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             addCategoryButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
@@ -109,7 +94,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         tableView.dataSource = self
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 20),
+            tableView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 20),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -20)

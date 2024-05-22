@@ -49,7 +49,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         setupStubView()
         setupCollectionView()
         
-        // Проверяем categories и обновляем интерфейс соответственно
+        // Проверяем categories и обновляем интерфейс
         categories.isEmpty ? (stubView.isHidden = false) : (collectionView.isHidden = false)
     }
     
@@ -103,7 +103,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
                 string: placeholderText,
                 attributes: [NSAttributedString.Key.foregroundColor: placeholderColor]
             )
-            
             // Настройка значка лупы
             if let leftView = textField.leftView as? UIImageView {
                 leftView.tintColor = .lightGray // Установка цвета значка лупы
@@ -157,7 +156,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         plusButton.tintColor = .black
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(plusButton)
-        
         plusButton.addTarget(self, action: #selector(didTapPlusButton), for: .touchUpInside)
     }
     
@@ -165,7 +163,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         
         view.backgroundColor = .white
         
-        // TRACKER LABEL
         trackerLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(trackerLabel)
         trackerLabel.textColor = .black
@@ -191,7 +188,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         let selectedDate = sender.date
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: selectedDate)
         print("Выбранная дата: \(selectedDate). День недели: \(selectedDayOfWeek)")
-        // Здесь добавьте логику для отображения трекеров привычек, соответствующих выбранному дню недели
+        // Здесь добавить логику для отображения трекеров привычек, соответствующих выбранному дню недели
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
@@ -225,10 +222,8 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // Получаем выбранную категорию
-//        let selectedCategory = categories[indexPath.item]
-//        
-//        // Создаем новый массив трекеров для обновленной категории
+//        Получаем выбранную категорию
+//        Создаем новый массив трекеров для обновленной категории
 //        let newTracker = Tracker(id: UUID(), name: "Новый трекер", color: .systemPink, emoji: "🚀", schedule: [.everyday])
 //        let updatedTrackers = selectedCategory.trackers + [newTracker]
 //        

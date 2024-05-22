@@ -13,67 +13,38 @@ final class NewTrackerViewController: UIViewController {
     weak var delegate: NewTrackerDelegate?
     
     private let habitButton: UIButton = {
-        let habitButton = UIButton(type: .system)
-        habitButton.setTitle("Привычка", for: .normal)
+        let habitButton = BasicButton(title: "Привычка")
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
-        habitButton.backgroundColor = .black
-        habitButton.tintColor = .white
-        habitButton.layer.cornerRadius = 12
-        habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        habitButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-        habitButton.layer.shadowColor = UIColor.black.cgColor
-        habitButton.layer.shadowOffset = CGSize(width: 0, height: 2)
-        habitButton.layer.shadowOpacity = 0.5
-        habitButton.layer.shadowRadius = 4
-        
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         return habitButton
     }()
     
+    
     private let irregularEvent: UIButton = {
-        let irregularEvent = UIButton(type: .system)
-        irregularEvent.setTitle("Нерегулярные события", for: .normal)
+        let irregularEvent = BasicButton(title: "Нерегулярные события")
         irregularEvent.addTarget(self, action: #selector(irregularEventTapped), for: .touchUpInside)
-        irregularEvent.backgroundColor = .black
-        irregularEvent.tintColor = .white
-        irregularEvent.layer.cornerRadius = 12
-        irregularEvent.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        irregularEvent.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-        irregularEvent.layer.shadowColor = UIColor.black.cgColor
-        irregularEvent.layer.shadowOffset = CGSize(width: 0, height: 2)
-        irregularEvent.layer.shadowOpacity = 0.5
-        irregularEvent.layer.shadowRadius = 4
-        
         irregularEvent.translatesAutoresizingMaskIntoConstraints = false
         return irregularEvent
     }()
     
     private let label: UILabel = {
-        let label = UILabel()
-        label.text = "Создание трекера"
-        label.font = UIFont.systemFont(ofSize: 20)
-        label.textColor = .white
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
+        let label = BasicTextLabel(text: "Создание трекера")
         return label
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         
-        view.addSubview(label)
         setupUI()
         stackView()
     }
     
     private func setupUI() {
+        view.backgroundColor = .white
+        view.addSubview(label)
         
-        //LABEL
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -20),
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
@@ -92,8 +63,6 @@ final class NewTrackerViewController: UIViewController {
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
-    
-    
     
     @objc private func habitButtonTapped() {
         let habitViewController = HabitViewController()

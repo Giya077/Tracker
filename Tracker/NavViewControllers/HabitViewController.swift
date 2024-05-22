@@ -13,13 +13,9 @@ class HabitViewController: UIViewController {
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
     
-    let newHabitLabel: UILabel = {
-        let newHabitLabel = UILabel()
-        newHabitLabel.text = "Новая привычка"
-        newHabitLabel.textColor = .black
-        newHabitLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        newHabitLabel.translatesAutoresizingMaskIntoConstraints = false
-        return newHabitLabel
+    let label: UILabel = {
+        let label = BasicTextLabel(text: "Новая привычка")
+        return label
     }()
     
     let trackNaming: UITextField = {
@@ -124,7 +120,7 @@ class HabitViewController: UIViewController {
         emojiCollectionView.dataSource = self
         
         view.addSubview(categoryLabel)
-        view.addSubview(newHabitLabel)
+        view.addSubview(label)
         view.addSubview(trackNaming)
         view.addSubview(categoryAndScheduleCollectionView)
         view.addSubview(emojiTextLabel)
@@ -132,10 +128,10 @@ class HabitViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             
-            newHabitLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            newHabitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            trackNaming.topAnchor.constraint(equalTo: newHabitLabel.bottomAnchor, constant: 50),
+            trackNaming.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
             trackNaming.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             trackNaming.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             trackNaming.heightAnchor.constraint(equalToConstant: 100),
