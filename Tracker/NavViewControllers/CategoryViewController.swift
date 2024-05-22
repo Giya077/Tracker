@@ -25,21 +25,21 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         }
     }
 
-    private let stubView = StubView(text: "Привычки и события можно\nобъединить по смыслу")
+    private lazy var stubView = StubView(text: "Привычки и события можно\nобъединить по смыслу")
     
-    private let label: UILabel = {
+    private lazy var label: UILabel = {
         let label = BasicTextLabel(text: "Категория")
         return label
     }()
         
-    private let addCategoryButton: UIButton = {
+    private lazy var addCategoryButton: UIButton = {
         let addCategoryButton = BasicButton(title: "Добавить категорию")
         addCategoryButton.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
         addCategoryButton.translatesAutoresizingMaskIntoConstraints = false
         return addCategoryButton
     }()
     
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false

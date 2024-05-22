@@ -18,14 +18,14 @@ class AddCategoryViewController: UIViewController {
         return label
     }()
     
-    private let doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let doneButton = BasicButton(title: "Готово")
         doneButton.addTarget(self, action: #selector(addCategory), for: .touchUpInside)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         return doneButton
     }()
     
-    private let categoryNameTextField: UITextField = {
+    private lazy var categoryNameTextField: UITextField = {
         let categoryNameTextField = UITextField()
         categoryNameTextField.textColor = .black
         categoryNameTextField.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)

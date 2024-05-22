@@ -34,12 +34,12 @@ class ScheduleViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let label: UILabel = {
+    lazy var label: UILabel = {
         let label = BasicTextLabel(text: "Новая привычка")
         return label
     }()
     
-    private let doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let doneButton = BasicButton(title: "Готово")
         doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         doneButton.translatesAutoresizingMaskIntoConstraints = false

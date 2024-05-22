@@ -33,7 +33,7 @@ class HabitViewController: UIViewController {
     
     let arrayCells = ["Категория", "Расписание"]
     let cellIdentifier = "CellType1"
-    let categoryAndScheduleCollectionView: UICollectionView = {
+    lazy var categoryAndScheduleCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 0
@@ -46,7 +46,7 @@ class HabitViewController: UIViewController {
         return collectionView
     }()
     
-    let emojiTextLabel: UILabel = {
+    lazy var emojiTextLabel: UILabel = {
         let emojiTextLabel = UILabel()
         emojiTextLabel.textColor = .black
         emojiTextLabel.text = "Emoji"
@@ -56,7 +56,7 @@ class HabitViewController: UIViewController {
     }()
     
     var emojiArray = ["😊", "🚀", "🎉", "⭐️", "🌈", "🎈", "🍀", "🌺", "🐶", "🐱", "🐰", "🐻", "🦄", "🍔", "🍕", "🍰", "🎸", "📚"]
-    let emojiCollectionView: UICollectionView = {
+    lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 10
@@ -68,7 +68,7 @@ class HabitViewController: UIViewController {
         return collectionView
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .system)
         cancelButton.setTitle("Отменить", for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
@@ -83,7 +83,7 @@ class HabitViewController: UIViewController {
         return cancelButton
     }()
     
-    let createButton: UIButton = {
+    lazy var createButton: UIButton = {
         let createButton = UIButton(type: .system)
         createButton.setTitle("Создать", for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
@@ -190,14 +190,14 @@ class HabitViewController: UIViewController {
     }
     
     private func updateCategoryLabel() {
-        guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? CellType1 else { return }
+        guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
         categoryCell.configure(title: "Категория", days: selectedCategory?.titles)
     }
     
-    func updateSelectedCategory(_ category: TrackerCategory) {
-        self.selectedCategory = category
-        categoryLabel.text = category.titles
-    }
+//    func updateSelectedCategory(_ category: TrackerCategory) {
+//        self.selectedCategory = category
+//        categoryLabel.text = category.titles
+//    }
     
     @objc
     private func cancelButtonTapped() {
@@ -220,26 +220,31 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
         return 0
     }
     
+    private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
+        
+        // Проверяем, является ли текущая ячейка Расписанием
+        if indexPath.row == 1 {
+            let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
+            cell.configure(title: arrayCells[indexPath.row], days: daysText.isEmpty ? nil : daysText)
+        } else {
+            // Если это не ячейка Расписание, передаем nil для daysLabel
+            cell.configure(title: arrayCells[indexPath.item], days: selectedCategory?.titles)
+        }
+        return cell
+    }
+    
+    private func cellEmojiAndColor(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! EmojiCell
+        cell.emojiLabel.text = emojiArray[indexPath.item]
+        return cell
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.categoryAndScheduleCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
-            
-            // Устанавливаем текст надписи "Категория"
-            cell.titleLabel.text = arrayCells[indexPath.item]
-            
-            // Проверяем, является ли текущая ячейка "Расписанием"
-            if indexPath.item == 1 {
-                let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
-                cell.configure(title: arrayCells[indexPath.item], days: daysText.isEmpty ? nil : daysText)
-            } else {
-                // Если это не ячейка "Расписание", передаем nil для daysLabel
-                cell.configure(title: arrayCells[indexPath.item], days: nil)
-            }
-            return cell
+            return cellCategoryAndSchedual(collectionView, indexPath)
         } else if collectionView == emojiCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! EmojiCell
-            cell.emojiLabel.text = emojiArray[indexPath.item]
-            return cell
+            return cellEmojiAndColor(collectionView, indexPath)
         }
         return UICollectionViewCell()
     }

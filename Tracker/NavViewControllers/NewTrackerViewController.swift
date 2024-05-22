@@ -12,7 +12,7 @@ final class NewTrackerViewController: UIViewController {
     
     weak var delegate: NewTrackerDelegate?
     
-    private let habitButton: UIButton = {
+    private lazy var habitButton: UIButton = {
         let habitButton = BasicButton(title: "Привычка")
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
         habitButton.translatesAutoresizingMaskIntoConstraints = false
@@ -20,14 +20,14 @@ final class NewTrackerViewController: UIViewController {
     }()
     
     
-    private let irregularEvent: UIButton = {
+    private lazy var irregularEvent: UIButton = {
         let irregularEvent = BasicButton(title: "Нерегулярные события")
         irregularEvent.addTarget(self, action: #selector(irregularEventTapped), for: .touchUpInside)
         irregularEvent.translatesAutoresizingMaskIntoConstraints = false
         return irregularEvent
     }()
     
-    private let label: UILabel = {
+    private lazy var label: UILabel = {
         let label = BasicTextLabel(text: "Создание трекера")
         return label
     }()
