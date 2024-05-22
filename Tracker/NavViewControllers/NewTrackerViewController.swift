@@ -8,9 +8,6 @@
 import Foundation
 import UIKit
 
-protocol NewTrackerDelegate: AnyObject {
-    func addTrackerToCompleted(trackRecord: TrackerRecord)}
-
 final class NewTrackerViewController: UIViewController {
     
     weak var delegate: NewTrackerDelegate?
@@ -21,7 +18,7 @@ final class NewTrackerViewController: UIViewController {
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
         habitButton.backgroundColor = .black
         habitButton.tintColor = .white
-        habitButton.layer.cornerRadius = 10
+        habitButton.layer.cornerRadius = 12
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         habitButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
@@ -40,7 +37,7 @@ final class NewTrackerViewController: UIViewController {
         irregularEvent.addTarget(self, action: #selector(irregularEventTapped), for: .touchUpInside)
         irregularEvent.backgroundColor = .black
         irregularEvent.tintColor = .white
-        irregularEvent.layer.cornerRadius = 10
+        irregularEvent.layer.cornerRadius = 12
         irregularEvent.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         irregularEvent.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
@@ -95,6 +92,8 @@ final class NewTrackerViewController: UIViewController {
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
+    
+    
     
     @objc private func habitButtonTapped() {
         let habitViewController = HabitViewController()

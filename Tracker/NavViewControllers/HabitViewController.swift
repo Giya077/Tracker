@@ -10,11 +10,14 @@ import UIKit
 
 class HabitViewController: UIViewController {
     
+    var selectedDays: Set<Days> = []
+    
+    
     let newHabitLabel: UILabel = {
         let newHabitLabel = UILabel()
         newHabitLabel.text = "Новая привычка"
         newHabitLabel.textColor = .black
-        newHabitLabel.font = UIFont.boldSystemFont(ofSize: 20)
+        newHabitLabel.font = UIFont.boldSystemFont(ofSize: 18)
         newHabitLabel.translatesAutoresizingMaskIntoConstraints = false
         return newHabitLabel
     }()
@@ -33,7 +36,7 @@ class HabitViewController: UIViewController {
     }()
     
     let array = ["Категория", "Расписание"]
-    let cell1Identifier = "CellType1"
+    let cellIdentifier = "CellType1"
     let categoryAndScheduleCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -41,7 +44,7 @@ class HabitViewController: UIViewController {
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
-        collectionView.isScrollEnabled = false
+        collectionView.isScrollEnabled = true
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(CellType1.self, forCellWithReuseIdentifier: "CellType1")
         return collectionView
@@ -69,17 +72,17 @@ class HabitViewController: UIViewController {
         return collectionView
     }()
     
-   private let cancelButton: UIButton = {
+    private let cancelButton: UIButton = {
         let cancelButton = UIButton(type: .system)
         cancelButton.setTitle("Отменить", for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         cancelButton.backgroundColor = .white
-        cancelButton.layer.cornerRadius = 10
+        cancelButton.layer.cornerRadius = 12
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.red.cgColor
         cancelButton.layer.masksToBounds = true
         cancelButton.tintColor = .red
-        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
         cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         return cancelButton
     }()
@@ -89,10 +92,10 @@ class HabitViewController: UIViewController {
         createButton.setTitle("Создать", for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         createButton.backgroundColor = .lightGray
-        createButton.layer.cornerRadius = 10
+        createButton.layer.cornerRadius = 12
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
         createButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         return createButton
     }()
@@ -143,7 +146,7 @@ class HabitViewController: UIViewController {
         let cellHeight: CGFloat = 50
         let padding: CGFloat = 10
         let cellsPerRow = 6
-
+        
         let collectionWidth = cellWidth * CGFloat(cellsPerRow) + padding /** CGFloat(cellsPerRow - 1)*/
         let collectionViewHeight = cellHeight * 3 + padding * 2 // 3 строки эмодзи с отступами
         
@@ -153,7 +156,7 @@ class HabitViewController: UIViewController {
             emojiCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             emojiCollectionView.topAnchor.constraint(equalTo: emojiTextLabel.bottomAnchor, constant: padding)
         ])
-
+        
         if let layout = emojiCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
             layout.minimumInteritemSpacing = padding
@@ -174,7 +177,6 @@ class HabitViewController: UIViewController {
             stackViewButton.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 20),
             stackViewButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             stackViewButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
-//            stackViewButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 20)
         ])
     }
     
@@ -186,7 +188,8 @@ class HabitViewController: UIViewController {
     private func createButtonTapped() {
     }
 }
-//        cell.accessoryType = .disclosureIndicator
+
+
 extension HabitViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -200,8 +203,19 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.categoryAndScheduleCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cell1Identifier, for: indexPath) as! CellType1
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
+            
+            // Устанавливаем текст надписи "Категория"
             cell.titleLabel.text = array[indexPath.item]
+            
+            // Проверяем, является ли текущая ячейка "Расписанием"
+            if indexPath.item == 1 {
+                let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
+                cell.configure(title: array[indexPath.item], days: daysText.isEmpty ? nil : daysText)
+            } else {
+                // Если это не ячейка "Расписание", передаем nil для daysLabel
+                cell.configure(title: array[indexPath.item], days: nil)
+            }
             return cell
         } else if collectionView == emojiCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! EmojiCell
@@ -221,11 +235,12 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 2.0 // задаем минимальный отступ между строками
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == self.categoryAndScheduleCollectionView {
+        if collectionView == categoryAndScheduleCollectionView {
             collectionView.deselectItem(at: indexPath, animated: true)
             switch indexPath.item {
+                
             case 0:
                 let categoryViewController = CategoryViewController()
                 let nav = UINavigationController(rootViewController: categoryViewController)
@@ -233,7 +248,7 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
                 print("categoryViewController tapped")
                 
             case 1:
-                let scheduleViewController = ScheduleViewController()
+                let scheduleViewController = ScheduleViewController(delegate: self, selectedDays: selectedDays)
                 let nav = UINavigationController(rootViewController: scheduleViewController)
                 present(nav, animated: true)
                 print("scheduleViewController tapped")
@@ -249,11 +264,6 @@ extension HabitViewController: UICollectionViewDataSource, UICollectionViewDeleg
     }
 }
 
-//let viewController = NewTrackerViewController()
-//viewController.delegate = self
-//let nav = UINavigationController(rootViewController: viewController)
-//present(nav,animated: true)
-
 extension HabitViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder() // Скрыть клавиатуру
@@ -261,5 +271,21 @@ extension HabitViewController: UITextFieldDelegate {
         return true
     }
 }
+
+extension HabitViewController: TimetableDelegate {
+    
+    func didUpdateSelectedDays(_ selectedDays: Set<Days>) {
+        self.selectedDays = selectedDays
+        
+        // Проверяем, что выбранные дни корректно передаются
+        print("Selected days updated in HabitViewController: \(selectedDays)")
+        
+        // Перезагружаем коллекцию после обновления данных
+        DispatchQueue.main.async {
+            self.categoryAndScheduleCollectionView.reloadData()
+        }
+    }
+}
+
 
 

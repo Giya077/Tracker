@@ -14,10 +14,10 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private var searchBar: UISearchBar!
     private var datePicker = UIDatePicker()
     private var collectionView: UICollectionView!
-    var stubView: UIImageView!
-    var textLabel = UILabel()
+    private let stubView = StubView(text: "Что будем отслеживать?")
     
-    private var categories: [TrackerCategory] = [] {
+    
+    internal var categories: [TrackerCategory] = [] {
           didSet {
               // При изменении данных в categories перезагружаем коллекцию или обновляем интерфейс
               if categories.isEmpty {
@@ -34,8 +34,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
       }
     
     var completedTrackers: [TrackerRecord] = []
-    
-    weak var delegate: NewTrackerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,8 +54,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     }
     
     private func setupStubView() {
-        stubView = UIImageView(image: UIImage(named: "stubView"))
-        stubView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stubView)
         
         NSLayoutConstraint.activate([
@@ -93,18 +89,28 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.layer.masksToBounds = true
         view.addSubview(searchBar)
-        
-        searchBar.searchTextField.backgroundColor = UIColor.lightGray
-        searchBar.searchTextField.tintColor = .lightGray
         searchBar.backgroundImage = UIImage()
-        
+
         if let textField = searchBar.value(forKey: "searchField") as? UITextField {
-            textField.backgroundColor = UIColor.secondarySystemFill // Цвет фона текстового поля
+            textField.backgroundColor = Colors.systemSearchColor // Цвет фона текстового поля
             textField.textColor = .black
             textField.tintColor = .black
-            textField.placeholder = "Поиск"
+            
+            // Установка цвета текста плейсхолдера
+            let placeholderText = "Поиск"
+            let placeholderColor = UIColor.lightGray // Цвет плейсхолдера
+            textField.attributedPlaceholder = NSAttributedString(
+                string: placeholderText,
+                attributes: [NSAttributedString.Key.foregroundColor: placeholderColor]
+            )
+            
+            // Настройка значка лупы
+            if let leftView = textField.leftView as? UIImageView {
+                leftView.tintColor = .lightGray // Установка цвета значка лупы
+                leftView.image = leftView.image?.withRenderingMode(.alwaysTemplate)
+            }
         }
-        
+
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: trackerLabel.topAnchor, constant: 50),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
@@ -113,7 +119,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.3) {
+        UIView.animate(withDuration: 0.1) {
             searchBar.showsCancelButton = true
             searchBar.layoutIfNeeded()
         }
@@ -171,19 +177,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
             trackerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             trackerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
         ])
-        
-        // TEXT LABEL
-        textLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(textLabel)
-        textLabel.numberOfLines = 0
-        textLabel.text = "Что будем отслеживать?"
-        textLabel.textColor = .black
-        textLabel.font = UIFont.systemFont(ofSize: 16)
-        
-        NSLayoutConstraint.activate([
-            textLabel.topAnchor.constraint(equalTo: stubView.bottomAnchor, constant: 20),
-            textLabel.centerXAnchor.constraint(equalTo: stubView.centerXAnchor),
-        ])
     }
     
     @objc
@@ -202,13 +195,20 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
-        completedTrackers.append(trackRecord)
+        completedTrackers.append(trackRecord) /// скорее в в трекерес
     }
     
     func removeTrackerFromCompleted(trackRecord: TrackerRecord) {
         if let index = completedTrackers.firstIndex(where: { $0.id == trackRecord.id}) {
             completedTrackers.remove(at: index)
         }
+    }
+    
+    func didAddTracker(_ tracker: Tracker) {
+        // Логика для добавления нового трекера в соответствующую категорию
+        // например:
+        // categories[0].trackers.append(tracker) !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        collectionView.reloadData()
     }
 }
 
@@ -226,23 +226,23 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // Получаем выбранную категорию
-        let selectedCategory = categories[indexPath.item]
-        
-        // Создаем новый массив трекеров для обновленной категории
-        let newTracker = Tracker(id: UUID(), name: "Новый трекер", color: .systemPink, emoji: "🚀", schedule: [.everyday])
-        let updatedTrackers = selectedCategory.trackers + [newTracker]
-        
-        // Создаем обновленную категорию с новым массивом трекеров
-        let updatedCategory = TrackerCategory(titles: selectedCategory.titles, trackers: updatedTrackers)
-        
-        // Создаем новый массив категорий с обновленной категорией на выбранной позиции
-        var updatedCategories = categories
-        updatedCategories[indexPath.item] = updatedCategory
-        
-        // Присваиваем обновленный массив категорий переменной categories
-        categories = updatedCategories
-        
-        // Перезагружаем коллекцию после изменения данных
-        collectionView.reloadData()
+//        let selectedCategory = categories[indexPath.item]
+//        
+//        // Создаем новый массив трекеров для обновленной категории
+//        let newTracker = Tracker(id: UUID(), name: "Новый трекер", color: .systemPink, emoji: "🚀", schedule: [.everyday])
+//        let updatedTrackers = selectedCategory.trackers + [newTracker]
+//        
+//        // Создаем обновленную категорию с новым массивом трекеров
+//        let updatedCategory = TrackerCategory(titles: selectedCategory.titles, trackers: updatedTrackers)
+//        
+//        // Создаем новый массив категорий с обновленной категорией на выбранной позиции
+//        var updatedCategories = categories
+//        updatedCategories[indexPath.item] = updatedCategory
+//        
+//        // Присваиваем обновленный массив категорий переменной categories
+//        categories = updatedCategories
+//        
+//        // Перезагружаем коллекцию после изменения данных
+//        collectionView.reloadData()
     }
 }

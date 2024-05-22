@@ -21,13 +21,12 @@ final class StubView: UIView {
     }()
     
     let textLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        label.textAlignment = .center
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
+        let textLabel = UILabel()
+        textLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+        textLabel.textAlignment = .center
+        textLabel.textColor = .black
+        textLabel.translatesAutoresizingMaskIntoConstraints = false
+        return textLabel
     }()
     
     private let stubImage: UIImageView = {
@@ -35,7 +34,6 @@ final class StubView: UIView {
         let stubImage = UIImageView(image: stub)
         stubImage.contentMode = .scaleAspectFit
         stubImage.translatesAutoresizingMaskIntoConstraints = false
-        
         return stubImage
     }()
     
@@ -43,14 +41,14 @@ final class StubView: UIView {
         super.init(frame: .zero)
         
         textLabel.text = text
-        configure()
+        setupStubView()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configure() {
+    private func setupStubView() {
         translatesAutoresizingMaskIntoConstraints = false
         vStack.addArrangedSubview(stubImage)
         vStack.addArrangedSubview(textLabel)
@@ -64,8 +62,8 @@ final class StubView: UIView {
             vStack.topAnchor.constraint(equalTo: topAnchor),
             vStack.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            stubImage.heightAnchor.constraint(equalToConstant: 80),
-            stubImage.widthAnchor.constraint(equalToConstant: 80),
+            stubImage.heightAnchor.constraint(equalToConstant: 100),
+            stubImage.widthAnchor.constraint(equalToConstant: 100),
             
             textLabel.leadingAnchor.constraint(equalTo: vStack.leadingAnchor),
             textLabel.trailingAnchor.constraint(equalTo: vStack.trailingAnchor)

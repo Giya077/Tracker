@@ -8,6 +8,12 @@
 import Foundation
 
 struct TrackerCategory {
-    let titles: String
-    let trackers: [Tracker]
+    let titles: String // Название категории
+    var trackers: [Tracker] // Массив трекеров в данной категории
+    
+    // Инициализатор
+    init(titles: String, trackers: [Tracker] = []) {
+        self.titles = titles
+        self.trackers = trackers
+    }
 }
