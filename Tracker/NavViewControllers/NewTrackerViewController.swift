@@ -8,9 +8,26 @@
 import Foundation
 import UIKit
 
-final class NewTrackerViewController: UIViewController {
+final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
+    
+    func didAddTracker(_ tracker: Tracker?) {
+        // Проверяем, что трекер не nil
+        guard let newTracker = tracker else {
+            print("Ошибка: Новый трекер не был передан.")
+            return
+        }
+
+        // Сохраняем созданный трекер
+        self.createdTracker = newTracker
+        print("Новый трекер добавлен: \(newTracker.name)")
+
+        // Передаем созданный трекер делегату
+        delegate?.didAddTracker(newTracker)
+    }
+
     
     weak var delegate: NewTrackerDelegate?
+    var createdTracker: Tracker? // Добавляем свойство для хранения созданного трекера
     
     private lazy var habitButton: UIButton = {
         let habitButton = BasicButton(title: "Привычка")
@@ -39,6 +56,8 @@ final class NewTrackerViewController: UIViewController {
         stackView()
     }
     
+    
+    
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(label)
@@ -66,6 +85,8 @@ final class NewTrackerViewController: UIViewController {
     
     @objc private func habitButtonTapped() {
         let habitViewController = HabitViewController()
+        habitViewController.delegate = self.delegate as? HabitCreationDelegate
+        habitViewController.trackerDelegate = self
         let nav = UINavigationController(rootViewController: habitViewController)
         present(nav, animated: true)
         print("habbit button tapped")

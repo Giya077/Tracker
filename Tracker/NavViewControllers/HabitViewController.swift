@@ -10,6 +10,9 @@ import UIKit
 
 class HabitViewController: UIViewController {
     
+    weak var delegate: HabitCreationDelegate?
+    weak var trackerDelegate: NewTrackerDelegate?
+    
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
     
@@ -194,17 +197,25 @@ class HabitViewController: UIViewController {
         categoryCell.configure(title: "Категория", days: selectedCategory?.titles)
     }
     
-//    func updateSelectedCategory(_ category: TrackerCategory) {
-//        self.selectedCategory = category
-//        categoryLabel.text = category.titles
-//    }
     
     @objc
     private func cancelButtonTapped() {
+        dismiss(animated: true, completion: nil)
     }
     
     @objc
     private func createButtonTapped() {
+        guard let name = trackNaming.text,
+              let category = selectedCategory else {
+            return
+        }
+        let schedule = Array(selectedDays)
+        let newTracker = Tracker(id: UUID(), name: name, schedule: schedule, categoryTitle: category.titles)
+        // Вызываем делегата для создания нового трекера
+        trackerDelegate?.didAddTracker(newTracker)
+        dismiss(animated: true) {
+            self.presentingViewController?.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

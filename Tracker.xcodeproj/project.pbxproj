@@ -11,6 +11,8 @@
 		1A195B882BEE20BE00B7AAC1 /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B872BEE20BE00B7AAC1 /* TrackerCategory.swift */; };
 		1A195B8A2BEE20CF00B7AAC1 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B892BEE20CF00B7AAC1 /* TrackerRecord.swift */; };
 		1A195B902BEE46F100B7AAC1 /* NewTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B8F2BEE46F100B7AAC1 /* NewTrackerViewController.swift */; };
+		1A83A3F22C033C0A0059B026 /* HabitCreationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A83A3F12C033C0A0059B026 /* HabitCreationDelegate.swift */; };
+		1A83A3F52C037D980059B026 /* TrackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A83A3F42C037D980059B026 /* TrackerCell.swift */; };
 		1A877D332BF286C2007EF036 /* DatePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877D322BF286C2007EF036 /* DatePickerHelper.swift */; };
 		1A877D352BF3552C007EF036 /* IrregularEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877D342BF3552C007EF036 /* IrregularEventViewController.swift */; };
 		1A877D372BF3557D007EF036 /* HabitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877D362BF3557D007EF036 /* HabitViewController.swift */; };
@@ -44,6 +46,8 @@
 		1A195B872BEE20BE00B7AAC1 /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
 		1A195B892BEE20CF00B7AAC1 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
 		1A195B8F2BEE46F100B7AAC1 /* NewTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTrackerViewController.swift; sourceTree = "<group>"; };
+		1A83A3F12C033C0A0059B026 /* HabitCreationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCreationDelegate.swift; sourceTree = "<group>"; };
+		1A83A3F42C037D980059B026 /* TrackerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCell.swift; sourceTree = "<group>"; };
 		1A877D322BF286C2007EF036 /* DatePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerHelper.swift; sourceTree = "<group>"; };
 		1A877D342BF3552C007EF036 /* IrregularEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrregularEventViewController.swift; sourceTree = "<group>"; };
 		1A877D362BF3557D007EF036 /* HabitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitViewController.swift; sourceTree = "<group>"; };
@@ -141,6 +145,7 @@
 				1A877D442BF4D798007EF036 /* EmojiCell.swift */,
 				1A877D4A2BF723C4007EF036 /* TimetableTableViewCell.swift */,
 				1A877D582BFCAB41007EF036 /* CellCategory.swift */,
+				1A83A3F42C037D980059B026 /* TrackerCell.swift */,
 			);
 			path = CollectionViewHelper;
 			sourceTree = "<group>";
@@ -162,6 +167,7 @@
 				1A877D542BFBC3F5007EF036 /* NewCategoryViewControllerDelegate.swift */,
 				1AA30DDA2BFDF239004C3D27 /* CategorySelectionDelegate.swift */,
 				1A877D4D2BF726B8007EF036 /* TimetableDelegate.swift */,
+				1A83A3F12C033C0A0059B026 /* HabitCreationDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -291,9 +297,11 @@
 				1A877D3C2BF37F64007EF036 /* CategoryViewController.swift in Sources */,
 				1AA642352BE7E9AA002D6B32 /* AppDelegate.swift in Sources */,
 				1A877D332BF286C2007EF036 /* DatePickerHelper.swift in Sources */,
+				1A83A3F52C037D980059B026 /* TrackerCell.swift in Sources */,
 				1AA30DDF2BFE1B63004C3D27 /* BasicTextLabel.swift in Sources */,
 				1A877D402BF4CF8A007EF036 /* Days.swift in Sources */,
 				1A877D3A2BF374EE007EF036 /* CellType.swift in Sources */,
+				1A83A3F22C033C0A0059B026 /* HabitCreationDelegate.swift in Sources */,
 				1A877D532BFBBB5A007EF036 /* AddCategoryViewController.swift in Sources */,
 				1A877D512BF74120007EF036 /* Colors.swift in Sources */,
 				1A877D552BFBC3F5007EF036 /* NewCategoryViewControllerDelegate.swift in Sources */,
