@@ -19,10 +19,10 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     private let stubView = StubView(text: "Что будем отслеживать?")
     
     var trackers: [Tracker] = []
+    var completedTrackers: [TrackerRecord] = []
     
     internal var categories: [TrackerCategory] = [] {
         didSet {
-            // При изменении данных в categories перезагружаем коллекцию или обновляем интерфейс
             print("Категории обновлены. Текущее количество категорий: \(categories.count)")
             if categories.isEmpty {
                 // Если categories пустой, показываем stubView
@@ -37,16 +37,14 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         }
     }
     
-    var completedTrackers: [TrackerRecord] = []
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         addPlusButton()
-        setupViews()
         setupUI()
-        setupSearchBar()
-        setupDatePicker()
-        setupNavigationBar()
+        setupViews()
+//        setupSearchBar()
+//        setupDatePicker()
+//        setupNavigationBar()
         delegate = self
         
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
@@ -54,6 +52,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         
         NotificationCenter.default.addObserver(self, selector: #selector(trackerCompletionChanged(_:)), name: .trackerCompletionChanged, object: nil)
     }
+    
     
     private func setupTrackerCell() {
         // Настройте ограничения и стили для nameLabel и daysLabel внутри TrackerCell
@@ -65,7 +64,10 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     
     private func setupViews() {
         setupStubView()
+        setupSearchBar()
         setupCollectionView()
+        setupDatePicker()
+        setupNavigationBar()
         
         // Проверяем categories и обновляем интерфейс
         categories.isEmpty ? (stubView.isHidden = false) : (collectionView.isHidden = false)
@@ -155,17 +157,18 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-        collectionView.backgroundColor = .lightGray
+        
+        collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "TrackerCell")
+        collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderView")
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: plusButton.bottomAnchor, constant: 20),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 20),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
@@ -269,6 +272,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         
         // Обновляем коллекцию
         collectionView.reloadData()
+        dismiss(animated: true)
     }
     
     func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days]) {
@@ -304,14 +308,19 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        let count = categories.count
+        print("Number of sections: \(count)")
+        return count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories[section].trackers.count
+        let count = categories[section].trackers.count
+        print("Number of items in section \(section): \(count)")
+        return count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        print("Configuring cell at section \(indexPath.section), item \(indexPath.item)")
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as! TrackerCell
         let tracker = categories[indexPath.section].trackers[indexPath.item]
         let completionCount = completedTrackers.filter { $0.id == tracker.id }.count

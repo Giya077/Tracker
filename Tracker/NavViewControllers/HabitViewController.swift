@@ -213,9 +213,7 @@ class HabitViewController: UIViewController {
         let newTracker = Tracker(id: UUID(), name: name, schedule: schedule, categoryTitle: category.titles)
         // Вызываем делегата для создания нового трекера
         trackerDelegate?.didAddTracker(newTracker)
-        dismiss(animated: true) {
-            self.presentingViewController?.dismiss(animated: true, completion: nil)
-        }
+        self.dismiss(animated: true)
     }
 }
 
