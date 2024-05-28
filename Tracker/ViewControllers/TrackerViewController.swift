@@ -341,13 +341,12 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-          let padding: CGFloat = 10
-          let itemsPerRow: CGFloat = 2
-          let totalPadding: CGFloat = padding * (itemsPerRow + 1)
-          let itemWidth: CGFloat = (collectionView.frame.width - totalPadding) / itemsPerRow
-          let itemsPerColumn: CGFloat = 3
-          let itemHeight: CGFloat = (collectionView.frame.height - totalPadding) / itemsPerColumn
-          return CGSize(width: itemWidth, height: itemHeight)
+        let padding: CGFloat = 10
+        let itemsPerRow: CGFloat = 2
+        let totalPadding: CGFloat = padding * (itemsPerRow - 1)
+        let itemWidth: CGFloat = (collectionView.frame.width - totalPadding) / itemsPerRow
+        let itemHeight: CGFloat = 120
+        return CGSize(width: itemWidth, height: itemHeight)
       }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -359,6 +358,6 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        return 10
     }
 }

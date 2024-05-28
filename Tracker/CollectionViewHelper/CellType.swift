@@ -32,6 +32,13 @@ class CellType1: UICollectionViewCell {
         return separatorLine
     }()
     
+    let chevronImageView: UIImageView = {
+        let chevronImageView = UIImageView(image: UIImage(systemName: "chevron.right"))
+        chevronImageView.tintColor = .gray
+        chevronImageView.translatesAutoresizingMaskIntoConstraints = false
+        return chevronImageView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -46,6 +53,7 @@ class CellType1: UICollectionViewCell {
         contentView.addSubview(titleLabel)
         contentView.addSubview(daysLabel)
         contentView.addSubview(separatorLine)
+        contentView.addSubview(chevronImageView)
         
         NSLayoutConstraint.activate([
              titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -61,7 +69,12 @@ class CellType1: UICollectionViewCell {
              separatorLine.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
              separatorLine.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
              separatorLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-             separatorLine.heightAnchor.constraint(equalToConstant: 1)
+             separatorLine.heightAnchor.constraint(equalToConstant: 1),
+             
+             chevronImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+             chevronImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+             chevronImageView.widthAnchor.constraint(equalToConstant: 12),
+             chevronImageView.heightAnchor.constraint(equalToConstant: 20)
          ])
     }
     

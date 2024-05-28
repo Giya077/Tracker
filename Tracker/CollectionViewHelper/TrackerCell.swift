@@ -49,11 +49,11 @@ class TrackerCell: UICollectionViewCell {
             nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),
             nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             
-            daysLabel.centerYAnchor.constraint(equalTo: actionButton.centerYAnchor),
+            daysLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
             daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             
-            actionButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            actionButton.centerYAnchor.constraint(equalTo: centerYAnchor),
+            actionButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+            actionButton.centerYAnchor.constraint(equalTo: daysLabel.centerYAnchor),
             actionButton.widthAnchor.constraint(equalToConstant: 40),
             actionButton.heightAnchor.constraint(equalToConstant: 40)
         ])
@@ -88,7 +88,6 @@ class TrackerCell: UICollectionViewCell {
         ]
         return colors.randomElement() ?? .gray
     }
-    
     
     @objc private func actionButtonTapped() {
         guard let tracker = tracker else { return }
