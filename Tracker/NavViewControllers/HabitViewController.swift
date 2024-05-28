@@ -42,11 +42,20 @@ class HabitViewController: UIViewController {
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .clear
         collectionView.isScrollEnabled = true
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(CellType1.self, forCellWithReuseIdentifier: "CellType1")
         return collectionView
+    }()
+    
+    let contrainerView: UIView = {
+        let contrainerView = UIView()
+        contrainerView.backgroundColor = Colors.systemSearchColor
+        contrainerView.layer.cornerRadius = 10
+        contrainerView.layer.masksToBounds = true
+        contrainerView.translatesAutoresizingMaskIntoConstraints = false
+        return contrainerView
     }()
     
     lazy var emojiTextLabel: UILabel = {
@@ -125,6 +134,9 @@ class HabitViewController: UIViewController {
         view.addSubview(categoryLabel)
         view.addSubview(label)
         view.addSubview(trackNaming)
+        
+        view.addSubview(contrainerView)
+        
         view.addSubview(categoryAndScheduleCollectionView)
         view.addSubview(emojiTextLabel)
         view.addSubview(emojiCollectionView)
@@ -143,6 +155,11 @@ class HabitViewController: UIViewController {
             categoryAndScheduleCollectionView.leadingAnchor.constraint(equalTo: trackNaming.leadingAnchor),
             categoryAndScheduleCollectionView.trailingAnchor.constraint(equalTo: trackNaming.trailingAnchor),
             categoryAndScheduleCollectionView.heightAnchor.constraint(equalToConstant: 200),
+            
+            contrainerView.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.topAnchor),
+            contrainerView.leadingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.leadingAnchor),
+            contrainerView.trailingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.trailingAnchor),
+            contrainerView.heightAnchor.constraint(equalToConstant: 200),
             
             emojiTextLabel.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.bottomAnchor, constant: 20),
             emojiTextLabel.leadingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.leadingAnchor),

@@ -37,6 +37,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         }
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         addPlusButton()
@@ -61,6 +62,8 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     private func setupHeaderView() {
         // Настройте ограничения и стили для titleLabel внутри HeaderView
     }
+    
+    
     
     private func setupViews() {
         setupStubView()
@@ -163,6 +166,8 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         collectionView.dataSource = self
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderView")
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 20),
@@ -336,10 +341,24 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width - 40, height: 80)
-    }
+          let padding: CGFloat = 10
+          let itemsPerRow: CGFloat = 2
+          let totalPadding: CGFloat = padding * (itemsPerRow + 1)
+          let itemWidth: CGFloat = (collectionView.frame.width - totalPadding) / itemsPerRow
+          let itemsPerColumn: CGFloat = 3
+          let itemHeight: CGFloat = (collectionView.frame.height - totalPadding) / itemsPerColumn
+          return CGSize(width: itemWidth, height: itemHeight)
+      }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
     }
 }

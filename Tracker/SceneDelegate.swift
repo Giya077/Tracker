@@ -29,7 +29,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.makeKeyAndVisible()
         
         let tabBarTopLine = UIView()
-               tabBarTopLine.backgroundColor = UIColor.secondarySystemGroupedBackground
+               tabBarTopLine.backgroundColor = UIColor.lightGray
                tabBarController.tabBar.addSubview(tabBarTopLine)
                tabBarTopLine.translatesAutoresizingMaskIntoConstraints = false
         

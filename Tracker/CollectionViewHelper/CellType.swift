@@ -25,6 +25,13 @@ class CellType1: UICollectionViewCell {
         return label
     }()
     
+    let separatorLine: UIView = {
+        let separatorLine = UIView()
+        separatorLine.backgroundColor = .lightGray
+        separatorLine.translatesAutoresizingMaskIntoConstraints = false
+        return separatorLine
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -38,6 +45,7 @@ class CellType1: UICollectionViewCell {
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(daysLabel)
+        contentView.addSubview(separatorLine)
         
         NSLayoutConstraint.activate([
              titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -48,12 +56,17 @@ class CellType1: UICollectionViewCell {
              daysLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
              daysLabel.heightAnchor.constraint(equalToConstant: 20), // Примерная высота daysLabel
              daysLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-             daysLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
+             daysLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10),
+             
+             separatorLine.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+             separatorLine.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+             separatorLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+             separatorLine.heightAnchor.constraint(equalToConstant: 1)
          ])
     }
     
     private func setupBackground() {
-        contentView.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        contentView.backgroundColor = .clear
         contentView.layer.cornerRadius = 10
         contentView.layer.masksToBounds = true
     }

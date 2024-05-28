@@ -32,7 +32,7 @@ final class TimetableTableViewCell: UITableViewCell {
         contentView.addSubview(switchView)
         backgroundColor = Colors.systemSearchColor
         textLabel?.textColor = .black
-        switchView.backgroundColor = Colors.systemSearchColor
+        switchView.layer.cornerRadius = 15
         
         NSLayoutConstraint.activate([
                    switchView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
