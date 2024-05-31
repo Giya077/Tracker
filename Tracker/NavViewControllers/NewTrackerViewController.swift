@@ -24,7 +24,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
         // Передаем созданный трекер делегату
         delegate?.didAddTracker(newTracker)
     }
-
     
     weak var delegate: NewTrackerDelegate?
     var createdTracker: Tracker? // Добавляем свойство для хранения созданного трекера
@@ -55,8 +54,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
         setupUI()
         stackView()
     }
-    
-    
     
     private func setupUI() {
         view.backgroundColor = .white

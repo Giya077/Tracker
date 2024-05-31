@@ -8,13 +8,6 @@
 import Foundation
 import UIKit
 
-
-//struct Tracker {
-//    let id: UUID
-//    let name: String
-//    let schedule: [Days]
-//}
-
 struct Tracker {
     let id: UUID
     let name: String
