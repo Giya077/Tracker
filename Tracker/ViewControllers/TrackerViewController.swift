@@ -8,7 +8,7 @@
 import UIKit
 
 final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitCreationDelegate, NewTrackerDelegate {
-
+    
     weak var delegate: HabitCreationDelegate?
     
     private var trackerLabel = UILabel()
@@ -20,6 +20,8 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     
     var trackers: [Tracker] = []
     var completedTrackers: [TrackerRecord] = []
+    
+    var currentDate: Date = Date()
     
     internal var categories: [TrackerCategory] = [] {
         didSet {
@@ -193,10 +195,10 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
               let isCompleted = userInfo["isCompleted"] as? Bool else { return }
         
         if isCompleted {
-            let trackerRecord = TrackerRecord(id: trackerId, date: Date())
+            let trackerRecord = TrackerRecord(id: trackerId, date: currentDate)
             completedTrackers.append(trackerRecord)
         } else {
-            if let index = completedTrackers.firstIndex(where: { $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: Date()) }) {
+            if let index = completedTrackers.firstIndex(where: { $0.id == trackerId && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }) {
                 completedTrackers.remove(at: index)
             }
         }
@@ -214,10 +216,10 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     
     @objc
     private func datePickerValueChanged(_ sender: UIDatePicker) {
-        let selectedDate = sender.date
-        let selectedDayOfWeek = Calendar.current.component(.weekday, from: selectedDate)
-        print("Выбранная дата: \(selectedDate). День недели: \(selectedDayOfWeek)")
-        // Здесь добавить логику для отображения трекеров привычек, соответствующих выбранному дню недели
+        currentDate = sender.date
+        let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+        print("Выбранная дата: \(currentDate). День недели: \(selectedDayOfWeek)")
+        collectionView.reloadData()
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
@@ -308,7 +310,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrackerCell", for: indexPath) as! TrackerCell
         let tracker = categories[indexPath.section].trackers[indexPath.item]
         let completionCount = completedTrackers.filter { $0.id == tracker.id }.count
-        let isCompleted = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: Date()) }
+        let isCompleted = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
         cell.configure(with: tracker, isCompleted: isCompleted, completionCount: completionCount)
         return cell
     }
@@ -326,7 +328,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let itemWidth: CGFloat = (collectionView.frame.width - totalPadding) / itemsPerRow
         let itemHeight: CGFloat = 150
         return CGSize(width: itemWidth, height: itemHeight)
-      }
+    }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 50)
@@ -335,7 +337,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 10
     }
