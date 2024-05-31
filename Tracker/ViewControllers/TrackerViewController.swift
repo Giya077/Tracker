@@ -8,7 +8,7 @@
 import UIKit
 
 final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitCreationDelegate, NewTrackerDelegate {
-    
+
     weak var delegate: HabitCreationDelegate?
     
     private var trackerLabel = UILabel()
@@ -37,33 +37,18 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         }
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         addPlusButton()
         setupUI()
         setupViews()
-//        setupSearchBar()
-//        setupDatePicker()
-//        setupNavigationBar()
         delegate = self
         
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
-        collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderView")
+        collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
         
         NotificationCenter.default.addObserver(self, selector: #selector(trackerCompletionChanged(_:)), name: .trackerCompletionChanged, object: nil)
     }
-    
-    
-    private func setupTrackerCell() {
-        // Настройте ограничения и стили для nameLabel и daysLabel внутри TrackerCell
-    }
-
-    private func setupHeaderView() {
-        // Настройте ограничения и стили для titleLabel внутри HeaderView
-    }
-    
-    
     
     private func setupViews() {
         setupStubView()
@@ -72,7 +57,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         setupDatePicker()
         setupNavigationBar()
         
-        // Проверяем categories и обновляем интерфейс
         categories.isEmpty ? (stubView.isHidden = false) : (collectionView.isHidden = false)
     }
     
@@ -119,16 +103,15 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
             textField.textColor = .black
             textField.tintColor = .black
             
-            // Установка цвета текста плейсхолдера
             let placeholderText = "Поиск"
-            let placeholderColor = UIColor.lightGray // Цвет плейсхолдера
+            let placeholderColor = UIColor.lightGray
             textField.attributedPlaceholder = NSAttributedString(
                 string: placeholderText,
                 attributes: [NSAttributedString.Key.foregroundColor: placeholderColor]
             )
             // Настройка значка лупы
             if let leftView = textField.leftView as? UIImageView {
-                leftView.tintColor = .lightGray // Установка цвета значка лупы
+                leftView.tintColor = .lightGray
                 leftView.image = leftView.image?.withRenderingMode(.alwaysTemplate)
             }
         }
@@ -165,7 +148,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
-        collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderView")
+        collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         
@@ -238,7 +221,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
-        completedTrackers.append(trackRecord) /// скорее в в трекерес
+        completedTrackers.append(trackRecord)
     }
     
     func removeTrackerFromCompleted(trackRecord: TrackerRecord) {
@@ -248,7 +231,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     }
     
     func didAddTracker(_ tracker: Tracker?) {
-        // Проверяем, что трекер не nil
         guard let newTracker = tracker else {
             print("Ошибка: Новый трекер не был передан.")
             return
@@ -274,17 +256,16 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
                 print("Ошибка: Категории не инициализированы или отсутствуют.")
             }
         }
-        
-        // Обновляем коллекцию
         collectionView.reloadData()
         dismiss(animated: true)
     }
     
-    func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days]) {
+    func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days], color: UIColor, emoji: Character) {
+        
         print("Метод didCreateTracker вызван")
         print("Создание трекера с именем: \(name) в категории: \(category.titles)")
         
-        let newTracker = Tracker(id: UUID(), name: name, schedule: schedule, categoryTitle: category.titles)
+        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule, categoryTitle: category.titles)
         
         if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
             categories[index].trackers.append(newTracker)
@@ -300,7 +281,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         collectionView.reloadData()
     }
     
-    
     func didCreateTrackerSuccessfully(_ tracker: Tracker) {
         print("Новый трекер успешно создан:")
         print("ID: \(tracker.id)")
@@ -310,7 +290,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
 }
 
 extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         let count = categories.count
@@ -335,7 +314,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderView", for: indexPath) as! HeaderView
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection", for: indexPath) as! HeaderViewTrackerCollection
         header.titleLabel.text = categories[indexPath.section].titles
         return header
     }
@@ -345,7 +324,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let itemsPerRow: CGFloat = 2
         let totalPadding: CGFloat = padding * (itemsPerRow - 1)
         let itemWidth: CGFloat = (collectionView.frame.width - totalPadding) / itemsPerRow
-        let itemHeight: CGFloat = 120
+        let itemHeight: CGFloat = 150
         return CGSize(width: itemWidth, height: itemHeight)
       }
     

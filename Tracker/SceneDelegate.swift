@@ -34,7 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                tabBarTopLine.translatesAutoresizingMaskIntoConstraints = false
         
                NSLayoutConstraint.activate([
-                tabBarTopLine.topAnchor.constraint(equalTo: tabBarController.tabBar.topAnchor, constant: -5),
+                tabBarTopLine.topAnchor.constraint(equalTo: tabBarController.tabBar.topAnchor),
                    tabBarTopLine.leadingAnchor.constraint(equalTo: tabBarController.tabBar.leadingAnchor),
                    tabBarTopLine.trailingAnchor.constraint(equalTo: tabBarController.tabBar.trailingAnchor),
                    tabBarTopLine.heightAnchor.constraint(equalToConstant: 1)

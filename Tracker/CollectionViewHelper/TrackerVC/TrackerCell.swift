@@ -8,8 +8,48 @@
 import UIKit
 
 class TrackerCell: UICollectionViewCell {
-    let nameLabel = UILabel()
-    let daysLabel = UILabel()
+    
+    let emojiLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
+       return label
+    }()
+    
+    let nameLabel: UILabel = {
+        let nameLabel = UILabel()
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.textColor = .white
+        nameLabel.font = UIFont.systemFont(ofSize: 18)
+        nameLabel.numberOfLines = 1
+        return nameLabel
+    }()
+    
+    let emojiPlaceholder: UIView = {
+        let placeholder = UIView()
+        placeholder.translatesAutoresizingMaskIntoConstraints = false
+        placeholder.backgroundColor = UIColor.lightGray.withAlphaComponent(0.2)
+        placeholder.layer.cornerRadius = 20
+        placeholder.layer.masksToBounds = true
+        return placeholder
+    }()
+    
+    let daysLabel: UILabel = {
+        let daysLabel = UILabel()
+        daysLabel.translatesAutoresizingMaskIntoConstraints = false
+        daysLabel.textColor = .black
+        daysLabel.font = UIFont.systemFont(ofSize: 18)
+        return daysLabel
+    }()
+    
+    let contrainerViewCell: UIView = {
+        let contrainerView = UIView()
+        contrainerView.layer.cornerRadius = 16
+        contrainerView.layer.masksToBounds = true
+        contrainerView.translatesAutoresizingMaskIntoConstraints = false
+        return contrainerView
+    }()
+    
     let actionButton = UIButton(type: .system)
     
     private var tracker: Tracker?
@@ -22,7 +62,6 @@ class TrackerCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
-        setupCellAppearance()
     }
     
     required init?(coder: NSCoder) {
@@ -31,28 +70,35 @@ class TrackerCell: UICollectionViewCell {
     
     private func setupViews() {
         
+        addSubview(contrainerViewCell)
         addSubview(nameLabel)
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.textColor = .black
-        nameLabel.font = UIFont.systemFont(ofSize: 18)
-        nameLabel.numberOfLines = 1
-        
         addSubview(daysLabel)
-        daysLabel.translatesAutoresizingMaskIntoConstraints = false
-        daysLabel.textColor = .black
-        daysLabel.font = UIFont.systemFont(ofSize: 18)
-        
         addSubview(actionButton)
+        addSubview(emojiPlaceholder)
+        addSubview(emojiLabel)
+        
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+            
+            contrainerViewCell.topAnchor.constraint(equalTo: topAnchor),
+            contrainerViewCell.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contrainerViewCell.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contrainerViewCell.heightAnchor.constraint(equalToConstant: 100),
+            
+            emojiPlaceholder.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            emojiPlaceholder.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+            
+            emojiLabel.leadingAnchor.constraint(equalTo: emojiPlaceholder.leadingAnchor),
+            emojiLabel.topAnchor.constraint(equalTo: emojiPlaceholder.topAnchor),
+            
+            nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
             nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             
             daysLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
             daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             
-            actionButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -15),
+            actionButton.trailingAnchor.constraint(equalTo: trailingAnchor),
             actionButton.centerYAnchor.constraint(equalTo: daysLabel.centerYAnchor),
             actionButton.widthAnchor.constraint(equalToConstant: 40),
             actionButton.heightAnchor.constraint(equalToConstant: 40)
@@ -66,29 +112,19 @@ class TrackerCell: UICollectionViewCell {
         self.tracker = tracker
         nameLabel.text = tracker.name
         daysLabel.text = "\(completionCount) дней"
+        emojiLabel.text = String(tracker.emoji)
+        contrainerViewCell.backgroundColor = tracker.color
+        actionButton.tintColor = tracker.color
         self.isCompleted = isCompleted
-        backgroundColor = getRandomColor()
-    }
-    
-    private func setupCellAppearance() {
-        layer.cornerRadius = 16
-        layer.masksToBounds = true
+        backgroundColor = .white
     }
     
     private func updateButtonAppearance() {
-        let buttonImage = isCompleted ? UIImage(systemName: "plus.circle.fill") : UIImage(systemName: "checkmark.circle.fill")
+        let buttonImage = isCompleted ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "plus.circle.fill")
         actionButton.setImage(buttonImage, for: .normal)
-        actionButton.tintColor = isCompleted ? .green : .green
+        actionButton.tintColor = isCompleted ? tracker?.color.withAlphaComponent(0.2) : tracker?.color
     }
-    
-    private func getRandomColor() -> UIColor {
-        let colors = [
-            UIColor.red, UIColor.green, UIColor.blue,
-            UIColor.orange, UIColor.purple, UIColor.yellow
-        ]
-        return colors.randomElement() ?? .gray
-    }
-    
+        
     @objc private func actionButtonTapped() {
         guard let tracker = tracker else { return }
         isCompleted.toggle()
@@ -97,7 +133,7 @@ class TrackerCell: UICollectionViewCell {
     
 }
 
-class HeaderView: UICollectionReusableView {
+class HeaderViewTrackerCollection: UICollectionReusableView {
     let titleLabel = UILabel()
     
     override init(frame: CGRect) {

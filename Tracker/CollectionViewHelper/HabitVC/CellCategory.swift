@@ -29,9 +29,9 @@ class CategoryCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
-        backgroundColor = .white // Установка цвета фона ячейки
-        selectedBackgroundView = UIView() // Создание кастомного вида для выбранной ячейки
-        selectedBackgroundView?.backgroundColor = .clear // Прозрачный фон для выбранной ячейки
+        backgroundColor = .white
+        selectedBackgroundView = UIView()
+        selectedBackgroundView?.backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {

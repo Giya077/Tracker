@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import UIKit
 
 protocol HabitCreationDelegate: AnyObject {
-    func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days])
+    func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days], color: UIColor, emoji: Character)
     func didCreateTrackerSuccessfully(_ tracker: Tracker)
 }

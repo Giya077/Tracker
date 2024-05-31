@@ -25,13 +25,6 @@ class CellType1: UICollectionViewCell {
         return label
     }()
     
-    let separatorLine: UIView = {
-        let separatorLine = UIView()
-        separatorLine.backgroundColor = .lightGray
-        separatorLine.translatesAutoresizingMaskIntoConstraints = false
-        return separatorLine
-    }()
-    
     let chevronImageView: UIImageView = {
         let chevronImageView = UIImageView(image: UIImage(systemName: "chevron.right"))
         chevronImageView.tintColor = .gray
@@ -52,24 +45,17 @@ class CellType1: UICollectionViewCell {
     private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(daysLabel)
-        contentView.addSubview(separatorLine)
         contentView.addSubview(chevronImageView)
         
         NSLayoutConstraint.activate([
-             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-             
-             daysLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-             daysLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-             daysLabel.heightAnchor.constraint(equalToConstant: 20), // Примерная высота daysLabel
-             daysLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
-             daysLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10),
-             
-             separatorLine.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-             separatorLine.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-             separatorLine.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-             separatorLine.heightAnchor.constraint(equalToConstant: 1),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -10),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
+            
+            daysLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            daysLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
+            daysLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10),
+            daysLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
              
              chevronImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
              chevronImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
