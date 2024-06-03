@@ -14,6 +14,7 @@
 		1A1E94FA2C071AA5009DD79B /* ColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94F92C071AA5009DD79B /* ColorCell.swift */; };
 		1A1E94FD2C0728DF009DD79B /* CellColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94FC2C0728DF009DD79B /* CellColors.swift */; };
 		1A1E94FF2C088725009DD79B /* HeaderViewHabitCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94FE2C088725009DD79B /* HeaderViewHabitCollections.swift */; };
+		1A1E95022C0D956D009DD79B /* TrackerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E95012C0D956D009DD79B /* TrackerType.swift */; };
 		1A83A3F22C033C0A0059B026 /* HabitCreationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A83A3F12C033C0A0059B026 /* HabitCreationDelegate.swift */; };
 		1A83A3F52C037D980059B026 /* TrackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A83A3F42C037D980059B026 /* TrackerCell.swift */; };
 		1A877D332BF286C2007EF036 /* DatePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877D322BF286C2007EF036 /* DatePickerHelper.swift */; };
@@ -52,6 +53,7 @@
 		1A1E94F92C071AA5009DD79B /* ColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCell.swift; sourceTree = "<group>"; };
 		1A1E94FC2C0728DF009DD79B /* CellColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellColors.swift; sourceTree = "<group>"; };
 		1A1E94FE2C088725009DD79B /* HeaderViewHabitCollections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViewHabitCollections.swift; sourceTree = "<group>"; };
+		1A1E95012C0D956D009DD79B /* TrackerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerType.swift; sourceTree = "<group>"; };
 		1A83A3F12C033C0A0059B026 /* HabitCreationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCreationDelegate.swift; sourceTree = "<group>"; };
 		1A83A3F42C037D980059B026 /* TrackerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCell.swift; sourceTree = "<group>"; };
 		1A877D322BF286C2007EF036 /* DatePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerHelper.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				1A877D522BFBBB5A007EF036 /* AddCategoryViewController.swift */,
 				1A877D3D2BF37FFB007EF036 /* ScheduleViewController.swift */,
 				1A877D342BF3552C007EF036 /* IrregularEventViewController.swift */,
+				1A1E95012C0D956D009DD79B /* TrackerType.swift */,
 			);
 			path = NavViewControllers;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				1A877D512BF74120007EF036 /* Colors.swift in Sources */,
 				1A877D552BFBC3F5007EF036 /* NewCategoryViewControllerDelegate.swift in Sources */,
 				1AA6424F2BE7FE7C002D6B32 /* TrackerViewController.swift in Sources */,
+				1A1E95022C0D956D009DD79B /* TrackerType.swift in Sources */,
 				1A877D372BF3557D007EF036 /* HabitViewController.swift in Sources */,
 				1AA30DDB2BFDF239004C3D27 /* CategorySelectionDelegate.swift in Sources */,
 				1A195B8A2BEE20CF00B7AAC1 /* TrackerRecord.swift in Sources */,

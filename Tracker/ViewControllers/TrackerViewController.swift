@@ -232,45 +232,33 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         }
     }
     
-    func didAddTracker(_ tracker: Tracker?) {
-        guard let newTracker = tracker else {
-            print("Ошибка: Новый трекер не был передан.")
-            return
-        }
-        
-        // Логика для добавления нового трекера в соответствующую категорию
-        if let categoryTitle = newTracker.categoryTitle {
-            if let index = categories.firstIndex(where: { $0.titles == categoryTitle }) {
-                categories[index].trackers.append(newTracker)
-                print("Новый трекер добавлен в категорию: \(categoryTitle)")
-            } else {
-                // Создаем новую категорию, если не найдена
-                let newCategory = TrackerCategory(titles: categoryTitle, trackers: [newTracker])
-                categories.append(newCategory)
-                print("Создана новая категория: \(categoryTitle) и добавлен трекер")
-            }
+    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory) {
+        if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
+            let category = categories[index]
+            var trackers = category.trackers
+            trackers.append(tracker)
+            categories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
         } else {
-            // Если трекер не содержит информацию о категории, добавляем его в первую категорию (если она существует)
-            if !categories.isEmpty {
-                categories[0].trackers.append(newTracker)
-                print("Новый трекер добавлен в категорию: \(categories[0].titles)")
-            } else {
-                print("Ошибка: Категории не инициализированы или отсутствуют.")
-            }
+            let newCategory = TrackerCategory(titles: category.titles, trackers: [tracker])
+            categories.append(newCategory)
         }
         collectionView.reloadData()
         dismiss(animated: true)
     }
     
+    
     func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days], color: UIColor, emoji: Character) {
-        
         print("Метод didCreateTracker вызван")
         print("Создание трекера с именем: \(name) в категории: \(category.titles)")
         
-        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule, categoryTitle: category.titles)
+        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule)
         
         if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
-            categories[index].trackers.append(newTracker)
+            let updatedCategory = categories[index]
+            var newTrackers = updatedCategory.trackers
+            newTrackers.append(newTracker)
+            let newCategory = TrackerCategory(titles: updatedCategory.titles, trackers: newTrackers)
+            categories[index] = newCategory
             print("Трекер добавлен в существующую категорию: \(category.titles)")
         } else {
             // Добавляем новую категорию, если она не найдена
@@ -282,6 +270,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         print("Текущее количество категорий: \(categories.count)")
         collectionView.reloadData()
     }
+
     
     func didCreateTrackerSuccessfully(_ tracker: Tracker) {
         print("Новый трекер успешно создан:")

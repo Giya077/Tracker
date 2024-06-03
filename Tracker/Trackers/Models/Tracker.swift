@@ -14,5 +14,4 @@ struct Tracker {
     let color: UIColor
     let emoji: Character
     let schedule: [Days]
-    let categoryTitle: String?
 }

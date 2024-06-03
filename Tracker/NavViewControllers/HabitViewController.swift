@@ -256,10 +256,10 @@ class HabitViewController: UIViewController {
             return
         }
         let schedule = Array(selectedDays)
-        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule, categoryTitle: category.titles)
+        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule)
         // Вызываем делегата для создания нового трекера
         
-        trackerDelegate?.didAddTracker(newTracker)
+        trackerDelegate?.didAddTracker(newTracker, to: category)
         self.dismiss(animated: true)
     }
 }
