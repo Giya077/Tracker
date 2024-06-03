@@ -10,6 +10,8 @@ import UIKit
 
 class IrregularEventViewController: UIViewController {
     
+    var trackerType: TrackerType?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

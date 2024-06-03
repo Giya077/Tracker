@@ -7,9 +7,7 @@
 
 import UIKit
 
-final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitCreationDelegate, NewTrackerDelegate {
-    
-    weak var delegate: HabitCreationDelegate?
+final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTrackerDelegate {
     
     private var trackerLabel = UILabel()
     private var plusButton = UIButton()
@@ -18,7 +16,11 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
     
-    var trackers: [Tracker] = []
+//    var trackers: [Tracker] = []
+    
+    var habitTrackers: [Tracker] = []
+    var eventTrackers: [Tracker] = []
+    
     var completedTrackers: [TrackerRecord] = []
     
     var currentDate: Date = Date()
@@ -44,7 +46,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         addPlusButton()
         setupUI()
         setupViews()
-        delegate = self
         
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
@@ -232,7 +233,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         }
     }
     
-    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory) {
+    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
         if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
             let category = categories[index]
             var trackers = category.trackers
@@ -242,41 +243,28 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
             let newCategory = TrackerCategory(titles: category.titles, trackers: [tracker])
             categories.append(newCategory)
         }
+
+        if trackerType == .habit {
+            habitTrackers.append(tracker)
+        } else if trackerType == .event {
+            eventTrackers.append(tracker)
+        }
+
+        printTrackersCount()
         collectionView.reloadData()
         dismiss(animated: true)
     }
-    
-    
-    func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days], color: UIColor, emoji: Character) {
-        print("Метод didCreateTracker вызван")
-        print("Создание трекера с именем: \(name) в категории: \(category.titles)")
-        
-        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule)
-        
-        if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
-            let updatedCategory = categories[index]
-            var newTrackers = updatedCategory.trackers
-            newTrackers.append(newTracker)
-            let newCategory = TrackerCategory(titles: updatedCategory.titles, trackers: newTrackers)
-            categories[index] = newCategory
-            print("Трекер добавлен в существующую категорию: \(category.titles)")
-        } else {
-            // Добавляем новую категорию, если она не найдена
-            let newCategory = TrackerCategory(titles: category.titles, trackers: [newTracker])
-            categories.append(newCategory)
-            print("Создана новая категория: \(category.titles) и добавлен трекер")
-        }
-        
-        print("Текущее количество категорий: \(categories.count)")
-        collectionView.reloadData()
-    }
 
-    
     func didCreateTrackerSuccessfully(_ tracker: Tracker) {
         print("Новый трекер успешно создан:")
         print("ID: \(tracker.id)")
         print("Название: \(tracker.name)")
         print("Расписание: \(tracker.schedule)")
+    }
+        
+    func printTrackersCount() {
+        print("Количество привычек: \(habitTrackers.count)")
+        print("Количество нерегулярных событий: \(eventTrackers.count)")
     }
 }
 

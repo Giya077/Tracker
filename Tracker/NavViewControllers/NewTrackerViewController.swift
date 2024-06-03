@@ -67,8 +67,8 @@ final class NewTrackerViewController: UIViewController {
     
     @objc private func habitButtonTapped() {
         let habitViewController = HabitViewController()
-        habitViewController.delegate = self.delegate as? HabitCreationDelegate
         habitViewController.trackerDelegate = self
+        habitViewController.trackerType = .habit
         let nav = UINavigationController(rootViewController: habitViewController)
         present(nav, animated: true)
         print("habbit button tapped")
@@ -76,6 +76,7 @@ final class NewTrackerViewController: UIViewController {
     
     @objc private func irregularEventTapped() {
         let irregularEventViewController = IrregularEventViewController()
+        irregularEventViewController.trackerType = .event
         let nav = UINavigationController(rootViewController: irregularEventViewController)
         present(nav, animated:  true)
         print("irregular button tapped")
@@ -83,8 +84,8 @@ final class NewTrackerViewController: UIViewController {
 }
 
 extension NewTrackerViewController: NewTrackerDelegate {
-    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory) {
+    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
         // Передаем созданный трекер делегату
-        delegate?.didAddTracker(tracker, to: category)
+        delegate?.didAddTracker(tracker, to: category, trackerType: trackerType)
     }
 }

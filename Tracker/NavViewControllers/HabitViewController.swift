@@ -10,8 +10,10 @@ import UIKit
 
 class HabitViewController: UIViewController {
     
-    weak var delegate: HabitCreationDelegate?
+//    weak var delegate: HabitCreationDelegate?
     weak var trackerDelegate: NewTrackerDelegate?
+    
+    var trackerType: TrackerType?
     
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
@@ -257,9 +259,12 @@ class HabitViewController: UIViewController {
         }
         let schedule = Array(selectedDays)
         let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule)
-        // Вызываем делегата для создания нового трекера
         
-        trackerDelegate?.didAddTracker(newTracker, to: category)
+        guard let trackerType = trackerType else { return }
+        
+        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ??
+        
+        trackerDelegate?.didAddTracker(newTracker, to: trackerCategory, trackerType: trackerType) // to newTracker
         self.dismiss(animated: true)
     }
 }

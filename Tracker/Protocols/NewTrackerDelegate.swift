@@ -8,5 +8,5 @@
 import Foundation
 
 protocol NewTrackerDelegate: AnyObject {
-    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory)
+    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType)
 }
