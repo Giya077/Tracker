@@ -16,8 +16,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
     
-//    var trackers: [Tracker] = []
-    
     var habitTrackers: [Tracker] = []
     var eventTrackers: [Tracker] = []
     
@@ -25,6 +23,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     
     var currentDate: Date = Date()
     
+    var allCategories: [TrackerCategory] = []  // Для хранения всех категорий без фильтрации
     internal var categories: [TrackerCategory] = [] {
         didSet {
             print("Категории обновлены. Текущее количество категорий: \(categories.count)")
@@ -189,12 +188,44 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         ])
     }
     
+    private func filterTrackersByDate() {
+        let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+        guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
+
+        var updatedCategories: [TrackerCategory] = []
+
+        for category in allCategories {
+            let filteredTrackers = category.trackers.filter { tracker in
+                return tracker.schedule.contains(selectedDay)
+            }
+            if !filteredTrackers.isEmpty {
+                updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
+            }
+        }
+
+        print("Количество отфильтрованных категорий: \(updatedCategories.count)")
+        updatedCategories.forEach { category in
+            print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
+        }
+
+        categories = updatedCategories
+        collectionView.reloadData()
+    }
+
     @objc
     private func trackerCompletionChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
               let trackerId = userInfo["trackerId"] as? UUID,
               let isCompleted = userInfo["isCompleted"] as? Bool else { return }
-        
+
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: currentDate)
+
+        if selectedDay > today {
+            print("Нельзя отмечать трекеры для будущих дат.")
+            return
+        }
+
         if isCompleted {
             let trackerRecord = TrackerRecord(id: trackerId, date: currentDate)
             completedTrackers.append(trackerRecord)
@@ -203,7 +234,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
                 completedTrackers.remove(at: index)
             }
         }
-        
+
         collectionView.reloadData()
     }
     
@@ -218,9 +249,8 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     @objc
     private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
-        let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
-        print("Выбранная дата: \(currentDate). День недели: \(selectedDayOfWeek)")
-        collectionView.reloadData()
+        filterTrackersByDate()
+        print("Выбранная дата: \(currentDate)")
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
@@ -234,14 +264,14 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     }
     
     func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
-        if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
-            let category = categories[index]
+        if let index = allCategories.firstIndex(where: { $0.titles == category.titles }) {
+            var category = allCategories[index]
             var trackers = category.trackers
             trackers.append(tracker)
-            categories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
+            allCategories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
         } else {
             let newCategory = TrackerCategory(titles: category.titles, trackers: [tracker])
-            categories.append(newCategory)
+            allCategories.append(newCategory)
         }
 
         if trackerType == .habit {
@@ -251,13 +281,20 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         }
 
         printTrackersCount()
+        filterTrackersByDate()
         collectionView.reloadData()
         dismiss(animated: true)
-    }
 
+        print("Трекер добавлен. Текущее количество категорий: \(allCategories.count)")
+        allCategories.forEach { category in
+            print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
+        }
+    }
+    
+    
     func didCreateTrackerSuccessfully(_ tracker: Tracker) {
         print("Новый трекер успешно создан:")
-        print("ID: \(tracker.id)")
+        print("ID: \(tracker.id)")  
         print("Название: \(tracker.name)")
         print("Расписание: \(tracker.schedule)")
     }
@@ -289,6 +326,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let completionCount = completedTrackers.filter { $0.id == tracker.id }.count
         let isCompleted = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
         cell.configure(with: tracker, isCompleted: isCompleted, completionCount: completionCount)
+        print("Трекер: \(tracker.name), Количество завершений: \(completionCount), Завершен сегодня: \(isCompleted)")
         return cell
     }
     

@@ -11,11 +11,8 @@ import UIKit
 class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
         
     weak var delegate: NewCategoryViewControllerDelegate? // для связи между AddCategoryViewController и CategoryViewController
-    
-    weak var habitDelegate: HabitViewController? // делегат для HabitViewController
-    
+    weak var habitDelegate: HabitViewController?
     weak var categorySelectionDelegate: CategorySelectionDelegate?
-    
     private var selectedCategories: Set<Int> = []
 
     var categories: [TrackerCategory] = [] {
