@@ -20,6 +20,7 @@ class ScheduleViewController: UIViewController {
         tableView.register(TimetableTableViewCell.self, forCellReuseIdentifier: "DaysCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.backgroundColor = .white
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         return tableView
     }()
     

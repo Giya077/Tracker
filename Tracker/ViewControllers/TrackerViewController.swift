@@ -81,6 +81,9 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(datePicker)
+        
+        // Установка цвета текста
+        datePicker.setValue(UIColor.black, forKey: "textColor")
     }
     
     private func setupNavigationBar() {
@@ -133,7 +136,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.8) {
+        UIView.animate(withDuration: 0.3) {
             searchBar.showsCancelButton = false // Скрываем кнопку "Отмена" при нажатии на неё
             searchBar.text = "" // Очищаем текст в поисковом поле
             searchBar.resignFirstResponder() // Скрываем клавиатуру
@@ -290,7 +293,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
             print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
         }
     }
-    
     
     func didCreateTrackerSuccessfully(_ tracker: Tracker) {
         print("Новый трекер успешно создан:")

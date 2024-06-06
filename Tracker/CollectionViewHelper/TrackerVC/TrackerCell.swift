@@ -21,7 +21,7 @@ class TrackerCell: UICollectionViewCell {
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textColor = .white
         nameLabel.font = UIFont.systemFont(ofSize: 18)
-        nameLabel.numberOfLines = 1
+        nameLabel.numberOfLines = 0
         return nameLabel
     }()
     
@@ -92,8 +92,11 @@ class TrackerCell: UICollectionViewCell {
             emojiLabel.leadingAnchor.constraint(equalTo: emojiPlaceholder.leadingAnchor),
             emojiLabel.topAnchor.constraint(equalTo: emojiPlaceholder.topAnchor),
             
-            nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+//            nameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            nameLabel.leadingAnchor.constraint(equalTo: contrainerViewCell.leadingAnchor, constant: 15),
+            nameLabel.topAnchor.constraint(equalTo: emojiPlaceholder.topAnchor, constant: 40),
+            nameLabel.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: 10),
+            nameLabel.bottomAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: -5),
             
             daysLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
             daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),

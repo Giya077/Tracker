@@ -13,7 +13,6 @@
 		1A195B902BEE46F100B7AAC1 /* NewTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A195B8F2BEE46F100B7AAC1 /* NewTrackerViewController.swift */; };
 		1A1E94FA2C071AA5009DD79B /* ColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94F92C071AA5009DD79B /* ColorCell.swift */; };
 		1A1E94FD2C0728DF009DD79B /* CellColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94FC2C0728DF009DD79B /* CellColors.swift */; };
-		1A1E94FF2C088725009DD79B /* HeaderViewHabitCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94FE2C088725009DD79B /* HeaderViewHabitCollections.swift */; };
 		1A1E95022C0D956D009DD79B /* TrackerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E95012C0D956D009DD79B /* TrackerType.swift */; };
 		1A83A3F52C037D980059B026 /* TrackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A83A3F42C037D980059B026 /* TrackerCell.swift */; };
 		1A877D332BF286C2007EF036 /* DatePickerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877D322BF286C2007EF036 /* DatePickerHelper.swift */; };
@@ -51,7 +50,6 @@
 		1A195B8F2BEE46F100B7AAC1 /* NewTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTrackerViewController.swift; sourceTree = "<group>"; };
 		1A1E94F92C071AA5009DD79B /* ColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCell.swift; sourceTree = "<group>"; };
 		1A1E94FC2C0728DF009DD79B /* CellColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellColors.swift; sourceTree = "<group>"; };
-		1A1E94FE2C088725009DD79B /* HeaderViewHabitCollections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViewHabitCollections.swift; sourceTree = "<group>"; };
 		1A1E95012C0D956D009DD79B /* TrackerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerType.swift; sourceTree = "<group>"; };
 		1A83A3F42C037D980059B026 /* TrackerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCell.swift; sourceTree = "<group>"; };
 		1A877D322BF286C2007EF036 /* DatePickerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerHelper.swift; sourceTree = "<group>"; };
@@ -145,7 +143,6 @@
 				1A877D442BF4D798007EF036 /* EmojiCell.swift */,
 				1A877D392BF374EE007EF036 /* CellType.swift */,
 				1A1E94F92C071AA5009DD79B /* ColorCell.swift */,
-				1A1E94FE2C088725009DD79B /* HeaderViewHabitCollections.swift */,
 			);
 			path = HabitVC;
 			sourceTree = "<group>";
@@ -326,7 +323,6 @@
 				1AA30DDF2BFE1B63004C3D27 /* BasicTextLabel.swift in Sources */,
 				1A877D402BF4CF8A007EF036 /* Days.swift in Sources */,
 				1A877D3A2BF374EE007EF036 /* CellType.swift in Sources */,
-				1A1E94FF2C088725009DD79B /* HeaderViewHabitCollections.swift in Sources */,
 				1A877D532BFBBB5A007EF036 /* AddCategoryViewController.swift in Sources */,
 				1A877D512BF74120007EF036 /* Colors.swift in Sources */,
 				1A877D552BFBC3F5007EF036 /* NewCategoryViewControllerDelegate.swift in Sources */,
@@ -493,8 +489,9 @@
 				INFOPLIST_FILE = Tracker/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -521,8 +518,9 @@
 				INFOPLIST_FILE = Tracker/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
