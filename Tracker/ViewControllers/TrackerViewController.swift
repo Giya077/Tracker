@@ -167,7 +167,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     
     private func addPlusButton() {
         plusButton = UIButton(type: .system)
-        plusButton.setImage(UIImage(systemName: "plus"), for: .normal)
+        plusButton.setImage(UIImage(named: "plus"), for: .normal)
         plusButton.tintColor = .black
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(plusButton)
