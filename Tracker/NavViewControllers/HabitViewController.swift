@@ -22,7 +22,6 @@ class HabitViewController: UIViewController {
     var selectedEmojiIndex: IndexPath?
     var selectedColorIndex: IndexPath?
     
-    
     let label: UILabel = {
         let label = BasicTextLabel(text: "Новая привычка")
         return label
@@ -145,7 +144,7 @@ class HabitViewController: UIViewController {
         let createButton = UIButton(type: .system)
         createButton.setTitle("Создать", for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
-        createButton.backgroundColor = .lightGray
+//        createButton.backgroundColor = .lightGray
         createButton.layer.cornerRadius = 12
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
@@ -170,6 +169,9 @@ class HabitViewController: UIViewController {
         colorCollectionView.delegate = self
         colorCollectionView.dataSource = self
         trackNaming.delegate = self
+        
+        createButton.isEnabled = false
+        createButton.backgroundColor = .lightGray
     }
     
     private func setupView() {
@@ -257,7 +259,26 @@ class HabitViewController: UIViewController {
     
     private func updateCategoryLabel() {
         guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
-        categoryCell.configure(title: "Категория", days: selectedCategory?.titles)
+        // Создаем строку, содержащую названия всех выбранных категорий, разделенные запятыми
+        let categoriesText = selectedCategory?.titles ?? ""
+        // Обновляем текст в ячейке с категорией
+        categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+    }
+    
+    private func checkFields() -> Bool {
+        guard let name = trackNaming.text, !name.isEmpty,
+              selectedColor != nil,
+              selectedEmoji != nil,
+              !selectedDays.isEmpty,
+              selectedCategory != nil else {
+            return false
+        }
+        return true
+    }
+    
+    private func updateCreateButtonState() {
+        createButton.isEnabled = checkFields()
+        createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
     }
     
     @objc
@@ -374,11 +395,9 @@ extension HabitViewController: UICollectionViewDelegate {
             collectionView.deselectItem(at: indexPath, animated: true)
             switch indexPath.row {
             case 0:
-                // Открываем CategoryViewController
                 guard let categoryVC = categoryViewController else { return }
                 navigationController?.pushViewController(categoryVC, animated: true)
             case 1:
-                // Открываем ScheduleViewController
                 let scheduleViewController = ScheduleViewController(delegate: self, selectedDays: selectedDays)
                 let nav = UINavigationController(rootViewController: scheduleViewController)
                 present(nav, animated: true)
@@ -395,6 +414,7 @@ extension HabitViewController: UICollectionViewDelegate {
                 selectedEmoji = emojiArray[indexPath.item].first
             }
             collectionView.reloadData()
+            updateCreateButtonState()
             
         } else if collectionView == colorCollectionView {
             // Обрабатываем выбор цвета
@@ -406,13 +426,15 @@ extension HabitViewController: UICollectionViewDelegate {
                 selectedColor = colorArray[indexPath.item]
             }
             collectionView.reloadData()
+            updateCreateButtonState()
         }
     }
 }
 
 extension HabitViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder() // Скрыть клавиатуру
+        textField.resignFirstResponder()// Скрыть клавиатуру
+        updateCreateButtonState()
         return true
     }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -430,6 +452,7 @@ extension HabitViewController: UITextFieldDelegate {
                      // Скрываем метку, если текст в пределах ограничения
                      hideCharacterLimitLabel()
                  }
+                 updateCreateButtonState()
                  return updatedText.count <= 38
              }
          }
@@ -456,6 +479,7 @@ extension HabitViewController: TimetableDelegate {
         // Перезагружаем коллекцию после обновления данных
         DispatchQueue.main.async {
             self.categoryAndScheduleCollectionView.reloadData()
+            self.updateCreateButtonState()
         }
     }
 }
@@ -467,13 +491,16 @@ extension HabitViewController: NewCategoryViewControllerDelegate {
     func didAddCategory(_ category: TrackerCategory) {
         selectedCategory = category
         updateCategoryLabel()
+        updateCreateButtonState()
     }
 }
 
 extension HabitViewController: CategorySelectionDelegate { // делегат для передачи выбранной категории от CategoryViewController к HabitViewController.
+    
     func didSelectCategory(_ category: TrackerCategory) {
-        self.selectedCategory = category
+        selectedCategory = category
         updateCategoryLabel()
+        updateCreateButtonState()
     }
 }
 

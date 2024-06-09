@@ -54,6 +54,11 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         addCategoryViewController()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData() // Обновляем таблицу при появлении контроллера на экране
+    }
+    
     private func setupView() {
         view.backgroundColor = .white
         

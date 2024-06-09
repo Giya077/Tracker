@@ -3,4 +3,52 @@
    uuid = "85A54D88-F9EB-491D-8B04-4B6476210FC6"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0751D1B4-20A3-4CE3-8AC1-D08B0612DEBB"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Tracker/NavViewControllers/HabitViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "491"
+            endingLineNumber = "491"
+            landmarkName = "didAddCategory(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "0751D1B4-20A3-4CE3-8AC1-D08B0612DEBB - 2f475895830a4234"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Tracker.HabitViewController.didAddCategory(Tracker.TrackerCategory) -&gt; ()"
+                  moduleName = "Tracker"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/giyadev/Documents/Tracker/Tracker/NavViewControllers/HabitViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "491"
+                  endingLineNumber = "491">
+               </Location>
+               <Location
+                  uuid = "0751D1B4-20A3-4CE3-8AC1-D08B0612DEBB - 2f475895830a4215"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Tracker.HabitViewController.didAddCategory(Tracker.TrackerCategory) -&gt; ()"
+                  moduleName = "Tracker"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/giyadev/Documents/Tracker/Tracker/NavViewControllers/HabitViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "492"
+                  endingLineNumber = "492">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
