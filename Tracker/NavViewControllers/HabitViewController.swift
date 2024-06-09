@@ -28,6 +28,8 @@ class HabitViewController: UIViewController {
         return label
     }()
     
+    var categoryViewController: CategoryViewController?
+    
     let trackNaming: UITextField = {
         let trackNaming = UITextField()
         trackNaming.textColor = .black
@@ -156,6 +158,10 @@ class HabitViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupView()
+        
+        categoryViewController = CategoryViewController()
+        categoryViewController?.categorySelectionDelegate = self
+        
         stackViewButton()
         categoryAndScheduleCollectionView.delegate = self
         categoryAndScheduleCollectionView.dataSource = self
@@ -366,25 +372,21 @@ extension HabitViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == categoryAndScheduleCollectionView {
             collectionView.deselectItem(at: indexPath, animated: true)
-            switch indexPath.item {
-                
+            switch indexPath.row {
             case 0:
-                let categoryViewController = CategoryViewController()
-                categoryViewController.categorySelectionDelegate = self
-                let nav = UINavigationController(rootViewController: categoryViewController)
-                present(nav, animated: true)
-                print("categoryViewController tapped")
-                
+                // Открываем CategoryViewController
+                guard let categoryVC = categoryViewController else { return }
+                navigationController?.pushViewController(categoryVC, animated: true)
             case 1:
+                // Открываем ScheduleViewController
                 let scheduleViewController = ScheduleViewController(delegate: self, selectedDays: selectedDays)
                 let nav = UINavigationController(rootViewController: scheduleViewController)
                 present(nav, animated: true)
-                print("scheduleViewController tapped")
-                
             default:
                 break
             }
         } else if collectionView == emojiCollectionView {
+            // Обрабатываем выбор emoji
             if selectedEmojiIndex == indexPath {
                 selectedEmojiIndex = nil
                 selectedEmoji = nil
@@ -395,6 +397,7 @@ extension HabitViewController: UICollectionViewDelegate {
             collectionView.reloadData()
             
         } else if collectionView == colorCollectionView {
+            // Обрабатываем выбор цвета
             if selectedColorIndex == indexPath {
                 selectedColorIndex = nil
                 selectedColor = nil
@@ -463,7 +466,7 @@ extension HabitViewController: NewCategoryViewControllerDelegate {
     
     func didAddCategory(_ category: TrackerCategory) {
         selectedCategory = category
-//        categoryLabel.text = category.titles
+        updateCategoryLabel()
     }
 }
 

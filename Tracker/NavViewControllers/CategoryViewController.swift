@@ -123,6 +123,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     func didAddCategory(_ category: TrackerCategory) {
         categories.append(category)
         removeStubAndShowCategories()
+        dismiss(animated: true)
     }
 }
 
@@ -147,7 +148,11 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedCategory = categories[indexPath.row]
+        
+        // Передаем выбранную категорию делегату, чтобы он мог обработать ее
         categorySelectionDelegate?.didSelectCategory(selectedCategory)
-        dismiss(animated: true)
-     }
+        
+        // Возвращаемся на экран HabitViewController
+        navigationController?.popViewController(animated: true)
+    }
  }
