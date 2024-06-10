@@ -405,7 +405,6 @@ extension HabitViewController: UICollectionViewDelegate {
                 break
             }
         } else if collectionView == emojiCollectionView {
-            // Обрабатываем выбор emoji
             if selectedEmojiIndex == indexPath {
                 selectedEmojiIndex = nil
                 selectedEmoji = nil
@@ -417,7 +416,6 @@ extension HabitViewController: UICollectionViewDelegate {
             updateCreateButtonState()
             
         } else if collectionView == colorCollectionView {
-            // Обрабатываем выбор цвета
             if selectedColorIndex == indexPath {
                 selectedColorIndex = nil
                 selectedColor = nil
@@ -472,11 +470,7 @@ extension HabitViewController: TimetableDelegate {
     
     func didUpdateSelectedDays(_ selectedDays: Set<Days>) {
         self.selectedDays = selectedDays
-        
-        // Проверяем, что выбранные дни корректно передаются
         print("Selected days updated in HabitViewController: \(selectedDays)")
-        
-        // Перезагружаем коллекцию после обновления данных
         DispatchQueue.main.async {
             self.categoryAndScheduleCollectionView.reloadData()
             self.updateCreateButtonState()
