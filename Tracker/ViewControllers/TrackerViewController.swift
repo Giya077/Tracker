@@ -7,9 +7,7 @@
 
 import UIKit
 
-final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitCreationDelegate, NewTrackerDelegate {
-    
-    weak var delegate: HabitCreationDelegate?
+final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTrackerDelegate {
     
     private var trackerLabel = UILabel()
     private var plusButton = UIButton()
@@ -18,11 +16,14 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
     
-    var trackers: [Tracker] = []
+    var habitTrackers: [Tracker] = []
+    var eventTrackers: [Tracker] = []
+    
     var completedTrackers: [TrackerRecord] = []
     
     var currentDate: Date = Date()
     
+    var allCategories: [TrackerCategory] = []  // Для хранения всех категорий без фильтрации
     internal var categories: [TrackerCategory] = [] {
         didSet {
             print("Категории обновлены. Текущее количество категорий: \(categories.count)")
@@ -44,7 +45,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         addPlusButton()
         setupUI()
         setupViews()
-        delegate = self
         
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
@@ -81,6 +81,9 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(datePicker)
+        
+        // Установка цвета текста
+        datePicker.setValue(UIColor.black, forKey: "textColor")
     }
     
     private func setupNavigationBar() {
@@ -133,7 +136,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.8) {
+        UIView.animate(withDuration: 0.3) {
             searchBar.showsCancelButton = false // Скрываем кнопку "Отмена" при нажатии на неё
             searchBar.text = "" // Очищаем текст в поисковом поле
             searchBar.resignFirstResponder() // Скрываем клавиатуру
@@ -164,7 +167,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     
     private func addPlusButton() {
         plusButton = UIButton(type: .system)
-        plusButton.setImage(UIImage(systemName: "plus"), for: .normal)
+        plusButton.setImage(UIImage(named: "plus"), for: .normal)
         plusButton.tintColor = .black
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(plusButton)
@@ -188,12 +191,44 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         ])
     }
     
+    private func filterTrackersByDate() {
+        let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
+        guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
+
+        var updatedCategories: [TrackerCategory] = []
+
+        for category in allCategories {
+            let filteredTrackers = category.trackers.filter { tracker in
+                return tracker.schedule.contains(selectedDay)
+            }
+            if !filteredTrackers.isEmpty {
+                updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
+            }
+        }
+
+        print("Количество отфильтрованных категорий: \(updatedCategories.count)")
+        updatedCategories.forEach { category in
+            print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
+        }
+
+        categories = updatedCategories
+        collectionView.reloadData()
+    }
+
     @objc
     private func trackerCompletionChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
               let trackerId = userInfo["trackerId"] as? UUID,
               let isCompleted = userInfo["isCompleted"] as? Bool else { return }
-        
+
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: currentDate)
+
+        if selectedDay > today {
+            print("Нельзя отмечать трекеры для будущих дат.")
+            return
+        }
+
         if isCompleted {
             let trackerRecord = TrackerRecord(id: trackerId, date: currentDate)
             completedTrackers.append(trackerRecord)
@@ -202,7 +237,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
                 completedTrackers.remove(at: index)
             }
         }
-        
+
         collectionView.reloadData()
     }
     
@@ -217,9 +252,8 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
     @objc
     private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
-        let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
-        print("Выбранная дата: \(currentDate). День недели: \(selectedDayOfWeek)")
-        collectionView.reloadData()
+        filterTrackersByDate()
+        print("Выбранная дата: \(currentDate)")
     }
     
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
@@ -232,62 +266,44 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, HabitC
         }
     }
     
-    func didAddTracker(_ tracker: Tracker?) {
-        guard let newTracker = tracker else {
-            print("Ошибка: Новый трекер не был передан.")
-            return
-        }
-        
-        // Логика для добавления нового трекера в соответствующую категорию
-        if let categoryTitle = newTracker.categoryTitle {
-            if let index = categories.firstIndex(where: { $0.titles == categoryTitle }) {
-                categories[index].trackers.append(newTracker)
-                print("Новый трекер добавлен в категорию: \(categoryTitle)")
-            } else {
-                // Создаем новую категорию, если не найдена
-                let newCategory = TrackerCategory(titles: categoryTitle, trackers: [newTracker])
-                categories.append(newCategory)
-                print("Создана новая категория: \(categoryTitle) и добавлен трекер")
-            }
+    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
+        if let index = allCategories.firstIndex(where: { $0.titles == category.titles }) {
+            var category = allCategories[index]
+            var trackers = category.trackers
+            trackers.append(tracker)
+            allCategories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
         } else {
-            // Если трекер не содержит информацию о категории, добавляем его в первую категорию (если она существует)
-            if !categories.isEmpty {
-                categories[0].trackers.append(newTracker)
-                print("Новый трекер добавлен в категорию: \(categories[0].titles)")
-            } else {
-                print("Ошибка: Категории не инициализированы или отсутствуют.")
-            }
+            let newCategory = TrackerCategory(titles: category.titles, trackers: [tracker])
+            allCategories.append(newCategory)
         }
+
+        if trackerType == .habit {
+            habitTrackers.append(tracker)
+        } else if trackerType == .event {
+            eventTrackers.append(tracker)
+        }
+
+        printTrackersCount()
+        filterTrackersByDate()
         collectionView.reloadData()
         dismiss(animated: true)
-    }
-    
-    func didCreateTracker(name: String, category: TrackerCategory, schedule: [Days], color: UIColor, emoji: Character) {
-        
-        print("Метод didCreateTracker вызван")
-        print("Создание трекера с именем: \(name) в категории: \(category.titles)")
-        
-        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule, categoryTitle: category.titles)
-        
-        if let index = categories.firstIndex(where: { $0.titles == category.titles }) {
-            categories[index].trackers.append(newTracker)
-            print("Трекер добавлен в существующую категорию: \(category.titles)")
-        } else {
-            // Добавляем новую категорию, если она не найдена
-            let newCategory = TrackerCategory(titles: category.titles, trackers: [newTracker])
-            categories.append(newCategory)
-            print("Создана новая категория: \(category.titles) и добавлен трекер")
+
+        print("Трекер добавлен. Текущее количество категорий: \(allCategories.count)")
+        allCategories.forEach { category in
+            print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
         }
-        
-        print("Текущее количество категорий: \(categories.count)")
-        collectionView.reloadData()
     }
     
     func didCreateTrackerSuccessfully(_ tracker: Tracker) {
         print("Новый трекер успешно создан:")
-        print("ID: \(tracker.id)")
+        print("ID: \(tracker.id)")  
         print("Название: \(tracker.name)")
         print("Расписание: \(tracker.schedule)")
+    }
+        
+    func printTrackersCount() {
+        print("Количество привычек: \(habitTrackers.count)")
+        print("Количество нерегулярных событий: \(eventTrackers.count)")
     }
 }
 
@@ -312,6 +328,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let completionCount = completedTrackers.filter { $0.id == tracker.id }.count
         let isCompleted = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
         cell.configure(with: tracker, isCompleted: isCompleted, completionCount: completionCount)
+        print("Трекер: \(tracker.name), Количество завершений: \(completionCount), Завершен сегодня: \(isCompleted)")
         return cell
     }
     

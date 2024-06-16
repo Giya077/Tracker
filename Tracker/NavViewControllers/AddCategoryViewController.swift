@@ -38,8 +38,6 @@ class AddCategoryViewController: UIViewController {
         return categoryNameTextField
     }()
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -72,7 +70,6 @@ class AddCategoryViewController: UIViewController {
         guard let name = categoryNameTextField.text, !name.isEmpty else { return }
         let newCategory = TrackerCategory(titles: name, trackers: []) // Используем инициализатор с передачей только названия
         delegate?.didAddCategory(newCategory)
-//        delegate?.removeStubAndShowCategories()
         dismiss(animated: true)
     }
 }

@@ -10,8 +10,9 @@ import UIKit
 
 class HabitViewController: UIViewController {
     
-    weak var delegate: HabitCreationDelegate?
     weak var trackerDelegate: NewTrackerDelegate?
+    
+    var trackerType: TrackerType?
     
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
@@ -21,11 +22,12 @@ class HabitViewController: UIViewController {
     var selectedEmojiIndex: IndexPath?
     var selectedColorIndex: IndexPath?
     
-    
     let label: UILabel = {
         let label = BasicTextLabel(text: "Новая привычка")
         return label
     }()
+    
+    var categoryViewController: CategoryViewController?
     
     let trackNaming: UITextField = {
         let trackNaming = UITextField()
@@ -40,6 +42,15 @@ class HabitViewController: UIViewController {
         return trackNaming
     }()
     
+    private let characterLimitLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ограничение 38 символов"
+        label.textColor = .red
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     let arrayCells = ["Категория", "Расписание"]
     let cellIdentifier = "CellType1"
     lazy var categoryAndScheduleCollectionView: UICollectionView = {
@@ -49,7 +60,7 @@ class HabitViewController: UIViewController {
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
-        collectionView.isScrollEnabled = false
+//        collectionView.isScrollEnabled = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(CellType1.self, forCellWithReuseIdentifier: "CellType1")
         return collectionView
@@ -71,15 +82,24 @@ class HabitViewController: UIViewController {
         return separatorLine
     }()
     
-    lazy var emojiTextLabel: UILabel = {
-        let emojiTextLabel = UILabel()
-        emojiTextLabel.textColor = .black
-        emojiTextLabel.text = "Emoji"
-        emojiTextLabel.font = UIFont.boldSystemFont(ofSize: 17)
-        emojiTextLabel.translatesAutoresizingMaskIntoConstraints = false
-        return emojiTextLabel
+    let emojiHeaderLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.text = "Emoji"
+        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
+    let colorsHeaderLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.text = "Цвет"
+        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+        
     var emojiArray = ["😊", "🚀", "🎉", "⭐️", "🌈", "🎈", "🍀", "🌺", "🐶", "🐱", "🐰", "🐻", "🦄", "🍔", "🍕", "🍰", "🎸", "📚"]
     private lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -124,7 +144,7 @@ class HabitViewController: UIViewController {
         let createButton = UIButton(type: .system)
         createButton.setTitle("Создать", for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
-        createButton.backgroundColor = .lightGray
+//        createButton.backgroundColor = .lightGray
         createButton.layer.cornerRadius = 12
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
@@ -133,41 +153,41 @@ class HabitViewController: UIViewController {
         return createButton
     }()
     
-    private let categoryLabel: UILabel = {
-        let categoryLabel = UILabel()
-        categoryLabel.textColor = .gray
-        categoryLabel.font = UIFont.systemFont(ofSize: 16)
-        categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-        return categoryLabel
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        stackViewButton()
         setupView()
+        
+        categoryViewController = CategoryViewController()
+        categoryViewController?.categorySelectionDelegate = self
+        
+        stackViewButton()
+        categoryAndScheduleCollectionView.delegate = self
+        categoryAndScheduleCollectionView.dataSource = self
+        emojiCollectionView.delegate = self
+        emojiCollectionView.dataSource = self
+        colorCollectionView.delegate = self
+        colorCollectionView.dataSource = self
         trackNaming.delegate = self
+        
+        createButton.isEnabled = false
+        createButton.backgroundColor = .lightGray
     }
     
     private func setupView() {
-        categoryAndScheduleCollectionView.delegate = self
-        categoryAndScheduleCollectionView.dataSource = self
         
-        emojiCollectionView.delegate = self
-        emojiCollectionView.dataSource = self
-        
-        colorCollectionView.delegate = self
-        colorCollectionView.dataSource = self
-        
-        view.addSubview(categoryLabel)
         view.addSubview(label)
         view.addSubview(trackNaming)
         view.addSubview(contrainerView)
         view.addSubview(separatorLine)
         view.addSubview(categoryAndScheduleCollectionView)
-        view.addSubview(emojiTextLabel)
+        view.addSubview(emojiHeaderLabel)
         view.addSubview(emojiCollectionView)
+        view.addSubview(colorsHeaderLabel)
         view.addSubview(colorCollectionView)
+        view.addSubview(characterLimitLabel)
+        
+        hideCharacterLimitLabel()
         
         NSLayoutConstraint.activate([
             
@@ -179,45 +199,44 @@ class HabitViewController: UIViewController {
             trackNaming.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             trackNaming.heightAnchor.constraint(equalToConstant: 50),
             
-            categoryAndScheduleCollectionView.topAnchor.constraint(equalTo: trackNaming.bottomAnchor, constant: 20),
+            characterLimitLabel.topAnchor.constraint(equalTo: trackNaming.bottomAnchor, constant: 5),
+//            characterLimitLabel.bottomAnchor.constraint(equalTo: contrainerView.topAnchor, constant: 10),
+            characterLimitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            categoryAndScheduleCollectionView.topAnchor.constraint(equalTo: characterLimitLabel.bottomAnchor, constant: 10),
             categoryAndScheduleCollectionView.leadingAnchor.constraint(equalTo: trackNaming.leadingAnchor),
             categoryAndScheduleCollectionView.trailingAnchor.constraint(equalTo: trackNaming.trailingAnchor),
-            categoryAndScheduleCollectionView.heightAnchor.constraint(equalToConstant: 200),
+            categoryAndScheduleCollectionView.heightAnchor.constraint(equalToConstant: 150),
             
             contrainerView.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.topAnchor),
             contrainerView.leadingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.leadingAnchor),
             contrainerView.trailingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.trailingAnchor),
-            contrainerView.heightAnchor.constraint(equalToConstant: 200),
+            contrainerView.heightAnchor.constraint(equalToConstant: 150),
             
             separatorLine.leadingAnchor.constraint(equalTo: contrainerView.leadingAnchor, constant: 20),
             separatorLine.trailingAnchor.constraint(equalTo: contrainerView.trailingAnchor, constant: -20),
             separatorLine.centerYAnchor.constraint(equalTo: contrainerView.centerYAnchor),
             separatorLine.heightAnchor.constraint(equalToConstant: 1),
-            
-            emojiTextLabel.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.bottomAnchor, constant: 20),
-            emojiTextLabel.leadingAnchor.constraint(equalTo: categoryAndScheduleCollectionView.leadingAnchor),
-            
-            categoryLabel.topAnchor.constraint(equalTo: categoryAndScheduleCollectionView.bottomAnchor, constant: 8),
-            categoryLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            categoryLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])
         
         //EmojiCollectionvView
                 
         NSLayoutConstraint.activate([
-            emojiCollectionView.topAnchor.constraint(equalTo: emojiTextLabel.bottomAnchor, constant: 10),
+            
+            emojiHeaderLabel.topAnchor.constraint(equalTo: contrainerView.bottomAnchor, constant: 15),
+            emojiHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            
+            emojiCollectionView.topAnchor.constraint(equalTo: emojiHeaderLabel.bottomAnchor, constant: 10),
             emojiCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             emojiCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            emojiCollectionView.heightAnchor.constraint(equalToConstant: 100)
-        ])
-        
-        // ColorCollectionView
-        
-        NSLayoutConstraint.activate([
-            colorCollectionView.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 10),
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 130),
+            
+            colorsHeaderLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 10),
+            colorsHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+
+            colorCollectionView.topAnchor.constraint(equalTo: colorsHeaderLabel.bottomAnchor, constant: 15),
             colorCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             colorCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            colorCollectionView.bottomAnchor.constraint(equalTo: createButton.topAnchor)
         ])
     }
     
@@ -231,6 +250,7 @@ class HabitViewController: UIViewController {
         stackViewButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            stackViewButton.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor),
             stackViewButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             stackViewButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             stackViewButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -239,7 +259,26 @@ class HabitViewController: UIViewController {
     
     private func updateCategoryLabel() {
         guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
-        categoryCell.configure(title: "Категория", days: selectedCategory?.titles)
+        // Создаем строку, содержащую названия всех выбранных категорий, разделенные запятыми
+        let categoriesText = selectedCategory?.titles ?? ""
+        // Обновляем текст в ячейке с категорией
+        categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+    }
+    
+    private func checkFields() -> Bool {
+        guard let name = trackNaming.text, !name.isEmpty,
+              selectedColor != nil,
+              selectedEmoji != nil,
+              !selectedDays.isEmpty,
+              selectedCategory != nil else {
+            return false
+        }
+        return true
+    }
+    
+    private func updateCreateButtonState() {
+        createButton.isEnabled = checkFields()
+        createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
     }
     
     @objc
@@ -256,10 +295,13 @@ class HabitViewController: UIViewController {
             return
         }
         let schedule = Array(selectedDays)
-        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule, categoryTitle: category.titles)
-        // Вызываем делегата для создания нового трекера
+        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule)
         
-        trackerDelegate?.didAddTracker(newTracker)
+        guard let trackerType = trackerType else { return }
+        
+        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ??
+        
+        trackerDelegate?.didAddTracker(newTracker, to: trackerCategory, trackerType: trackerType) // to newTracker
         self.dismiss(animated: true)
     }
 }
@@ -323,22 +365,26 @@ extension HabitViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         if collectionView == emojiCollectionView {
-            let padding: CGFloat = 10
+            let padding: CGFloat = 20
             let itemsPerRow: CGFloat = 6
             let itemWidth = (collectionView.frame.width - padding * (itemsPerRow - 1)) / itemsPerRow
             return CGSize(width: itemWidth, height: itemWidth)
             
         } else if collectionView == colorCollectionView {
-            let padding: CGFloat = 10
+            let padding: CGFloat = 15
             let itemsPerRow: CGFloat = 6
             let itemWidth = (collectionView.frame.width - padding * (itemsPerRow - 1)) / itemsPerRow
             return CGSize(width: itemWidth, height: itemWidth)
         }
-        return CGSize(width: collectionView.frame.width, height: 100 )
+        return CGSize(width: collectionView.frame.width, height: 75 )
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 5
+        if collectionView == colorCollectionView {
+            return 10
+        } else {
+            return 0
+        }
     }
 }
 
@@ -347,21 +393,14 @@ extension HabitViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == categoryAndScheduleCollectionView {
             collectionView.deselectItem(at: indexPath, animated: true)
-            switch indexPath.item {
-                
+            switch indexPath.row {
             case 0:
-                let categoryViewController = CategoryViewController()
-                categoryViewController.categorySelectionDelegate = self
-                let nav = UINavigationController(rootViewController: categoryViewController)
-                present(nav, animated: true)
-                print("categoryViewController tapped")
-                
+                guard let categoryVC = categoryViewController else { return }
+                navigationController?.pushViewController(categoryVC, animated: true)
             case 1:
                 let scheduleViewController = ScheduleViewController(delegate: self, selectedDays: selectedDays)
                 let nav = UINavigationController(rootViewController: scheduleViewController)
                 present(nav, animated: true)
-                print("scheduleViewController tapped")
-                
             default:
                 break
             }
@@ -374,6 +413,7 @@ extension HabitViewController: UICollectionViewDelegate {
                 selectedEmoji = emojiArray[indexPath.item].first
             }
             collectionView.reloadData()
+            updateCreateButtonState()
             
         } else if collectionView == colorCollectionView {
             if selectedColorIndex == indexPath {
@@ -384,14 +424,45 @@ extension HabitViewController: UICollectionViewDelegate {
                 selectedColor = colorArray[indexPath.item]
             }
             collectionView.reloadData()
+            updateCreateButtonState()
         }
     }
 }
 
 extension HabitViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder() // Скрыть клавиатуру
+        textField.resignFirstResponder()// Скрыть клавиатуру
+        updateCreateButtonState()
         return true
+    }
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+         // Проверяем, что это наше текстовое поле
+         if textField == trackNaming {
+             // Проверяем, что текст после изменений не превышает 38 символов
+             if let text = textField.text,
+                let textRange = Range(range, in: text) {
+                 let updatedText = text.replacingCharacters(in: textRange, with: string)
+                 // Проверяем, достигнуто ли ограничение
+                 if updatedText.count >= 38 {
+                     // Отображаем метку
+                     showCharacterLimitLabel()
+                 } else {
+                     // Скрываем метку, если текст в пределах ограничения
+                     hideCharacterLimitLabel()
+                 }
+                 updateCreateButtonState()
+                 return updatedText.count <= 38
+             }
+         }
+         return true
+     }
+    
+    private func showCharacterLimitLabel() {
+        characterLimitLabel.isHidden = false
+    }
+    
+    private func hideCharacterLimitLabel() {
+        characterLimitLabel.isHidden = true
     }
 }
 
@@ -399,13 +470,10 @@ extension HabitViewController: TimetableDelegate {
     
     func didUpdateSelectedDays(_ selectedDays: Set<Days>) {
         self.selectedDays = selectedDays
-        
-        // Проверяем, что выбранные дни корректно передаются
         print("Selected days updated in HabitViewController: \(selectedDays)")
-        
-        // Перезагружаем коллекцию после обновления данных
         DispatchQueue.main.async {
             self.categoryAndScheduleCollectionView.reloadData()
+            self.updateCreateButtonState()
         }
     }
 }
@@ -416,14 +484,17 @@ extension HabitViewController: NewCategoryViewControllerDelegate {
     
     func didAddCategory(_ category: TrackerCategory) {
         selectedCategory = category
-        categoryLabel.text = category.titles
+        updateCategoryLabel()
+        updateCreateButtonState()
     }
 }
 
 extension HabitViewController: CategorySelectionDelegate { // делегат для передачи выбранной категории от CategoryViewController к HabitViewController.
+    
     func didSelectCategory(_ category: TrackerCategory) {
-        self.selectedCategory = category
+        selectedCategory = category
         updateCategoryLabel()
+        updateCreateButtonState()
     }
 }
 

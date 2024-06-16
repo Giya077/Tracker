@@ -7,13 +7,7 @@
 
 import Foundation
 
-class TrackerCategory {
+struct TrackerCategory {
     let titles: String // Название категории
-    var trackers: [Tracker] // Массив трекеров в данной категории
-    
-
-    init(titles: String, trackers: [Tracker] = []) {
-        self.titles = titles
-        self.trackers = trackers
-    }
+    let trackers: [Tracker] // Массив трекеров в данной категории
 }

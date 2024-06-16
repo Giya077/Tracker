@@ -8,24 +8,8 @@
 import Foundation
 import UIKit
 
-final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
-    
-    func didAddTracker(_ tracker: Tracker?) {
-        // Проверяем, что трекер не nil
-        guard let newTracker = tracker else {
-            print("Ошибка: Новый трекер не был передан.")
-            return
-        }
-
-        // Сохраняем созданный трекер
-        self.createdTracker = newTracker
-        print("Новый трекер добавлен: \(newTracker.name)")
-
-        // Передаем созданный трекер делегату
-        delegate?.didAddTracker(newTracker)
-    }
-
-    
+final class NewTrackerViewController: UIViewController {
+        
     weak var delegate: NewTrackerDelegate?
     var createdTracker: Tracker? // Добавляем свойство для хранения созданного трекера
     
@@ -56,8 +40,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
         stackView()
     }
     
-    
-    
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(label)
@@ -85,8 +67,8 @@ final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
     
     @objc private func habitButtonTapped() {
         let habitViewController = HabitViewController()
-        habitViewController.delegate = self.delegate as? HabitCreationDelegate
         habitViewController.trackerDelegate = self
+        habitViewController.trackerType = .habit
         let nav = UINavigationController(rootViewController: habitViewController)
         present(nav, animated: true)
         print("habbit button tapped")
@@ -94,8 +76,16 @@ final class NewTrackerViewController: UIViewController, NewTrackerDelegate {
     
     @objc private func irregularEventTapped() {
         let irregularEventViewController = IrregularEventViewController()
+        irregularEventViewController.trackerType = .event
         let nav = UINavigationController(rootViewController: irregularEventViewController)
         present(nav, animated:  true)
         print("irregular button tapped")
+    }
+}
+
+extension NewTrackerViewController: NewTrackerDelegate {
+    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
+        // Передаем созданный трекер делегату
+        delegate?.didAddTracker(tracker, to: category, trackerType: trackerType)
     }
 }

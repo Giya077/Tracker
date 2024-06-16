@@ -9,29 +9,26 @@ import Foundation
 import UIKit
 
 class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
-        
+    
     weak var delegate: NewCategoryViewControllerDelegate? // для связи между AddCategoryViewController и CategoryViewController
-    
-    weak var habitDelegate: HabitViewController? // делегат для HabitViewController
-    
+    weak var habitDelegate: HabitViewController?
     weak var categorySelectionDelegate: CategorySelectionDelegate?
-    
     private var selectedCategories: Set<Int> = []
-
+    
     var categories: [TrackerCategory] = [] {
         didSet {
             tableView.reloadData()
             updateViewVisibility()
         }
     }
-
+    
     private lazy var stubView = StubView(text: "Привычки и события можно\nобъединить по смыслу")
     
     private lazy var label: UILabel = {
         let label = BasicTextLabel(text: "Категория")
         return label
     }()
-        
+    
     private lazy var addCategoryButton: UIButton = {
         let addCategoryButton = BasicButton(title: "Добавить категорию")
         addCategoryButton.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
@@ -50,11 +47,17 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.hidesBackButton = true
         setupView()
         setupStubView()
         setupTableView()
         updateViewVisibility()
         addCategoryViewController()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData() // Обновляем таблицу при появлении контроллера на экране
     }
     
     private func setupView() {
@@ -126,6 +129,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     func didAddCategory(_ category: TrackerCategory) {
         categories.append(category)
         removeStubAndShowCategories()
+        dismiss(animated: true)
     }
 }
 
@@ -149,8 +153,22 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let selectedCategory = categories[indexPath.row]
-        categorySelectionDelegate?.didSelectCategory(selectedCategory)
-        dismiss(animated: true)
-     }
- }
+        
+        // Обновляем множество выбранных категорий
+        
+        let selectedCategoryIndex = indexPath.row
+        
+        if selectedCategories.contains(selectedCategoryIndex) {
+            selectedCategories.remove(selectedCategoryIndex)
+        } else {
+            selectedCategories.removeAll()
+            selectedCategories.insert(selectedCategoryIndex)
+        }
+        
+        // Если у делегата есть метод didSelectCategory, вызываем его и передаем выбранную категорию
+        if let selectedCategory = selectedCategories.first.map({ categories[$0] }) {
+            categorySelectionDelegate?.didSelectCategory(selectedCategory)
+        }
+        navigationController?.popViewController(animated: true)
+    }
+}
