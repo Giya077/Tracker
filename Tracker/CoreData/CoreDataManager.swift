@@ -9,17 +9,21 @@ import Foundation
 import CoreData
 
 class CoreDataManager {
-    static let shared = CoreDataManager()
+    static let shared = CoreDataManager(persistentContainer: NSPersistentContainer(name: "Model"))
+    private let persistentContainer: NSPersistentContainer
     
-    lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "Model")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+    init(persistentContainer: NSPersistentContainer) {
+        self.persistentContainer = persistentContainer
+        self.persistentContainer.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
-        })
-        return container
-    }()
+        }
+    }
+    
+    var viewContext: NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
     
     func saveContext() {
         let context = persistentContainer.viewContext
@@ -33,4 +37,5 @@ class CoreDataManager {
         }
     }
 }
+
 

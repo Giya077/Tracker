@@ -5,8 +5,8 @@
 //  Created by GiyaDev on 10.05.2024.
 //
 
-import Foundation
 import UIKit
+import CoreData
 
 final class NewTrackerViewController: UIViewController {
         
