@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
     

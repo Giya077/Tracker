@@ -7,8 +7,8 @@
 
 import Foundation
 
-@objc(DaysValueTransformer)
-final class DaysValueTransformer: ValueTransformer {
+@objc(ScheduleValueTransformer)
+final class ScheduleValueTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass { NSData.self }
     override class func allowsReverseTransformation() -> Bool { true }
 

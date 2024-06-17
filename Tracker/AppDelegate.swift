@@ -15,14 +15,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        registerDaysValueTransformer()
+        registerScheduleValueTransformer()
         registerColorValueTransformer()
         return true
     }
     
-    private func registerDaysValueTransformer() {
-        let transformer = DaysValueTransformer()
-        ValueTransformer.setValueTransformer(transformer, forName: NSValueTransformerName(rawValue: String(describing: DaysValueTransformer.self)))
+    private func registerScheduleValueTransformer() {
+        let transformer = ScheduleValueTransformer()
+        ValueTransformer.setValueTransformer(transformer, forName: NSValueTransformerName(rawValue: String(describing: ScheduleValueTransformer().self)))
     }
     
     private func registerColorValueTransformer() {

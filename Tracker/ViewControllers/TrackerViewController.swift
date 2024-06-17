@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTrackerDelegate {
     
