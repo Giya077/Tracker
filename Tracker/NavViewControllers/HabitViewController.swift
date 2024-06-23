@@ -11,8 +11,9 @@ class HabitViewController: UIViewController {
     
     weak var trackerDelegate: NewTrackerDelegate?
     
-    var trackerType: TrackerType?
+    var trackerStore: TrackerStore!
     
+    var trackerType: TrackerType?
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
     var selectedColor: UIColor?
@@ -59,7 +60,6 @@ class HabitViewController: UIViewController {
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
-//        collectionView.isScrollEnabled = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(CellType1.self, forCellWithReuseIdentifier: "CellType1")
         return collectionView
@@ -143,7 +143,6 @@ class HabitViewController: UIViewController {
         let createButton = UIButton(type: .system)
         createButton.setTitle("Создать", for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
-//        createButton.backgroundColor = .lightGray
         createButton.layer.cornerRadius = 12
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
@@ -199,7 +198,6 @@ class HabitViewController: UIViewController {
             trackNaming.heightAnchor.constraint(equalToConstant: 50),
             
             characterLimitLabel.topAnchor.constraint(equalTo: trackNaming.bottomAnchor, constant: 5),
-//            characterLimitLabel.bottomAnchor.constraint(equalTo: contrainerView.topAnchor, constant: 10),
             characterLimitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             categoryAndScheduleCollectionView.topAnchor.constraint(equalTo: characterLimitLabel.bottomAnchor, constant: 10),

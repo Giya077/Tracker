@@ -1,46 +1,51 @@
-//
-//  TrackerStore.swift
-//  Tracker
-//
-//  Created by GiyaDev on 17.06.2024.
-//
-
 import Foundation
 import CoreData
 import UIKit
 
 class TrackerStore {
     private let context: NSManagedObjectContext
-    
+    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
+
     init(context: NSManagedObjectContext) {
         self.context = context
+        setupFetchedResultsController()
     }
-    
-    func fetchAllTrackers() -> [TrackerCoreData] {
+
+    private func setupFetchedResultsController() {
         let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+
+        fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
         do {
-            return try context.fetch(fetchRequest)
+            try fetchedResultsController?.performFetch()
         } catch {
-            print("Ошибка при получении данных о трекерах: \(error)")
-            return []
+            print("Error fetching trackers: \(error.localizedDescription)")
         }
     }
-    
-    func saveTracker(name: String, color: UIColor, emoji: String, schedule: [Days]) {
-        context.performAndWait {
-            let tracker = TrackerCoreData(context: context)
-            tracker.id = UUID()
-            tracker.name = name
-            tracker.color = color
-            tracker.emoji = emoji
-            tracker.schedule = schedule as NSObject
-            
+
+    func fetchAllTrackers() -> [TrackerCoreData] {
+        return fetchedResultsController?.fetchedObjects ?? []
+    }
+
+    func saveTracker(_ tracker: Tracker, to category: TrackerCategoryCoreData) {
+        context.perform {
+            let newTracker = TrackerCoreData(context: self.context)
+            newTracker.id = tracker.id
+            newTracker.name = tracker.name
+            newTracker.color = tracker.color
+            newTracker.emoji = String(tracker.emoji)
+            newTracker.schedule = tracker.schedule.map { $0.rawValue } as NSObject
+
             do {
-                try context.save()
+                try self.context.save()
             } catch {
-                fatalError("Failed to save tracker: \(error)")
+                print("Failed to save tracker: \(error)")
             }
         }
     }
 }
-

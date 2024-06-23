@@ -1,30 +1,25 @@
-//
-//  CoreDataManager.swift
-//  Tracker
-//
-//  Created by GiyaDev on 15.06.2024.
-//
 
 import Foundation
 import CoreData
 
 class CoreDataManager {
-    static let shared = CoreDataManager(persistentContainer: NSPersistentContainer(name: "Model"))
-    private let persistentContainer: NSPersistentContainer
-    
-    init(persistentContainer: NSPersistentContainer) {
-        self.persistentContainer = persistentContainer
-        self.persistentContainer.loadPersistentStores { (storeDescription, error) in
+    static let shared = CoreDataManager()
+
+    private init() {
+        persistentContainer = NSPersistentContainer(name: "Model")
+        persistentContainer.loadPersistentStores { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         }
     }
-    
+
+    private let persistentContainer: NSPersistentContainer
+
     var viewContext: NSManagedObjectContext {
         return persistentContainer.viewContext
     }
-    
+
     func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {
@@ -37,5 +32,3 @@ class CoreDataManager {
         }
     }
 }
-
-

@@ -10,20 +10,58 @@ import CoreData
 
 class TrackerRecordStore {
     private let context: NSManagedObjectContext
+    private var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData>?
     
     init(context: NSManagedObjectContext) {
         self.context = context
+        setupFetchedResultsController()
     }
     
-    func saveRecord(id: UUID, date: Date) {
-        let record = TrackerRecordCoreData(context: context)
-        record.id = id
-        record.date = date
+    private func setupFetchedResultsController() {
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+        
+        fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
         
         do {
-            try context.save()
+            try fetchedResultsController?.performFetch()
         } catch {
-            fatalError("Failed to save record \(error)")
+            print("Error fetching records \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchAllRecords() -> [TrackerRecordCoreData] {
+        return fetchedResultsController?.fetchedObjects ?? []
+    }
+    
+//    func saveRecord(id: UUID, date: Date) {
+//        let record = TrackerRecordCoreData(context: context)
+//        record.id = id
+//        record.date = date
+//        
+//        do {
+//            try context.save()
+//        } catch {
+//            fatalError("Failed to save record \(error)")
+//        }
+//    }
+    
+    func saveRecord(date: Date) {
+        context.performAndWait {
+            let record = TrackerRecordCoreData(context: context)
+            record.id = UUID()
+            record.date = date
+            
+            do {
+                try context.save()
+            } catch {
+                fatalError("Failed to save record \(error)")
+            }
         }
     }
 }

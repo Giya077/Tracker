@@ -18,7 +18,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     
     var habitTrackers: [Tracker] = []
     var eventTrackers: [Tracker] = []
-    
     var completedTrackers: [TrackerRecord] = []
     
     var currentDate: Date = Date()

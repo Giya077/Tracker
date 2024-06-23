@@ -48,6 +48,7 @@
 		1AA6424D2BE7FB4A002D6B32 /* StatisticViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA6424C2BE7FB4A002D6B32 /* StatisticViewController.swift */; };
 		1AA6424F2BE7FE7C002D6B32 /* TrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA6424E2BE7FE7C002D6B32 /* TrackerViewController.swift */; };
 		1AAFC20C2C14A5E8006982F0 /* trackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAFC20B2C14A5E8006982F0 /* trackerCell.swift */; };
+		1AEC76C92C24BB680047729F /* TrackerCategoryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AEC76C82C24BB680047729F /* TrackerCategoryProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -94,6 +95,7 @@
 		1AA6424C2BE7FB4A002D6B32 /* StatisticViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticViewController.swift; sourceTree = "<group>"; };
 		1AA6424E2BE7FE7C002D6B32 /* TrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewController.swift; sourceTree = "<group>"; };
 		1AAFC20B2C14A5E8006982F0 /* trackerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = trackerCell.swift; sourceTree = "<group>"; };
+		1AEC76C82C24BB680047729F /* TrackerCategoryProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 		1A195B832BEE200F00B7AAC1 /* Trackers */ = {
 			isa = PBXGroup;
 			children = (
+				1AEC76C72C24BB450047729F /* Protocols */,
 				1A195B862BEE209F00B7AAC1 /* Models */,
 			);
 			path = Trackers;
@@ -284,6 +287,14 @@
 			path = Tracker;
 			sourceTree = "<group>";
 		};
+		1AEC76C72C24BB450047729F /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				1AEC76C82C24BB680047729F /* TrackerCategoryProtocol.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -388,6 +399,7 @@
 				1A7E1A272C20127900A35B34 /* TrackerRecordStore.swift in Sources */,
 				1A877D482BF68FC8007EF036 /* StubView.swift in Sources */,
 				1A195B852BEE209900B7AAC1 /* Tracker.swift in Sources */,
+				1AEC76C92C24BB680047729F /* TrackerCategoryProtocol.swift in Sources */,
 				1A7E1A0C2C1B231700A35B34 /* DaysValueTransformer.swift in Sources */,
 				1A1E94FD2C0728DF009DD79B /* CellColors.swift in Sources */,
 				1A877D352BF3552C007EF036 /* IrregularEventViewController.swift in Sources */,
