@@ -17,7 +17,7 @@ class HabitViewController: UIViewController {
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
     var selectedColor: UIColor?
-    var selectedEmoji: Character?
+    var selectedEmoji: String?
     
     var selectedEmojiIndex: IndexPath?
     var selectedColorIndex: IndexPath?
@@ -407,7 +407,7 @@ extension HabitViewController: UICollectionViewDelegate {
                 selectedEmoji = nil
             } else {
                 selectedEmojiIndex = indexPath
-                selectedEmoji = emojiArray[indexPath.item].first
+                selectedEmoji = emojiArray[indexPath.item]
             }
             collectionView.reloadData()
             updateCreateButtonState()

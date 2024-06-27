@@ -16,11 +16,14 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
     
+    private let trackerCategoryStore = TrackerCategoryStore()
+    
     var habitTrackers: [Tracker] = []
     var eventTrackers: [Tracker] = []
     var completedTrackers: [TrackerRecord] = []
     
     var currentDate: Date = Date()
+    
     
     var allCategories: [TrackerCategory] = []  // Для хранения всех категорий без фильтрации
     internal var categories: [TrackerCategory] = [] {
