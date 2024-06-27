@@ -36,6 +36,17 @@ class AddCategoryViewController: UIViewController {
         return categoryNameTextField
     }()
     
+    private let trackerCategoryStore: TrackerCategoryStore
+    
+    init(trackerCategoryStore: TrackerCategoryStore) {
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
@@ -64,9 +75,24 @@ class AddCategoryViewController: UIViewController {
         ])
     }
     
+//    @objc private func addCategory() {
+//        guard let name = categoryNameTextField.text, !name.isEmpty else { return }
+//        let newCategory = TrackerCategory(titles: name, trackers: []) // Используем инициализатор с передачей только названия
+//        delegate?.didAddCategory(newCategory)
+//        dismiss(animated: true)
+//    }
+    
     @objc private func addCategory() {
         guard let name = categoryNameTextField.text, !name.isEmpty else { return }
-        let newCategory = TrackerCategory(titles: name, trackers: []) // Используем инициализатор с передачей только названия
+        
+        do {
+            try trackerCategoryStore.createCategory(title: name)
+        } catch {
+            print("Ошибка при создании категории: \(error)")
+            return
+        }
+        
+        let newCategory = TrackerCategory(titles: name, trackers: [])
         delegate?.didAddCategory(newCategory)
         dismiss(animated: true)
     }

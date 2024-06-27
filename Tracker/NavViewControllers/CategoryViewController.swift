@@ -14,6 +14,8 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     weak var categorySelectionDelegate: CategorySelectionDelegate?
     private var selectedCategories: Set<Int> = []
     
+    private let trackerCategoryStore: TrackerCategoryStore
+    
     var categories: [TrackerCategory] = [] {
         didSet {
             tableView.reloadData()
@@ -43,6 +45,17 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         return tableView
     }()
     
+    init(trackerCategoryStore: TrackerCategoryStore) {
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+        
+        //Загрузка категорий из Core Data
+        self.categories = trackerCategoryStore.categories
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,7 +89,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     }
     
     private func addCategoryViewController() {
-        let addCategoryViewController = AddCategoryViewController()
+        let addCategoryViewController = AddCategoryViewController(trackerCategoryStore: trackerCategoryStore)
         addCategoryViewController.delegate = self
     }
     
@@ -115,7 +128,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     
     @objc
     private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController()
+        let addCategoryViewController = AddCategoryViewController(trackerCategoryStore: trackerCategoryStore)
         addCategoryViewController.delegate = self
         let nav = UINavigationController(rootViewController: addCategoryViewController)
         present(nav, animated: true)

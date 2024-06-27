@@ -11,7 +11,8 @@ class HabitViewController: UIViewController {
     
     weak var trackerDelegate: NewTrackerDelegate?
     
-    var trackerStore: TrackerStore!
+    var categoryViewController: CategoryViewController?
+    var trackerCategoryStore: TrackerCategoryStore
     
     var trackerType: TrackerType?
     var selectedDays: Set<Days> = []
@@ -26,8 +27,6 @@ class HabitViewController: UIViewController {
         let label = BasicTextLabel(text: "Новая привычка")
         return label
     }()
-    
-    var categoryViewController: CategoryViewController?
     
     let trackNaming: UITextField = {
         let trackNaming = UITextField()
@@ -151,12 +150,21 @@ class HabitViewController: UIViewController {
         return createButton
     }()
     
+    init(trackerCategoryStore: TrackerCategoryStore) {
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupView()
         
-        categoryViewController = CategoryViewController()
+        categoryViewController = CategoryViewController(trackerCategoryStore: trackerCategoryStore)
         categoryViewController?.categorySelectionDelegate = self
         
         stackViewButton()
@@ -296,7 +304,7 @@ class HabitViewController: UIViewController {
         
         guard let trackerType = trackerType else { return }
         
-        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ??
+        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ?? TrackerStore!!
         
         trackerDelegate?.didAddTracker(newTracker, to: trackerCategory, trackerType: trackerType) // to newTracker
         self.dismiss(animated: true)

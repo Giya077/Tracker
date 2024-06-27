@@ -71,7 +71,7 @@ final class TrackerStore: NSObject {
         )
     }
     
-    func createTracker(from tracker: Tracker) throws -> TrackerCoreData {
+    func createTrackerCoreData(from tracker: Tracker) throws -> TrackerCoreData {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name

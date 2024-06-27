@@ -12,6 +12,8 @@ final class NewTrackerViewController: UIViewController {
     weak var delegate: NewTrackerDelegate?
     var createdTracker: Tracker? // Добавляем свойство для хранения созданного трекера
     
+    private let trackerCategoryStore = TrackerCategoryStore() /// ???????!!!!!!!!
+    
     private lazy var habitButton: UIButton = {
         let habitButton = BasicButton(title: "Привычка")
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
@@ -31,6 +33,7 @@ final class NewTrackerViewController: UIViewController {
         let label = BasicTextLabel(text: "Создание трекера")
         return label
     }()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,7 +68,7 @@ final class NewTrackerViewController: UIViewController {
     }
     
     @objc private func habitButtonTapped() {
-        let habitViewController = HabitViewController()
+        let habitViewController = HabitViewController(trackerCategoryStore: trackerCategoryStore)
         habitViewController.trackerDelegate = self
         habitViewController.trackerType = .habit
         let nav = UINavigationController(rootViewController: habitViewController)

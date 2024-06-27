@@ -17,7 +17,7 @@ enum TrackerCategoryStoreError: Error {
 
 class TrackerCategoryStore: NSObject {
     private let context: NSManagedObjectContext
-    private let trackerStore = TrackerStore()
+    private var trackerStore = TrackerStore()
     
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
@@ -56,17 +56,31 @@ class TrackerCategoryStore: NSObject {
         }
     }
     
+//    init(context: NSManagedObjectContext) {
+//        self.context = context
+//        super.init()
+//    }
+   
+    
     init(context: NSManagedObjectContext) {
         self.context = context
+        self.trackerStore = TrackerStore(context: context)
         super.init()
+        
+        do {
+            try fetchedResultController.performFetch()
+        } catch {
+            print("Failed to fetch categories: \(error)")
+        }
     }
     
+    //преобразования данных из Core Data в модели
     private func makeCategories(from trackerCategoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
         guard let title = trackerCategoryCoreData.titles else {
             throw TrackerCategoryStoreError.decodingErrorInvalidTitle
         }
         
-        guard let trackers = trackerCategoryCoreData.tracker else {
+        guard let trackers = trackerCategoryCoreData.trackers else {
             throw TrackerCategoryStoreError.decodingErrorInvalidCategory
         }
         
@@ -89,18 +103,19 @@ class TrackerCategoryStore: NSObject {
         }
     }
     
+    //добавления трекера в уже существующую категорию
     func createTrackerWithCategory(tracker: Tracker, with titles: String) throws {
-        let trackerCoreData = try trackerStore.createTracker(from: tracker)
+        let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
         
         if let currentCategory = try? fetchedCategory(with: titles) {
-            guard let trackers = currentCategory.tracker, var newCoreDataTrackers = trackers.allObjects
+            guard let trackers = currentCategory.trackers, var newCoreDataTrackers = trackers.allObjects
                     as? [TrackerCoreData] else {return}
             newCoreDataTrackers.append(trackerCoreData)
-            currentCategory.tracker = NSSet(array: newCoreDataTrackers)
+            currentCategory.trackers = NSSet(array: newCoreDataTrackers)
         } else {
             let newCategory = TrackerCategoryCoreData(context: context)
             newCategory.titles = titles
-            newCategory.tracker = NSSet(array: [trackerCoreData])
+            newCategory.trackers = NSSet(array: [trackerCoreData])
         }
         
         do {
@@ -126,6 +141,26 @@ class TrackerCategoryStore: NSObject {
                 print("Failed to save context after deleting category: \(error)")
                 throw error
             }
+        }
+    }
+    
+    func createCategory(title: String) throws {
+        // Проверяем, существует ли уже категория с таким названием
+        if let _ = try? fetchedCategory(with: title) {
+            print("Категория с таким названием уже существует")
+            return
+        }
+        
+        // Создаём новую категорию
+        let newCategory = TrackerCategoryCoreData(context: context)
+        newCategory.titles = title
+        newCategory.trackers = []
+        
+        do {
+            try context.save()
+        } catch {
+            print("Не удалось сохранить категорию: \(error)")
+            throw error
         }
     }
 }
