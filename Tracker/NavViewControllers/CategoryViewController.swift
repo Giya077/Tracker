@@ -133,19 +133,39 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     
     private func editCategory(at indexPath: IndexPath) {
         let category = categories[indexPath.row]
+        let alertController = UIAlertController(title: "Редактировать категорию", message: nil, preferredStyle: .alert)
+        
+        alertController.addTextField { textField in
+             textField.text = category.titles
+         }
+        
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel)
+        alertController.addAction(cancelAction)
+        
+        let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
+            guard let newName = alertController.textFields?.first?.text else { return }
+            
+            do {
+                try self? .trackerCategoryStore.updateCategory(oldTitle: category.titles, newTitle: newName)
+                self?.updateCategories()
+            } catch {
+                print("Failed to update category: \(error)")
+            }
+        }
+        alertController.addAction(saveAction)
+        present(alertController, animated: true)
     }
     
     func deleteCategory(at indexPath: IndexPath) {
         let category = categories[indexPath.row]
-
+        
         do {
             try trackerCategoryStore.deleteCategory(with: category.titles)
-            // Удаление из массива categories и таблицы tableView произойдет автоматически через NSFetchedResultsControllerDelegate
+            
         } catch {
             print("Failed to delete category: \(error)")
         }
     }
-    
     
     @objc
     private func addCategoryButtonTapped() {

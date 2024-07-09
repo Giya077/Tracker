@@ -140,7 +140,6 @@ class TrackerCategoryStore: NSObject{
         }
     }
     
-    
     func createCategory(title: String) throws {
         // Проверяем, существует ли уже категория с таким названием
         if let _ = try? fetchedCategory(with: title) {
@@ -157,6 +156,23 @@ class TrackerCategoryStore: NSObject{
             try context.save()
         } catch {
             print("Не удалось сохранить категорию: \(error)")
+            throw error
+        }
+    }
+    
+    func updateCategory(oldTitle: String, newTitle: String) throws {
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "titles == %@", oldTitle)
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let category = results.first {
+                category.titles = newTitle
+                try context.save()
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Category not found"])
+            }
+        } catch {
             throw error
         }
     }
