@@ -15,19 +15,22 @@ enum TrackerCategoryStoreError: Error {
     case decodingErrorInvalidCategoryModel
 }
 
-class TrackerCategoryStore: NSObject {
+class TrackerCategoryStore: NSObject{
+    
     private let context: NSManagedObjectContext
     private var trackerStore = TrackerStore()
+    weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
     
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
     private var updatedIndexes: IndexSet?
     private var movedIndexes: Set<TrackerCategoryStoreUpdate.Move>?
     
-    private lazy var fetchedResultController: NSFetchedResultsController<TrackerCategoryCoreData> = {
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCategoryCoreData.titles, ascending: true)
+        let sortDescriptor = NSSortDescriptor(key: "titles", ascending: true)
         request.sortDescriptors = [sortDescriptor]
+        
         let controller = NSFetchedResultsController(
             fetchRequest: request,
             managedObjectContext: context,
@@ -35,13 +38,19 @@ class TrackerCategoryStore: NSObject {
             cacheName: nil
         )
         controller.delegate = self
-        try? controller.performFetch()
+        
+        do {
+            try controller.performFetch()
+        } catch {
+            print("Failed to fetch categories: \(error)")
+        }
+        
         return controller
     }()
     
     var categories: [TrackerCategory] {
         guard
-            let objects = self.fetchedResultController.fetchedObjects,
+            let objects = self.fetchedResultsController.fetchedObjects,
             let categories = try? objects.map({ try self.makeCategories(from: $0) })
         else { return [] }
         return categories
@@ -56,22 +65,9 @@ class TrackerCategoryStore: NSObject {
         }
     }
     
-//    init(context: NSManagedObjectContext) {
-//        self.context = context
-//        super.init()
-//    }
-   
-    
     init(context: NSManagedObjectContext) {
         self.context = context
-        self.trackerStore = TrackerStore(context: context)
         super.init()
-        
-        do {
-            try fetchedResultController.performFetch()
-        } catch {
-            print("Failed to fetch categories: \(error)")
-        }
     }
     
     //преобразования данных из Core Data в модели
@@ -93,8 +89,8 @@ class TrackerCategoryStore: NSObject {
     }
     
     private func fetchedCategory(with title: String) throws -> TrackerCategoryCoreData? {
-        let request = fetchedResultController.fetchRequest
-        request.predicate = NSPredicate(format: "%K == %@", argumentArray: ["titles", title])
+        let request = fetchedResultsController.fetchRequest
+        request.predicate = NSPredicate(format: "titles == %@", title)
         do {
             let category = try context.fetch(request)
             return category.first
@@ -126,23 +122,24 @@ class TrackerCategoryStore: NSObject {
     }
     
     func deleteCategory(with title: String) throws {
-        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCategoryCoreData")
-        request.predicate = NSPredicate(format: "%K == %@", 
-                                        #keyPath(TrackerCategoryCoreData.titles), title)
+        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.titles), title)
         
-        let categories = try context.fetch(request)
+        let categoriesToDelete = try context.fetch(request)
         
-        if let categoryToDelete = categories.first {
+        if let categoryToDelete = categoriesToDelete.first {
             context.delete(categoryToDelete)
-         
+            
             do {
                 try context.save()
+                trackerCategoryStoreDelegate?.categoriesDidChange()
             } catch {
                 print("Failed to save context after deleting category: \(error)")
                 throw error
             }
         }
     }
+    
     
     func createCategory(title: String) throws {
         // Проверяем, существует ли уже категория с таким названием
@@ -185,3 +182,10 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
         }
     }
 }
+
+extension TrackerCategoryStore: TrackerCategoryStoreDelegate {
+    func categoriesDidChange() {
+        trackerCategoryStoreDelegate?.categoriesDidChange()
+    }
+}
+

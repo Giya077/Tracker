@@ -9,8 +9,8 @@ import UIKit
 
 class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
     
-    weak var delegate: NewCategoryViewControllerDelegate? // для связи между AddCategoryViewController и CategoryViewController
-    weak var habitDelegate: HabitViewController?
+    weak var delegate: NewCategoryViewControllerDelegate?
+    weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?// для связи между AddCategoryViewController и CategoryViewController
     weak var categorySelectionDelegate: CategorySelectionDelegate?
     private var selectedCategories: Set<Int> = []
     
@@ -51,6 +51,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         
         //Загрузка категорий из Core Data
         self.categories = trackerCategoryStore.categories
+        trackerCategoryStore.trackerCategoryStoreDelegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -126,12 +127,57 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         }
     }
     
+    private func updateCategories() {
+        self.categories = trackerCategoryStore.categories
+    }
+    
+    private func editCategory(at indexPath: IndexPath) {
+        let category = categories[indexPath.row]
+    }
+    
+    func deleteCategory(at indexPath: IndexPath) {
+        let category = categories[indexPath.row]
+
+        do {
+            try trackerCategoryStore.deleteCategory(with: category.titles)
+            // Удаление из массива categories и таблицы tableView произойдет автоматически через NSFetchedResultsControllerDelegate
+        } catch {
+            print("Failed to delete category: \(error)")
+        }
+    }
+    
+    
     @objc
     private func addCategoryButtonTapped() {
         let addCategoryViewController = AddCategoryViewController(trackerCategoryStore: trackerCategoryStore)
         addCategoryViewController.delegate = self
         let nav = UINavigationController(rootViewController: addCategoryViewController)
         present(nav, animated: true)
+    }
+    
+    @objc
+    private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        guard gestureRecognizer.state == .began else {return}
+        
+        let touchPoint = gestureRecognizer.location(in: self.tableView)
+        if let indexPath = tableView.indexPathForRow(at: touchPoint) {
+            _ = categories[indexPath.row]
+            
+            let allertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            
+            let editAction = UIAlertAction(title: "Редактировать", style: .default) { [weak self] _ in
+                self?.editCategory(at: indexPath)
+            }
+            
+            let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+                self?.deleteCategory(at: indexPath)
+            }
+            
+            allertController.addAction(editAction)
+            allertController.addAction(deleteAction)
+            
+            present(allertController, animated: true, completion: nil)
+        }
     }
     
     func removeStubAndShowCategories() {
@@ -156,6 +202,10 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         let category = categories[indexPath.row]
         let isSelected = selectedCategories.contains(indexPath.row)
         cell.configure(withTitle: category.titles, backgroundColor: Colors.systemSearchColor!, isSelected: isSelected)
+        
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        cell.addGestureRecognizer(longPressRecognizer)
+        
         return cell
     }
     
@@ -182,5 +232,23 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
             categorySelectionDelegate?.didSelectCategory(selectedCategory)
         }
         navigationController?.popViewController(animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let category = categories[indexPath.row]
+            do {
+                try trackerCategoryStore.deleteCategory(with: category.titles)
+            } catch {
+                print("Failed to delete category: \(error)")
+            }
+        }
+    }
+}
+
+extension CategoryViewController: TrackerCategoryStoreDelegate {
+    func categoriesDidChange() {
+        updateCategories()
+        tableView.reloadData()
     }
 }
