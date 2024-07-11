@@ -26,34 +26,74 @@ class TrackerCategoryStore: NSObject{
     private var updatedIndexes: IndexSet?
     private var movedIndexes: Set<TrackerCategoryStoreUpdate.Move>?
     
+    //    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
+    //        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+    //        let sortDescriptor = NSSortDescriptor(key: "titles", ascending: true)
+    //        request.sortDescriptors = [sortDescriptor]
+    //
+    //        let controller = NSFetchedResultsController(
+    //            fetchRequest: request,
+    //            managedObjectContext: context,
+    //            sectionNameKeyPath: nil,
+    //            cacheName: nil
+    //        )
+    //        controller.delegate = self
+    //
+    //        do {
+    //            try controller.performFetch()
+    //        } catch {
+    //            print("Failed to fetch categories: \(error)")
+    //        }
+    //
+    //        return controller
+    //    }()
+    
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
-        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        let sortDescriptor = NSSortDescriptor(key: "titles", ascending: true)
-        request.sortDescriptors = [sortDescriptor]
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.titles, ascending: true)]
         
-        let controller = NSFetchedResultsController(
-            fetchRequest: request,
+        let fetchedResultsController = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
             managedObjectContext: context,
             sectionNameKeyPath: nil,
             cacheName: nil
         )
-        controller.delegate = self
+        
+        fetchedResultsController.delegate = self
         
         do {
-            try controller.performFetch()
+            try fetchedResultsController.performFetch()
         } catch {
-            print("Failed to fetch categories: \(error)")
+            fatalError("Unresolved error \(error)")
         }
         
-        return controller
+        return fetchedResultsController
     }()
     
+    
+    //    var categories: [TrackerCategory] {
+    //        guard
+    //            let objects = self.fetchedResultsController.fetchedObjects,
+    //            let categories = try? objects.map({ try self.makeCategories(from: $0) })
+    //        else { return [] }
+    //        return categories
+    //    }
+    
     var categories: [TrackerCategory] {
-        guard
-            let objects = self.fetchedResultsController.fetchedObjects,
-            let categories = try? objects.map({ try self.makeCategories(from: $0) })
-        else { return [] }
-        return categories
+        return fetchedResultsController.fetchedObjects?.map {
+            TrackerCategory(
+                titles: $0.titles!,
+                trackers: ($0.trackers?.allObjects as? [TrackerCoreData])?.map {
+                    Tracker(
+                        id: $0.id!,
+                        name: $0.name!,
+                        color: ColorValueTransformer().reverseTransformedValue($0.color) as! UIColor,
+                        emoji: String($0.emoji!),
+                        schedule: ScheduleValueTransformer().reverseTransformedValue($0.schedule) as! [Days]
+                    )
+                } ?? []
+            )
+        } ?? []
     }
     
     convenience override init() {
@@ -116,65 +156,40 @@ class TrackerCategoryStore: NSObject{
         
         do {
             try context.save()
+            //            trackerCategoryStoreDelegate?.categoriesDidChange()
         } catch {
             print("Unable to save category. Error: \(error), \(error.localizedDescription)")
         }
     }
     
     func deleteCategory(with title: String) throws {
-        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.titles), title)
+        let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "titles == %@", title)
         
-        let categoriesToDelete = try context.fetch(request)
-        
-        if let categoryToDelete = categoriesToDelete.first {
-            context.delete(categoryToDelete)
-            
-            do {
-                try context.save()
-                trackerCategoryStoreDelegate?.categoriesDidChange()
-            } catch {
-                print("Failed to save context after deleting category: \(error)")
-                throw error
-            }
+        if let category = try context.fetch(fetchRequest).first {
+            context.delete(category)
+            try context.save()
         }
     }
     
-    func createCategory(title: String) throws {
-        // Проверяем, существует ли уже категория с таким названием
-        if let _ = try? fetchedCategory(with: title) {
-            print("Категория с таким названием уже существует")
-            return
-        }
-        
-        // Создаём новую категорию
+    func createCategory(with title: String) throws {
         let newCategory = TrackerCategoryCoreData(context: context)
         newCategory.titles = title
-        newCategory.trackers = []
-        
-        do {
-            try context.save()
-        } catch {
-            print("Не удалось сохранить категорию: \(error)")
-            throw error
-        }
+        try context.save()
     }
     
     func updateCategory(oldTitle: String, newTitle: String) throws {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "titles == %@", oldTitle)
         
-        do {
-            let results = try context.fetch(fetchRequest)
-            if let category = results.first {
-                category.titles = newTitle
-                try context.save()
-            } else {
-                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Category not found"])
-            }
-        } catch {
-            throw error
+        if let category = try context.fetch(fetchRequest).first {
+            category.titles = newTitle
+            try context.save()
         }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        trackerCategoryStoreDelegate?.categoriesDidChange()
     }
 }
 
@@ -199,9 +214,9 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     }
 }
 
-extension TrackerCategoryStore: TrackerCategoryStoreDelegate {
-    func categoriesDidChange() {
-        trackerCategoryStoreDelegate?.categoriesDidChange()
-    }
-}
+//extension TrackerCategoryStore: TrackerCategoryStoreDelegate {
+//    func categoriesDidChange() {
+//        trackerCategoryStoreDelegate?.categoriesDidChange()
+//    }
+//}
 

@@ -10,7 +10,7 @@ import UIKit
 class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
     
     weak var delegate: NewCategoryViewControllerDelegate?
-    weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?// для связи между AddCategoryViewController и CategoryViewController
+    weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
     weak var categorySelectionDelegate: CategorySelectionDelegate?
     private var selectedCategories: Set<Int> = []
     
@@ -65,7 +65,6 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         setupStubView()
         setupTableView()
         updateViewVisibility()
-        addCategoryViewController()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -88,12 +87,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
             addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
     }
-    
-    private func addCategoryViewController() {
-        let addCategoryViewController = AddCategoryViewController(trackerCategoryStore: trackerCategoryStore)
-        addCategoryViewController.delegate = self
-    }
-    
+        
     private func setupStubView() {
         view.addSubview(stubView)
         stubView.textLabel.numberOfLines = 2
@@ -171,6 +165,7 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     private func addCategoryButtonTapped() {
         let addCategoryViewController = AddCategoryViewController(trackerCategoryStore: trackerCategoryStore)
         addCategoryViewController.delegate = self
+        addCategoryViewController.trackerCategoryStoreDelegate = trackerCategoryStoreDelegate
         let nav = UINavigationController(rootViewController: addCategoryViewController)
         present(nav, animated: true)
     }

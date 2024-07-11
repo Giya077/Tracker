@@ -10,6 +10,9 @@ import UIKit
 class AddCategoryViewController: UIViewController {
     
     weak var delegate: NewCategoryViewControllerDelegate?
+    weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
+    
+    private let trackerCategoryStore: TrackerCategoryStore
     
     private let label: UILabel = {
         let label = BasicTextLabel(text: "Новая категория")
@@ -35,8 +38,6 @@ class AddCategoryViewController: UIViewController {
         categoryNameTextField.translatesAutoresizingMaskIntoConstraints = false
         return categoryNameTextField
     }()
-    
-    private let trackerCategoryStore: TrackerCategoryStore
     
     init(trackerCategoryStore: TrackerCategoryStore) {
         self.trackerCategoryStore = trackerCategoryStore
@@ -74,27 +75,17 @@ class AddCategoryViewController: UIViewController {
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
     }
-    
-//    @objc private func addCategory() {
-//        guard let name = categoryNameTextField.text, !name.isEmpty else { return }
-//        let newCategory = TrackerCategory(titles: name, trackers: []) // Используем инициализатор с передачей только названия
-//        delegate?.didAddCategory(newCategory)
-//        dismiss(animated: true)
-//    }
-    
+        
     @objc private func addCategory() {
         guard let name = categoryNameTextField.text, !name.isEmpty else { return }
         
         do {
-            try trackerCategoryStore.createCategory(title: name)
+            try trackerCategoryStore.createCategory(with: name)
+            dismiss(animated: true)
         } catch {
             print("Ошибка при создании категории: \(error)")
             return
         }
-        
-        let newCategory = TrackerCategory(titles: name, trackers: [])
-        delegate?.didAddCategory(newCategory)
-        dismiss(animated: true)
     }
 }
 

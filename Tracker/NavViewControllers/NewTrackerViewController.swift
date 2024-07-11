@@ -34,10 +34,8 @@ final class NewTrackerViewController: UIViewController {
         return label
     }()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
         stackView()
     }
