@@ -14,6 +14,7 @@
 		1A1E94FA2C071AA5009DD79B /* ColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94F92C071AA5009DD79B /* ColorCell.swift */; };
 		1A1E94FD2C0728DF009DD79B /* CellColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E94FC2C0728DF009DD79B /* CellColors.swift */; };
 		1A1E95022C0D956D009DD79B /* TrackerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1E95012C0D956D009DD79B /* TrackerType.swift */; };
+		1A31C3442C4FDCC20078D14B /* Colors:Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A31C3432C4FDCC20078D14B /* Colors:Schedule.swift */; };
 		1A42528A2C2D3A51000C2955 /* TrackerCategoryStoreUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4252892C2D3A51000C2955 /* TrackerCategoryStoreUpdate.swift */; };
 		1A5CCC672C3C5E4200FAD465 /* TrackerCategoryStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5CCC662C3C5E4200FAD465 /* TrackerCategoryStoreDelegate.swift */; };
 		1A7E1A092C1B086100A35B34 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1A7E1A072C1B086100A35B34 /* Model.xcdatamodeld */; };
@@ -61,6 +62,7 @@
 		1A1E94F92C071AA5009DD79B /* ColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCell.swift; sourceTree = "<group>"; };
 		1A1E94FC2C0728DF009DD79B /* CellColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellColors.swift; sourceTree = "<group>"; };
 		1A1E95012C0D956D009DD79B /* TrackerType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerType.swift; sourceTree = "<group>"; };
+		1A31C3432C4FDCC20078D14B /* Colors:Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Colors:Schedule.swift"; sourceTree = "<group>"; };
 		1A4252892C2D3A51000C2955 /* TrackerCategoryStoreUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStoreUpdate.swift; sourceTree = "<group>"; };
 		1A5CCC662C3C5E4200FAD465 /* TrackerCategoryStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStoreDelegate.swift; sourceTree = "<group>"; };
 		1A7E1A082C1B086100A35B34 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 			children = (
 				1A7E1A0B2C1B231700A35B34 /* DaysValueTransformer.swift */,
 				1A7E1A132C1EF9F500A35B34 /* ColorValueTransformer.swift */,
+				1A31C3432C4FDCC20078D14B /* Colors:Schedule.swift */,
 			);
 			path = Transformers;
 			sourceTree = "<group>";
@@ -395,6 +398,7 @@
 				1A877D332BF286C2007EF036 /* DatePickerHelper.swift in Sources */,
 				1AA30DDF2BFE1B63004C3D27 /* BasicTextLabel.swift in Sources */,
 				1A877D402BF4CF8A007EF036 /* Days.swift in Sources */,
+				1A31C3442C4FDCC20078D14B /* Colors:Schedule.swift in Sources */,
 				1A877D3A2BF374EE007EF036 /* CellType.swift in Sources */,
 				1A877D532BFBBB5A007EF036 /* AddCategoryViewController.swift in Sources */,
 				1A877D512BF74120007EF036 /* Colors.swift in Sources */,

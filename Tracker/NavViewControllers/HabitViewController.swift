@@ -13,13 +13,12 @@ class HabitViewController: UIViewController {
     
     var categoryViewController: CategoryViewController?
     var trackerCategoryStore: TrackerCategoryStore
-    
     var trackerType: TrackerType?
     var selectedDays: Set<Days> = []
     var selectedCategory: TrackerCategory?
+    
     var selectedColor: UIColor?
     var selectedEmoji: String?
-    
     var selectedEmojiIndex: IndexPath?
     var selectedColorIndex: IndexPath?
     
@@ -286,6 +285,28 @@ class HabitViewController: UIViewController {
         createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
     }
     
+    private func saveTracker() {
+        guard let name = trackNaming.text, !name.isEmpty,
+              let color = selectedColor,
+              let emoji = selectedEmoji,
+              !selectedDays.isEmpty,
+              let category = selectedCategory else {
+            // Можно добавить обработку ошибки или показать уведомление
+            return
+        }
+        
+        let newTracker = Tracker(
+            id: UUID(),
+            name: name,
+            color: color,
+            emoji: emoji,
+            schedule: Array(selectedDays)
+        )
+        
+        trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didAddTracker(newTracker, to: category, trackerType: trackerType ?? .habit)
+    }
+    
     @objc
     private func cancelButtonTapped() {
         dismiss(animated: true, completion: nil)
@@ -293,22 +314,29 @@ class HabitViewController: UIViewController {
     
     @objc
     private func createButtonTapped() {
-        guard let name = trackNaming.text,
-              let selectedColor = selectedColor,
-              let selectedEmoji = selectedEmoji,
-              let category = selectedCategory else {
-            return
-        }
-        let schedule = Array(selectedDays)
-        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule)
-        
-        guard let trackerType = trackerType else { return }
-        
-        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ?? TrackerStore!!
-        
-        trackerDelegate?.didAddTracker(newTracker, to: trackerCategory, trackerType: trackerType) // to newTracker
-        self.dismiss(animated: true)
+        saveTracker()
+        dismiss(animated: true)
     }
+    
+//    @objc
+//    private func createButtonTapped() {
+//        guard let name = trackNaming.text,
+//              let selectedColor = selectedColor,
+//              let selectedEmoji = selectedEmoji,
+//              let category = selectedCategory else {
+//            return
+//        }
+//        let schedule = Array(selectedDays)
+//        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule)
+//        
+//        guard let trackerType = trackerType else { return }
+//        
+//        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ?? TrackerStore!!
+//        
+//        saveTracker()
+//        trackerDelegate?.didAddTracker(newTracker, to: trackerCategory, trackerType: trackerType) // to newTracker
+//        self.dismiss(animated: true)
+//    }
 }
 
 
@@ -502,6 +530,3 @@ extension HabitViewController: CategorySelectionDelegate { // делегат д�
         updateCreateButtonState()
     }
 }
-
-
-

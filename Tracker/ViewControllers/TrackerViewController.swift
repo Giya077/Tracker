@@ -271,15 +271,19 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
             var trackers = category.trackers
             trackers.append(tracker)
             allCategories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
+            print("Tracker added to existing category: \(category.titles)")
         } else {
             let newCategory = TrackerCategory(titles: category.titles, trackers: [tracker])
             allCategories.append(newCategory)
+            print("New category created: \(category.titles)")
         }
 
         if trackerType == .habit {
             habitTrackers.append(tracker)
+            print("Tracker added to habitTrackers")
         } else if trackerType == .event {
             eventTrackers.append(tracker)
+            print("Tracker added to eventTrackers")
         }
 
         printTrackersCount()

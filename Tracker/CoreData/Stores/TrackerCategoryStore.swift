@@ -18,36 +18,14 @@ enum TrackerCategoryStoreError: Error {
 class TrackerCategoryStore: NSObject{
     
     private let context: NSManagedObjectContext
-    private var trackerStore = TrackerStore()
+    private var trackerStore: TrackerStore
     weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
     
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
     private var updatedIndexes: IndexSet?
     private var movedIndexes: Set<TrackerCategoryStoreUpdate.Move>?
-    
-    //    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
-    //        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-    //        let sortDescriptor = NSSortDescriptor(key: "titles", ascending: true)
-    //        request.sortDescriptors = [sortDescriptor]
-    //
-    //        let controller = NSFetchedResultsController(
-    //            fetchRequest: request,
-    //            managedObjectContext: context,
-    //            sectionNameKeyPath: nil,
-    //            cacheName: nil
-    //        )
-    //        controller.delegate = self
-    //
-    //        do {
-    //            try controller.performFetch()
-    //        } catch {
-    //            print("Failed to fetch categories: \(error)")
-    //        }
-    //
-    //        return controller
-    //    }()
-    
+        
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.titles, ascending: true)]
@@ -71,30 +49,14 @@ class TrackerCategoryStore: NSObject{
     }()
     
     
-    //    var categories: [TrackerCategory] {
-    //        guard
-    //            let objects = self.fetchedResultsController.fetchedObjects,
-    //            let categories = try? objects.map({ try self.makeCategories(from: $0) })
-    //        else { return [] }
-    //        return categories
-    //    }
+        var categories: [TrackerCategory] {
+            guard
+                let objects = self.fetchedResultsController.fetchedObjects,
+                let categories = try? objects.map({ try self.makeCategories(from: $0) })
+            else { return [] }
+            return categories
+        }
     
-    var categories: [TrackerCategory] {
-        return fetchedResultsController.fetchedObjects?.map {
-            TrackerCategory(
-                titles: $0.titles!,
-                trackers: ($0.trackers?.allObjects as? [TrackerCoreData])?.map {
-                    Tracker(
-                        id: $0.id!,
-                        name: $0.name!,
-                        color: ColorValueTransformer().reverseTransformedValue($0.color) as! UIColor,
-                        emoji: String($0.emoji!),
-                        schedule: ScheduleValueTransformer().reverseTransformedValue($0.schedule) as! [Days]
-                    )
-                } ?? []
-            )
-        } ?? []
-    }
     
     convenience override init() {
         if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
@@ -107,6 +69,7 @@ class TrackerCategoryStore: NSObject{
     
     init(context: NSManagedObjectContext) {
         self.context = context
+        self.trackerStore = TrackerStore(context: context)
         super.init()
     }
     
@@ -122,7 +85,7 @@ class TrackerCategoryStore: NSObject{
         
         return TrackerCategory(titles: title, trackers: trackers.compactMap { coreDataTracker -> Tracker? in
             if let coreDataTracker = coreDataTracker as? TrackerCoreData {
-                return try? trackerStore.makeTracker(from: coreDataTracker)
+                return try? trackerStore.loadTrackerFromCoreData(from: coreDataTracker)
             }
             return nil
         })
@@ -187,6 +150,37 @@ class TrackerCategoryStore: NSObject{
             try context.save()
         }
     }
+        
+    func saveTracker(_ tracker: Tracker, forCategoryTitle categoryTitle: String) {
+        do {
+            // Создание TrackerCoreData из Tracker
+            let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
+            
+            // Поиск категории
+            if let currentCategory = try fetchedCategory(with: categoryTitle) {
+                // Добавление трекера в категорию
+                if let trackers = currentCategory.trackers, var newCoreDataTrackers = trackers.allObjects as? [TrackerCoreData] {
+                    newCoreDataTrackers.append(trackerCoreData)
+                    currentCategory.trackers = NSSet(array: newCoreDataTrackers)
+                } else {
+                    currentCategory.trackers = NSSet(array: [trackerCoreData])
+                }
+            } else {
+                // Создание новой категории, если она не найдена
+                let newCategory = TrackerCategoryCoreData(context: context)
+                newCategory.titles = categoryTitle
+                newCategory.trackers = NSSet(array: [trackerCoreData])
+            }
+            
+            // Сохранение контекста
+            try context.save()
+            // Уведомление делегата об изменениях
+            trackerCategoryStoreDelegate?.categoriesDidChange()
+        } catch {
+            print("Unable to save tracker. Error: \(error), \(error.localizedDescription)")
+        }
+    }
+
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         trackerCategoryStoreDelegate?.categoriesDidChange()
@@ -213,10 +207,4 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
         }
     }
 }
-
-//extension TrackerCategoryStore: TrackerCategoryStoreDelegate {
-//    func categoriesDidChange() {
-//        trackerCategoryStoreDelegate?.categoriesDidChange()
-//    }
-//}
 
