@@ -317,26 +317,6 @@ class HabitViewController: UIViewController {
         saveTracker()
         dismiss(animated: true)
     }
-    
-//    @objc
-//    private func createButtonTapped() {
-//        guard let name = trackNaming.text,
-//              let selectedColor = selectedColor,
-//              let selectedEmoji = selectedEmoji,
-//              let category = selectedCategory else {
-//            return
-//        }
-//        let schedule = Array(selectedDays)
-//        let newTracker = Tracker(id: UUID(), name: name, color: selectedColor, emoji: selectedEmoji, schedule: schedule)
-//        
-//        guard let trackerType = trackerType else { return }
-//        
-//        let trackerCategory = TrackerCategory(titles: category.titles, trackers: [newTracker]) // ?? TrackerStore!!
-//        
-//        saveTracker()
-//        trackerDelegate?.didAddTracker(newTracker, to: trackerCategory, trackerType: trackerType) // to newTracker
-//        self.dismiss(animated: true)
-//    }
 }
 
 

@@ -14,9 +14,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError("Unable to access AppDelegate")
+        }
+        
+        let context = appDelegate.persistantContainer.viewContext
+        
         let window = UIWindow(windowScene: windowScene)
         let tabBarController = UITabBarController()
-        let trackerViewController = TrackerViewController()
+        let trackerStore = TrackerStore(context: context)
+        let trackerCategoryStore = TrackerCategoryStore(context: context)
+        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore)
         let statisticViewController = StatisticViewController()
         let trackNav = UINavigationController(rootViewController: trackerViewController)
         let statisticNav = UINavigationController(rootViewController: statisticViewController)

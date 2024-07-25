@@ -48,7 +48,6 @@ class TrackerCategoryStore: NSObject{
         return fetchedResultsController
     }()
     
-    
         var categories: [TrackerCategory] {
             guard
                 let objects = self.fetchedResultsController.fetchedObjects,
@@ -56,7 +55,6 @@ class TrackerCategoryStore: NSObject{
             else { return [] }
             return categories
         }
-    
     
     convenience override init() {
         if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
@@ -102,27 +100,8 @@ class TrackerCategoryStore: NSObject{
         }
     }
     
-    //добавления трекера в уже существующую категорию
-    func createTrackerWithCategory(tracker: Tracker, with titles: String) throws {
-        let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
-        
-        if let currentCategory = try? fetchedCategory(with: titles) {
-            guard let trackers = currentCategory.trackers, var newCoreDataTrackers = trackers.allObjects
-                    as? [TrackerCoreData] else {return}
-            newCoreDataTrackers.append(trackerCoreData)
-            currentCategory.trackers = NSSet(array: newCoreDataTrackers)
-        } else {
-            let newCategory = TrackerCategoryCoreData(context: context)
-            newCategory.titles = titles
-            newCategory.trackers = NSSet(array: [trackerCoreData])
-        }
-        
-        do {
-            try context.save()
-            //            trackerCategoryStoreDelegate?.categoriesDidChange()
-        } catch {
-            print("Unable to save category. Error: \(error), \(error.localizedDescription)")
-        }
+    func fetchAllCategories() -> [TrackerCategoryCoreData] {
+        return fetchedResultsController.fetchedObjects ?? []
     }
     
     func deleteCategory(with title: String) throws {
@@ -157,11 +136,16 @@ class TrackerCategoryStore: NSObject{
             let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
             
             // Поиск категории
-            if let currentCategory = try fetchedCategory(with: categoryTitle) {
+            let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "titles == %@", categoryTitle)
+            let categories = try context.fetch(fetchRequest)
+            
+            if let currentCategory = categories.first {
                 // Добавление трекера в категорию
-                if let trackers = currentCategory.trackers, var newCoreDataTrackers = trackers.allObjects as? [TrackerCoreData] {
-                    newCoreDataTrackers.append(trackerCoreData)
-                    currentCategory.trackers = NSSet(array: newCoreDataTrackers)
+                if let trackers = currentCategory.trackers?.allObjects as? [TrackerCoreData] {
+                    var updatedTrackers = trackers
+                    updatedTrackers.append(trackerCoreData)
+                    currentCategory.trackers = NSSet(array: updatedTrackers)
                 } else {
                     currentCategory.trackers = NSSet(array: [trackerCoreData])
                 }

@@ -16,6 +16,10 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
     
+    private var trackerStore: TrackerStore
+    private var trackerCategoryStore: TrackerCategoryStore
+    private var trackers: [Tracker] = []
+    
     var habitTrackers: [Tracker] = []
     var eventTrackers: [Tracker] = []
     var completedTrackers: [TrackerRecord] = []
@@ -39,11 +43,23 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         }
     }
     
+    init(trackerStore: TrackerStore, trackerCategoryStore: TrackerCategoryStore) {
+        self.trackerStore = trackerStore
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         addPlusButton()
         setupUI()
         setupViews()
+        
+        loadTrackers()
         
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
@@ -51,6 +67,32 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         NotificationCenter.default.addObserver(self, selector: #selector(trackerCompletionChanged(_:)), name: .trackerCompletionChanged, object: nil)
     }
     
+    private func loadTrackers() {
+        let categoryCoreDataList = trackerCategoryStore.fetchAllCategories()
+        var allCategories: [TrackerCategory] = []
+
+        for categoryCoreData in categoryCoreDataList {
+            if let categoryName = categoryCoreData.titles {
+                var trackers: [Tracker] = []
+                
+                if let trackerCoreDataList = categoryCoreData.trackers?.allObjects as? [TrackerCoreData] {
+                    for trackerCoreData in trackerCoreDataList {
+                        if let tracker = try? trackerStore.loadTrackerFromCoreData(from: trackerCoreData) {
+                            trackers.append(tracker)
+                        }
+                    }
+                }
+
+                let trackerCategory = TrackerCategory(titles: categoryName, trackers: trackers)
+                allCategories.append(trackerCategory)
+            }
+        }
+
+        self.allCategories = allCategories
+        filterTrackersByDate()
+        collectionView.reloadData()
+    }
+
     private func setupViews() {
         setupStubView()
         setupSearchBar()
@@ -295,13 +337,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         allCategories.forEach { category in
             print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
         }
-    }
-    
-    func didCreateTrackerSuccessfully(_ tracker: Tracker) {
-        print("Новый трекер успешно создан:")
-        print("ID: \(tracker.id)")  
-        print("Название: \(tracker.name)")
-        print("Расписание: \(tracker.schedule)")
     }
         
     func printTrackersCount() {
