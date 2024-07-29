@@ -88,18 +88,7 @@ class TrackerCategoryStore: NSObject{
             return nil
         })
     }
-    
-    private func fetchedCategory(with title: String) throws -> TrackerCategoryCoreData? {
-        let request = fetchedResultsController.fetchRequest
-        request.predicate = NSPredicate(format: "titles == %@", title)
-        do {
-            let category = try context.fetch(request)
-            return category.first
-        } catch {
-            throw TrackerCategoryStoreError.decodingErrorInvalidCategoryModel
-        }
-    }
-    
+        
     func fetchAllCategories() -> [TrackerCategoryCoreData] {
         return fetchedResultsController.fetchedObjects ?? []
     }
@@ -120,6 +109,15 @@ class TrackerCategoryStore: NSObject{
         try context.save()
     }
     
+    func reloadFetchedResultsController() {
+        do {
+            try fetchedResultsController.performFetch()
+            trackerCategoryStoreDelegate?.categoriesDidChange()
+        } catch {
+            fatalError("Failed to fetch categories: \(error)")
+        }
+    }
+    
     func updateCategory(oldTitle: String, newTitle: String) throws {
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "titles == %@", oldTitle)
@@ -127,6 +125,10 @@ class TrackerCategoryStore: NSObject{
         if let category = try context.fetch(fetchRequest).first {
             category.titles = newTitle
             try context.save()
+            
+            reloadFetchedResultsController()
+            let updatedCategory = try self.makeCategories(from: category)
+            trackerCategoryStoreDelegate?.categoryDidUpdate(updatedCategory)
         }
     }
         
@@ -164,15 +166,16 @@ class TrackerCategoryStore: NSObject{
             print("Unable to save tracker. Error: \(error), \(error.localizedDescription)")
         }
     }
-
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        trackerCategoryStoreDelegate?.categoriesDidChange()
-    }
 }
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    func controller(
+        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+        didChange anObject: Any,
+        at indexPath: IndexPath?,
+        for type: NSFetchedResultsChangeType,
+        newIndexPath: IndexPath?
+    ) {
         switch type {
         case .insert:
             guard let indexPath = newIndexPath else { fatalError() }
@@ -186,9 +189,14 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
         case .move:
             guard let oldIndexPath = indexPath, let newIndexPath = newIndexPath else { fatalError() }
             movedIndexes?.insert(.init(oldIndex: oldIndexPath.item, newIndex: newIndexPath.item))
+            
         @unknown default:
             fatalError()
         }
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        trackerCategoryStoreDelegate?.categoriesDidChange()
     }
 }
 

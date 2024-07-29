@@ -74,7 +74,6 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
     
     private func setupView() {
         view.backgroundColor = .white
-        
         view.addSubview(label)
         view.addSubview(addCategoryButton)
         
@@ -262,6 +261,14 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension CategoryViewController: TrackerCategoryStoreDelegate {
+    
+    func categoryDidUpdate(_ updatedCategory: TrackerCategory) {
+        if let index = categories.firstIndex(where: { $0.titles == updatedCategory.titles }) {
+            categories[index] = updatedCategory
+            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
     func categoriesDidChange() {
         updateCategories()
         tableView.reloadData()

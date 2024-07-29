@@ -116,25 +116,6 @@ final class TrackerStore: NSObject {
         }
     }
     
-//    func fetchAllTrackers() -> [Tracker] {
-//        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-//        
-//        do {
-//            let results = try context.fetch(request)
-//            return results.map { trackerCoreData in
-//                do {
-//                    return try loadTrackerFromCoreData(from: trackerCoreData)
-//                } catch {
-//                    print("Failed to load tracker: \(error)")
-//                    return nil
-//                }
-//            }.compactMap { $0 }
-//        } catch {
-//            print("Failed to fetch trackers: \(error)")
-//            return []
-//        }
-//    }
-    
     func fetchAllTrackers() -> [Tracker] {
         let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
         

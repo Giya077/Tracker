@@ -9,4 +9,5 @@ import Foundation
 
 protocol TrackerCategoryStoreDelegate: AnyObject {
     func categoriesDidChange()
+    func categoryDidUpdate(_ updatedCategory: TrackerCategory)
 }

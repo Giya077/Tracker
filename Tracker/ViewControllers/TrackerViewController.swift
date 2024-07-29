@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTrackerDelegate {
+final class TrackerViewController: UIViewController, NewTrackerDelegate {
     
     private var trackerLabel = UILabel()
     private var plusButton = UIButton()
@@ -47,6 +47,8 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         self.trackerStore = trackerStore
         self.trackerCategoryStore = trackerCategoryStore
         super.init(nibName: nil, bundle: nil)
+        self.trackerCategoryStore.trackerCategoryStoreDelegate = self
+        
     }
     
     required init?(coder: NSCoder) {
@@ -70,7 +72,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private func loadTrackers() {
         let categoryCoreDataList = trackerCategoryStore.fetchAllCategories()
         var allCategories: [TrackerCategory] = []
-
+        
         for categoryCoreData in categoryCoreDataList {
             if let categoryName = categoryCoreData.titles {
                 var trackers: [Tracker] = []
@@ -82,24 +84,23 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
                         }
                     }
                 }
-
+                
                 let trackerCategory = TrackerCategory(titles: categoryName, trackers: trackers)
                 allCategories.append(trackerCategory)
             }
         }
-
+        
         self.allCategories = allCategories
         filterTrackersByDate()
         collectionView.reloadData()
     }
-
+    
     private func setupViews() {
         setupStubView()
         setupSearchBar()
         setupCollectionView()
         setupDatePicker()
         setupNavigationBar()
-        
         categories.isEmpty ? (stubView.isHidden = false) : (collectionView.isHidden = false)
     }
     
@@ -169,21 +170,6 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         ])
     }
     
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.1) {
-            searchBar.showsCancelButton = true
-            searchBar.layoutIfNeeded()
-        }
-    }
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.3) {
-            searchBar.showsCancelButton = false // Скрываем кнопку "Отмена" при нажатии на неё
-            searchBar.text = "" // Очищаем текст в поисковом поле
-            searchBar.resignFirstResponder() // Скрываем клавиатуру
-        }
-    }
-    
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -235,9 +221,9 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
     private func filterTrackersByDate() {
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
         guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
-
+        
         var updatedCategories: [TrackerCategory] = []
-
+        
         for category in allCategories {
             let filteredTrackers = category.trackers.filter { tracker in
                 return tracker.schedule.contains(selectedDay)
@@ -246,30 +232,30 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
                 updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
             }
         }
-
+        
         print("Количество отфильтрованных категорий: \(updatedCategories.count)")
         updatedCategories.forEach { category in
             print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
         }
-
+        
         categories = updatedCategories
         collectionView.reloadData()
     }
-
+    
     @objc
     private func trackerCompletionChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
               let trackerId = userInfo["trackerId"] as? UUID,
               let isCompleted = userInfo["isCompleted"] as? Bool else { return }
-
+        
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: currentDate)
-
+        
         if selectedDay > today {
             print("Нельзя отмечать трекеры для будущих дат.")
             return
         }
-
+        
         if isCompleted {
             let trackerRecord = TrackerRecord(id: trackerId, date: currentDate)
             completedTrackers.append(trackerRecord)
@@ -278,7 +264,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
                 completedTrackers.remove(at: index)
             }
         }
-
+        
         collectionView.reloadData()
     }
     
@@ -297,6 +283,12 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         print("Выбранная дата: \(currentDate)")
     }
     
+    func updateCategories() {
+        self.categories = trackerCategoryStore.categories
+        filterTrackersByDate() // Обно отображение трекеров, если это нужно
+        collectionView.reloadData()
+    }
+    
     func addTrackerToCompleted(trackRecord: TrackerRecord) {
         completedTrackers.append(trackRecord)
     }
@@ -307,9 +299,15 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
         }
     }
     
+    func didFinishCreatingTracker(trackerType: TrackerType) {
+        print("Трекер типа \(trackerType) был создан.")
+        // Обновите интерфейс или выполните другие необходимые действия
+        loadTrackers()
+    }
+    
     func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
         if let index = allCategories.firstIndex(where: { $0.titles == category.titles }) {
-            var category = allCategories[index]
+            let category = allCategories[index]
             var trackers = category.trackers
             trackers.append(tracker)
             allCategories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
@@ -319,7 +317,7 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
             allCategories.append(newCategory)
             print("New category created: \(category.titles)")
         }
-
+        
         if trackerType == .habit {
             habitTrackers.append(tracker)
             print("Tracker added to habitTrackers")
@@ -327,18 +325,18 @@ final class TrackerViewController: UIViewController, UISearchBarDelegate, NewTra
             eventTrackers.append(tracker)
             print("Tracker added to eventTrackers")
         }
-
+        
         printTrackersCount()
         filterTrackersByDate()
         collectionView.reloadData()
         dismiss(animated: true)
-
+        
         print("Трекер добавлен. Текущее количество категорий: \(allCategories.count)")
         allCategories.forEach { category in
             print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
         }
     }
-        
+    
     func printTrackersCount() {
         print("Количество привычек: \(habitTrackers.count)")
         print("Количество нерегулярных событий: \(eventTrackers.count)")
@@ -395,5 +393,38 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 10
+    }
+}
+
+extension TrackerViewController: UISearchBarDelegate {
+        
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        UIView.animate(withDuration: 0.1) {
+            searchBar.showsCancelButton = true
+            searchBar.layoutIfNeeded()
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        UIView.animate(withDuration: 0.3) {
+            searchBar.showsCancelButton = false // Скрываем кнопку "Отмена" при нажатии на неё
+            searchBar.text = "" // Очищаем текст в поисковом поле
+            searchBar.resignFirstResponder() // Скрываем клавиатуру
+        }
+    }
+}
+
+extension TrackerViewController: TrackerCategoryStoreDelegate {
+    func categoriesDidChange() {
+        loadTrackers()
+    }
+    
+    func categoryDidUpdate(_ category: TrackerCategory) {
+        if let index = allCategories.firstIndex(where: { $0.titles == category.titles }) {
+            allCategories[index] = category
+        } else {
+            allCategories.append(category)
+        }
+        filterTrackersByDate()
     }
 }

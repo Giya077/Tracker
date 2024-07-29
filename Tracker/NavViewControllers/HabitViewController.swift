@@ -291,7 +291,7 @@ class HabitViewController: UIViewController {
               let emoji = selectedEmoji,
               !selectedDays.isEmpty,
               let category = selectedCategory else {
-            // Можно добавить обработку ошибки или показать уведомление
+            // добавить обработку ошибки или показать уведомление
             return
         }
         
@@ -303,8 +303,12 @@ class HabitViewController: UIViewController {
             schedule: Array(selectedDays)
         )
         
-        trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
-        trackerDelegate?.didAddTracker(newTracker, to: category, trackerType: trackerType ?? .habit)
+        do {
+            trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
+            trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
+        } catch {
+            print("ошибка сохранение трекера \(error)")
+        }
     }
     
     @objc
@@ -315,7 +319,7 @@ class HabitViewController: UIViewController {
     @objc
     private func createButtonTapped() {
         saveTracker()
-        dismiss(animated: true)
+        navigationController?.popToRootViewController(animated: true)
     }
 }
 

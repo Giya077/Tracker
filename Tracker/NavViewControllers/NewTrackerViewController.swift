@@ -69,8 +69,7 @@ final class NewTrackerViewController: UIViewController {
         let habitViewController = HabitViewController(trackerCategoryStore: trackerCategoryStore)
         habitViewController.trackerDelegate = self
         habitViewController.trackerType = .habit
-        let nav = UINavigationController(rootViewController: habitViewController)
-        present(nav, animated: true)
+        navigationController?.pushViewController(habitViewController, animated: true)
         print("habbit button tapped")
     }
     
@@ -84,8 +83,10 @@ final class NewTrackerViewController: UIViewController {
 }
 
 extension NewTrackerViewController: NewTrackerDelegate {
-    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
-        // Передаем созданный трекер делегату
-        delegate?.didAddTracker(tracker, to: category, trackerType: trackerType)
+    func didFinishCreatingTracker(trackerType: TrackerType) {
+        // Закрываем текущий контроллер и, возможно, выполняем дополнительные действия
+        dismiss(animated: true) {
+            print("Трекер типа \(trackerType) был успешно создан.")
+        }
     }
 }
