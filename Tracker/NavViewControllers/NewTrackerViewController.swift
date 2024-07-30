@@ -74,10 +74,10 @@ final class NewTrackerViewController: UIViewController {
     }
     
     @objc private func irregularEventTapped() {
-        let irregularEventViewController = IrregularEventViewController()
+        let irregularEventViewController = IrregularEventViewController(trackerCategoryStore: trackerCategoryStore)
+        irregularEventViewController.trackerDelegate = self
         irregularEventViewController.trackerType = .event
-        let nav = UINavigationController(rootViewController: irregularEventViewController)
-        present(nav, animated:  true)
+        navigationController?.pushViewController(irregularEventViewController, animated: true)
         print("irregular button tapped")
     }
 }

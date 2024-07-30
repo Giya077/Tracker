@@ -22,7 +22,7 @@ class HabitViewController: UIViewController {
     var selectedEmojiIndex: IndexPath?
     var selectedColorIndex: IndexPath?
     
-    let label: UILabel = {
+    private let label: UILabel = {
         let label = BasicTextLabel(text: "Новая привычка")
         return label
     }()
@@ -49,9 +49,9 @@ class HabitViewController: UIViewController {
         return label
     }()
     
-    let arrayCells = ["Категория", "Расписание"]
-    let cellIdentifier = "CellType1"
-    lazy var categoryAndScheduleCollectionView: UICollectionView = {
+    private let arrayCells = ["Категория", "Расписание"]
+    private let cellIdentifier = "CellType1"
+    private lazy var categoryAndScheduleCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 0
@@ -63,7 +63,7 @@ class HabitViewController: UIViewController {
         return collectionView
     }()
     
-    let contrainerView: UIView = {
+    private let contrainerView: UIView = {
         let contrainerView = UIView()
         contrainerView.backgroundColor = Colors.systemSearchColor
         contrainerView.layer.cornerRadius = 10
@@ -72,14 +72,14 @@ class HabitViewController: UIViewController {
         return contrainerView
     }()
     
-    let separatorLine: UIView = {
+    private let separatorLine: UIView = {
         let separatorLine = UIView()
         separatorLine.backgroundColor = .lightGray
         separatorLine.translatesAutoresizingMaskIntoConstraints = false
         return separatorLine
     }()
     
-    let emojiHeaderLabel: UILabel = {
+    private let emojiHeaderLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.text = "Emoji"
@@ -88,7 +88,7 @@ class HabitViewController: UIViewController {
         return label
     }()
     
-    let colorsHeaderLabel: UILabel = {
+    private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.text = "Цвет"
@@ -96,8 +96,8 @@ class HabitViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-        
-    var emojiArray = ["😊", "🚀", "🎉", "⭐️", "🌈", "🎈", "🍀", "🌺", "🐶", "🐱", "🐰", "🐻", "🦄", "🍔", "🍕", "🍰", "🎸", "📚"]
+    
+    private let emojiArray = ["😊", "🚀", "🎉", "⭐️", "🧨", "🎈", "🍀", "🌺", "🥷", "👩‍🚀", "🏊‍♀️", "🐻", "👩‍🚀", "🍔", "🍕", "🎺", "🎸", "📚"]
     private lazy var emojiCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 10
@@ -109,7 +109,7 @@ class HabitViewController: UIViewController {
         return collectionView
     }()
     
-    var colorArray: [UIColor] = [.sLightPurple, .sfBlue, .sfCaesarPurple, .sfChampagne, .sfDarkPurple, .sfFial, .sfGreen, .sfGreenLawn, .sfLightPink, .sfOceanBlue, .sfOrange, .sfPamelaOrange, .sfPink, .sfPinkyPink, .sfPurple, .sfRed, .sfSystemPurple, .sfTiffany]
+    private let colorArray: [UIColor] = [.sLightPurple, .sfBlue, .sfCaesarPurple, .sfChampagne, .sfDarkPurple, .sfFial, .sfGreen, .sfGreenLawn, .sfLightPink, .sfOceanBlue, .sfOrange, .sfPamelaOrange, .sfPink, .sfPinkyPink, .sfPurple, .sfRed, .sfSystemPurple, .sfTiffany]
     private lazy var colorCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 40, height: 40)
@@ -153,7 +153,7 @@ class HabitViewController: UIViewController {
         self.trackerCategoryStore = trackerCategoryStore
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -224,7 +224,7 @@ class HabitViewController: UIViewController {
         ])
         
         //EmojiCollectionvView
-                
+        
         NSLayoutConstraint.activate([
             
             emojiHeaderLabel.topAnchor.constraint(equalTo: contrainerView.bottomAnchor, constant: 15),
@@ -237,7 +237,7 @@ class HabitViewController: UIViewController {
             
             colorsHeaderLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 10),
             colorsHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-
+            
             colorCollectionView.topAnchor.constraint(equalTo: colorsHeaderLabel.bottomAnchor, constant: 15),
             colorCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             colorCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -453,26 +453,26 @@ extension HabitViewController: UITextFieldDelegate {
         return true
     }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-         // Проверяем, что это наше текстовое поле
-         if textField == trackNaming {
-             // Проверяем, что текст после изменений не превышает 38 символов
-             if let text = textField.text,
-                let textRange = Range(range, in: text) {
-                 let updatedText = text.replacingCharacters(in: textRange, with: string)
-                 // Проверяем, достигнуто ли ограничение
-                 if updatedText.count >= 38 {
-                     // Отображаем метку
-                     showCharacterLimitLabel()
-                 } else {
-                     // Скрываем метку, если текст в пределах ограничения
-                     hideCharacterLimitLabel()
-                 }
-                 updateCreateButtonState()
-                 return updatedText.count <= 38
-             }
-         }
-         return true
-     }
+        // Проверяем, что это наше текстовое поле
+        if textField == trackNaming {
+            // Проверяем, что текст после изменений не превышает 38 символов
+            if let text = textField.text,
+               let textRange = Range(range, in: text) {
+                let updatedText = text.replacingCharacters(in: textRange, with: string)
+                // Проверяем, достигнуто ли ограничение
+                if updatedText.count >= 38 {
+                    // Отображаем метку
+                    showCharacterLimitLabel()
+                } else {
+                    // Скрываем метку, если текст в пределах ограничения
+                    hideCharacterLimitLabel()
+                }
+                updateCreateButtonState()
+                return updatedText.count <= 38
+            }
+        }
+        return true
+    }
     
     private func showCharacterLimitLabel() {
         characterLimitLabel.isHidden = false

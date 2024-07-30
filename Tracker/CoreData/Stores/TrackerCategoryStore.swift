@@ -97,7 +97,13 @@ class TrackerCategoryStore: NSObject{
         let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "titles == %@", title)
         
-        if let category = try context.fetch(fetchRequest).first {
+        let categories = try context.fetch(fetchRequest)
+        if let category = categories.first {
+            if let trackers = category.trackers as? Set<TrackerCoreData> {
+                for tracker in trackers {
+                    context.delete(tracker)
+                }
+            }
             context.delete(category)
             try context.save()
         }
