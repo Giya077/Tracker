@@ -84,7 +84,6 @@ final class NewTrackerViewController: UIViewController {
 
 extension NewTrackerViewController: NewTrackerDelegate {
     func didFinishCreatingTracker(trackerType: TrackerType) {
-        // Закрываем текущий контроллер и, возможно, выполняем дополнительные действия
         dismiss(animated: true) {
             print("Трекер типа \(trackerType) был успешно создан.")
         }

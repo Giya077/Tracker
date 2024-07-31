@@ -70,8 +70,8 @@ class TrackerCell: UICollectionViewCell {
         button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
         let imageSize: CGFloat = 20
-        button.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
-        button.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+//        button.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+//        button.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
         return button
         
     }()
@@ -169,12 +169,14 @@ class TrackerCell: UICollectionViewCell {
         contrainerViewCell.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
         buttonContainer.backgroundColor = tracker.color
         self.isCompleted = isCompleted
+        updateButtonAppearance()
     }
     
     @objc private func actionButtonTapped() {
         guard let tracker = tracker else { return }
         isCompleted.toggle()
         NotificationCenter.default.post(name: .trackerCompletionChanged, object: nil, userInfo: ["trackerId": tracker.id, "isCompleted": isCompleted])
+        updateButtonAppearance()
     }
     
 }

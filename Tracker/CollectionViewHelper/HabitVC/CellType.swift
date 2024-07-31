@@ -20,7 +20,7 @@ class CellType1: UICollectionViewCell {
     let resultLabel: UILabel = {
         let label = UILabel()
         label.textColor = .gray
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -55,7 +55,7 @@ class CellType1: UICollectionViewCell {
             resultLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             resultLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
             resultLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
-            resultLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 20),
+            resultLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 10),
             
             chevronImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             chevronImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),

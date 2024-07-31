@@ -11,7 +11,7 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
     
     private var trackerLabel = UILabel()
     private var plusButton = UIButton()
-    private var searchBar: UISearchBar!
+    private var searchBar = UISearchBar()
     private var datePicker = UIDatePicker()
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
@@ -26,6 +26,7 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
     
     var currentDate: Date = Date()
     
+    private var searchText: String = ""
     var allCategories: [TrackerCategory] = []  // Для хранения всех категорий без фильтрации
     internal var categories: [TrackerCategory] = [] {
         didSet {
@@ -60,12 +61,9 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
         addPlusButton()
         setupUI()
         setupViews()
-        
         loadTrackers()
-        
         collectionView.register(TrackerCell.self, forCellWithReuseIdentifier: "TrackerCell")
         collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
-        
         NotificationCenter.default.addObserver(self, selector: #selector(trackerCompletionChanged(_:)), name: .trackerCompletionChanged, object: nil)
     }
     
@@ -218,6 +216,16 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
         ])
     }
     
+    private func updateStubViewVisibility() {
+        if categories.isEmpty {
+            stubView.isHidden = false
+            collectionView.isHidden = true
+        } else {
+            stubView.isHidden = true
+            collectionView.isHidden = false
+        }
+    }
+        
     private func filterTrackersByDate() {
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
         guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
@@ -226,7 +234,8 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
 
         for category in allCategories {
             let filteredTrackers = category.trackers.filter { tracker in
-                return tracker.schedule.isEmpty || tracker.schedule.contains(selectedDay)
+                (tracker.schedule.isEmpty || tracker.schedule.contains(selectedDay)) &&
+                (searchText.isEmpty || tracker.name.localizedCaseInsensitiveContains(searchText))
             }
             if !filteredTrackers.isEmpty {
                 updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
@@ -234,7 +243,9 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
         }
 
         categories = updatedCategories
+        printTrackersCount()
         collectionView.reloadData()
+        updateStubViewVisibility()
     }
 
     @objc
@@ -299,39 +310,7 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
         // Обновите интерфейс или выполните другие необходимые действия
         loadTrackers()
     }
-    
-    func didAddTracker(_ tracker: Tracker, to category: TrackerCategory, trackerType: TrackerType) {
-        if let index = allCategories.firstIndex(where: { $0.titles == category.titles }) {
-            let category = allCategories[index]
-            var trackers = category.trackers
-            trackers.append(tracker)
-            allCategories[index] = TrackerCategory(titles: category.titles, trackers: trackers)
-            print("Tracker added to existing category: \(category.titles)")
-        } else {
-            let newCategory = TrackerCategory(titles: category.titles, trackers: [tracker])
-            allCategories.append(newCategory)
-            print("New category created: \(category.titles)")
-        }
         
-        if trackerType == .habit {
-            habitTrackers.append(tracker)
-            print("Tracker added to habitTrackers")
-        } else if trackerType == .event {
-            eventTrackers.append(tracker)
-            print("Tracker added to eventTrackers")
-        }
-        
-        printTrackersCount()
-        filterTrackersByDate()
-        collectionView.reloadData()
-        dismiss(animated: true)
-        
-        print("Трекер добавлен. Текущее количество категорий: \(allCategories.count)")
-        allCategories.forEach { category in
-            print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
-        }
-    }
-    
     func printTrackersCount() {
         print("Количество привычек: \(habitTrackers.count)")
         print("Количество нерегулярных событий: \(eventTrackers.count)")
@@ -392,20 +371,25 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
 }
 
 extension TrackerViewController: UISearchBarDelegate {
-        
+    
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.1) {
-            searchBar.showsCancelButton = true
-            searchBar.layoutIfNeeded()
+        searchBar.setShowsCancelButton(true, animated: true)
+        if let cancelButton = searchBar.value(forKey: "cancelButton") as? UIButton {
+            cancelButton.setTitle("Отменить", for: .normal)
         }
     }
     
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            self.searchText = searchText
+            filterTrackersByDate()
+    }
+    
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        UIView.animate(withDuration: 0.3) {
-            searchBar.showsCancelButton = false // Скрываем кнопку "Отмена" при нажатии на неё
-            searchBar.text = "" // Очищаем текст в поисковом поле
-            searchBar.resignFirstResponder() // Скрываем клавиатуру
-        }
+        searchBar.setShowsCancelButton(false, animated: true)
+        searchBar.text = ""
+        searchText = ""
+        filterTrackersByDate()
+        searchBar.resignFirstResponder()
     }
 }
 
