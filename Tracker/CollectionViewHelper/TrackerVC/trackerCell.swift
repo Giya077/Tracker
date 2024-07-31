@@ -144,7 +144,7 @@ class TrackerCell: UICollectionViewCell {
     }
     
     private func updateButtonAppearance() {
-        let buttonImage = isCompleted ? UIImage(named: "done") : UIImage(systemName: "plus")
+        let buttonImage = isCompleted ? UIImage(systemName: "checkmark") : UIImage(systemName: "plus")
         actionButton.setImage(buttonImage, for: .normal)
         actionButton.tintColor = isCompleted ? UIColor.white.withAlphaComponent(0.2) : UIColor.white
     }
@@ -168,9 +168,7 @@ class TrackerCell: UICollectionViewCell {
         contrainerViewCell.backgroundColor = tracker.color
         contrainerViewCell.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
         buttonContainer.backgroundColor = tracker.color
-        actionButton.tintColor = .white
         self.isCompleted = isCompleted
-        backgroundColor = .white
     }
     
     @objc private func actionButtonTapped() {

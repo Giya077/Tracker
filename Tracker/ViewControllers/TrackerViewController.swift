@@ -221,27 +221,22 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
     private func filterTrackersByDate() {
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
         guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
-        
+
         var updatedCategories: [TrackerCategory] = []
-        
+
         for category in allCategories {
             let filteredTrackers = category.trackers.filter { tracker in
-                return tracker.schedule.contains(selectedDay)
+                return tracker.schedule.isEmpty || tracker.schedule.contains(selectedDay)
             }
             if !filteredTrackers.isEmpty {
                 updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
             }
         }
-        
-        print("Количество отфильтрованных категорий: \(updatedCategories.count)")
-        updatedCategories.forEach { category in
-            print("Категория: \(category.titles), Количество трекеров: \(category.trackers.count)")
-        }
-        
+
         categories = updatedCategories
         collectionView.reloadData()
     }
-    
+
     @objc
     private func trackerCompletionChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -285,7 +280,7 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
     
     func updateCategories() {
         self.categories = trackerCategoryStore.categories
-        filterTrackersByDate() // Обно отображение трекеров, если это нужно
+        filterTrackersByDate()
         collectionView.reloadData()
     }
     
