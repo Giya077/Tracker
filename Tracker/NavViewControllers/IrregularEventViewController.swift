@@ -24,6 +24,9 @@ final class IrregularEventViewController: UIViewController {
     private var selectedEmojiIndex: IndexPath?
     private var selectedColorIndex: IndexPath?
     
+    private var scrollView: UIScrollView!
+    private var contentView: UIView!
+    
     private let label: UILabel = {
         let label = BasicTextLabel(text: "Новое нерегулярное событие")
         return label
@@ -159,10 +162,11 @@ final class IrregularEventViewController: UIViewController {
         view.backgroundColor = .white
         navigationItem.hidesBackButton = true
         
+        setupScrollView()
         setupView()
+        
         categoryViewController = CategoryViewController(trackerCategoryStore: trackerCategoryStore)
         categoryViewController?.categorySelectionDelegate = self
-        stackViewButton()
         categoryCollectionView.delegate = self
         categoryCollectionView.dataSource = self
         emojiCollectionView.delegate = self
@@ -175,32 +179,60 @@ final class IrregularEventViewController: UIViewController {
         createButton.backgroundColor = .lightGray
     }
     
+    private func setupScrollView() {
+        scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+        
+        contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(contentView)
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+        ])
+    }
+    
     private func setupView() {
         
-        view.addSubview(label)
-        view.addSubview(trackNaming)
-        view.addSubview(contrainerView)
-        view.addSubview(categoryCollectionView)
-        view.addSubview(emojiHeaderLabel)
-        view.addSubview(emojiCollectionView)
-        view.addSubview(colorsHeaderLabel)
-        view.addSubview(colorCollectionView)
-        view.addSubview(characterLimitLabel)
+        contentView.addSubview(label)
+        contentView.addSubview(trackNaming)
+        contentView.addSubview(contrainerView)
+        contentView.addSubview(categoryCollectionView)
+        contentView.addSubview(emojiHeaderLabel)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorsHeaderLabel)
+        contentView.addSubview(colorCollectionView)
+        contentView.addSubview(characterLimitLabel)
+        
+        let buttonStack = stackViewButton()
+        contentView.addSubview(buttonStack)
         
         hideCharacterLimitLabel()
         
         NSLayoutConstraint.activate([
             
-            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: contentView.topAnchor),
+            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             trackNaming.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 30),
-            trackNaming.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            trackNaming.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            trackNaming.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            trackNaming.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             trackNaming.heightAnchor.constraint(equalToConstant: 50),
             
             characterLimitLabel.topAnchor.constraint(equalTo: trackNaming.bottomAnchor, constant: 5),
-            characterLimitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            characterLimitLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             categoryCollectionView.topAnchor.constraint(equalTo: characterLimitLabel.bottomAnchor, constant: 10),
             categoryCollectionView.leadingAnchor.constraint(equalTo: trackNaming.leadingAnchor),
@@ -211,44 +243,42 @@ final class IrregularEventViewController: UIViewController {
             contrainerView.leadingAnchor.constraint(equalTo: categoryCollectionView.leadingAnchor),
             contrainerView.trailingAnchor.constraint(equalTo: categoryCollectionView.trailingAnchor),
             contrainerView.heightAnchor.constraint(equalToConstant: 75),
-        ])
         
         //EmojiCollectionvView
-        
-        NSLayoutConstraint.activate([
-            
+                    
             emojiHeaderLabel.topAnchor.constraint(equalTo: contrainerView.bottomAnchor, constant: 25),
-            emojiHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            emojiHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
             
             emojiCollectionView.topAnchor.constraint(equalTo: emojiHeaderLabel.bottomAnchor, constant: 15),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 130),
             
+            //ColorCollectionvView
+            
             colorsHeaderLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 15),
-            colorsHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            colorsHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
             
             colorCollectionView.topAnchor.constraint(equalTo: colorsHeaderLabel.bottomAnchor, constant: 25),
-            colorCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            colorCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            colorCollectionView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            colorCollectionView.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            colorCollectionView.heightAnchor.constraint(equalToConstant: 160),
+            
+            buttonStack.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor, constant: 20),
+            buttonStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            buttonStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            buttonStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
     }
     
-    private func stackViewButton() {
-        let stackViewButton = UIStackView(arrangedSubviews: [cancelButton,createButton])
+    private func stackViewButton() -> UIStackView {
+        let stackViewButton = UIStackView(arrangedSubviews: [cancelButton, createButton])
         stackViewButton.axis = .horizontal
         stackViewButton.spacing = 15
         stackViewButton.distribution = .fillEqually
         stackViewButton.alignment = .fill
-        view.addSubview(stackViewButton)
         stackViewButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stackViewButton.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor),
-            stackViewButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            stackViewButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            stackViewButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
+        return stackViewButton
     }
     
     private func updateCategoryLabel() {
