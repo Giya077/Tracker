@@ -7,27 +7,28 @@
 
 import UIKit
 
-final class TrackerViewController: UIViewController, NewTrackerDelegate {
+final class TrackerViewController: UIViewController {
     
+    // MARK: - Public Properties
+    var habitTrackers: [Tracker] = []
+    var eventTrackers: [Tracker] = []
+    var completedTrackers: [TrackerRecord] = []
+    var allCategories: [TrackerCategory] = []
+    
+    // MARK: - Private Properties
     private var trackerLabel = UILabel()
     private var plusButton = UIButton()
     private var searchBar = UISearchBar()
     private var datePicker = UIDatePicker()
     private var collectionView: UICollectionView!
     private let stubView = StubView(text: "Что будем отслеживать?")
+    private var currentDate: Date = Date()
+    private var searchText: String = ""
     
     private var trackerStore: TrackerStore
     private var trackerCategoryStore: TrackerCategoryStore
     private var trackers: [Tracker] = []
-    
-    var habitTrackers: [Tracker] = []
-    var eventTrackers: [Tracker] = []
-    var completedTrackers: [TrackerRecord] = []
-    
-    var currentDate: Date = Date()
-    
-    private var searchText: String = ""
-    var allCategories: [TrackerCategory] = []  // Для хранения всех категорий без фильтрации
+
     internal var categories: [TrackerCategory] = [] {
         didSet {
             print("Категории обновлены. Текущее количество категорий: \(categories.count)")
@@ -44,6 +45,7 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
         }
     }
     
+    // MARK: - Initializers
     init(trackerStore: TrackerStore, trackerCategoryStore: TrackerCategoryStore) {
         self.trackerStore = trackerStore
         self.trackerCategoryStore = trackerCategoryStore
@@ -243,7 +245,6 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
         }
 
         categories = updatedCategories
-        printTrackersCount()
         collectionView.reloadData()
         updateStubViewVisibility()
     }
@@ -304,16 +305,15 @@ final class TrackerViewController: UIViewController, NewTrackerDelegate {
             completedTrackers.remove(at: index)
         }
     }
+}
+
+
+extension TrackerViewController: NewTrackerDelegate {
     
     func didFinishCreatingTracker(trackerType: TrackerType) {
         print("Трекер типа \(trackerType) был создан.")
         // Обновите интерфейс или выполните другие необходимые действия
         loadTrackers()
-    }
-        
-    func printTrackersCount() {
-        print("Количество привычек: \(habitTrackers.count)")
-        print("Количество нерегулярных событий: \(eventTrackers.count)")
     }
 }
 

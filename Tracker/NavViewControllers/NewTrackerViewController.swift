@@ -10,9 +10,8 @@ import UIKit
 final class NewTrackerViewController: UIViewController {
         
     weak var delegate: NewTrackerDelegate?
-    var createdTracker: Tracker? // Добавляем свойство для хранения созданного трекера
     
-    private let trackerCategoryStore = TrackerCategoryStore() /// ???????!!!!!!!!
+    private let trackerCategoryStore = TrackerCategoryStore()
     
     private lazy var habitButton: UIButton = {
         let habitButton = BasicButton(title: "Привычка")
@@ -20,7 +19,6 @@ final class NewTrackerViewController: UIViewController {
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         return habitButton
     }()
-    
     
     private lazy var irregularEvent: UIButton = {
         let irregularEvent = BasicButton(title: "Нерегулярные события")

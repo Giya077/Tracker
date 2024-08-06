@@ -7,27 +7,32 @@
 
 import UIKit
 
-class HabitViewController: UIViewController {
+final class HabitViewController: UIViewController {
     
+    // MARK: - Public Properties
+    var trackerType: TrackerType?
     weak var trackerDelegate: NewTrackerDelegate?
     
-    var categoryViewController: CategoryViewController?
-    var trackerCategoryStore: TrackerCategoryStore
-    var trackerType: TrackerType?
-    var selectedDays: Set<Days> = []
-    var selectedCategory: TrackerCategory?
+    // MARK: - Private Properties
+    private var categoryViewController: CategoryViewController?
+    private var trackerCategoryStore: TrackerCategoryStore
+    private var selectedDays: Set<Days> = []
+    private var selectedCategory: TrackerCategory?
     
-    var selectedColor: UIColor?
-    var selectedEmoji: String?
-    var selectedEmojiIndex: IndexPath?
-    var selectedColorIndex: IndexPath?
+    private var selectedColor: UIColor?
+    private var selectedEmoji: String?
+    private var selectedEmojiIndex: IndexPath?
+    private var selectedColorIndex: IndexPath?
+    
+    private var scrollView: UIScrollView!
+    private var contentView: UIView!
     
     private let label: UILabel = {
         let label = BasicTextLabel(text: "Новая привычка")
         return label
     }()
     
-    let trackNaming: UITextField = {
+   private let trackNaming: UITextField = {
         let trackNaming = UITextField()
         trackNaming.textColor = .black
         trackNaming.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
@@ -110,6 +115,7 @@ class HabitViewController: UIViewController {
     }()
     
     private let colorArray: [UIColor] = [.sLightPurple, .sfBlue, .sfCaesarPurple, .sfChampagne, .sfDarkPurple, .sfFial, .sfGreen, .sfGreenLawn, .sfLightPink, .sfOceanBlue, .sfOrange, .sfPamelaOrange, .sfPink, .sfPinkyPink, .sfPurple, .sfRed, .sfSystemPurple, .sfTiffany]
+    
     private lazy var colorCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 40, height: 40)
@@ -162,12 +168,12 @@ class HabitViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationItem.hidesBackButton = true
+        setupScrollView()
         setupView()
         
         categoryViewController = CategoryViewController(trackerCategoryStore: trackerCategoryStore)
         categoryViewController?.categorySelectionDelegate = self
         
-        stackViewButton()
         categoryAndScheduleCollectionView.delegate = self
         categoryAndScheduleCollectionView.dataSource = self
         emojiCollectionView.delegate = self
@@ -180,33 +186,63 @@ class HabitViewController: UIViewController {
         createButton.backgroundColor = .lightGray
     }
     
+    
+    private func setupScrollView() {
+         scrollView = UIScrollView()
+         scrollView.translatesAutoresizingMaskIntoConstraints = false
+         view.addSubview(scrollView)
+         
+         NSLayoutConstraint.activate([
+             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+         ])
+         
+         contentView = UIView()
+         contentView.translatesAutoresizingMaskIntoConstraints = false
+         scrollView.addSubview(contentView)
+         
+         NSLayoutConstraint.activate([
+             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+//             contentView.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
+         ])
+     }
+    
     private func setupView() {
         
-        view.addSubview(label)
-        view.addSubview(trackNaming)
-        view.addSubview(contrainerView)
-        view.addSubview(separatorLine)
-        view.addSubview(categoryAndScheduleCollectionView)
-        view.addSubview(emojiHeaderLabel)
-        view.addSubview(emojiCollectionView)
-        view.addSubview(colorsHeaderLabel)
-        view.addSubview(colorCollectionView)
-        view.addSubview(characterLimitLabel)
+        contentView.addSubview(label)
+        contentView.addSubview(trackNaming)
+        contentView.addSubview(contrainerView)
+        contentView.addSubview(separatorLine)
+        contentView.addSubview(categoryAndScheduleCollectionView)
+        contentView.addSubview(emojiHeaderLabel)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorsHeaderLabel)
+        contentView.addSubview(colorCollectionView)
+        contentView.addSubview(characterLimitLabel)
+        
+        let buttonStack = stackViewButton()
+            contentView.addSubview(buttonStack)
         
         hideCharacterLimitLabel()
         
         NSLayoutConstraint.activate([
             
-            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: contentView.topAnchor),
+            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             trackNaming.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 30),
-            trackNaming.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            trackNaming.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            trackNaming.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            trackNaming.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             trackNaming.heightAnchor.constraint(equalToConstant: 50),
             
             characterLimitLabel.topAnchor.constraint(equalTo: trackNaming.bottomAnchor, constant: 5),
-            characterLimitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            characterLimitLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             categoryAndScheduleCollectionView.topAnchor.constraint(equalTo: characterLimitLabel.bottomAnchor, constant: 10),
             categoryAndScheduleCollectionView.leadingAnchor.constraint(equalTo: trackNaming.leadingAnchor),
@@ -222,44 +258,58 @@ class HabitViewController: UIViewController {
             separatorLine.trailingAnchor.constraint(equalTo: contrainerView.trailingAnchor, constant: -20),
             separatorLine.centerYAnchor.constraint(equalTo: contrainerView.centerYAnchor),
             separatorLine.heightAnchor.constraint(equalToConstant: 1),
-        ])
+            
         
         //EmojiCollectionvView
         
-        NSLayoutConstraint.activate([
-            
             emojiHeaderLabel.topAnchor.constraint(equalTo: contrainerView.bottomAnchor, constant: 15),
-            emojiHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            emojiHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
             
             emojiCollectionView.topAnchor.constraint(equalTo: emojiHeaderLabel.bottomAnchor, constant: 10),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 130),
             
             colorsHeaderLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 10),
-            colorsHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            colorsHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
             
             colorCollectionView.topAnchor.constraint(equalTo: colorsHeaderLabel.bottomAnchor, constant: 15),
-            colorCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            colorCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-        ])
+            colorCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            colorCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            colorCollectionView.heightAnchor.constraint(equalToConstant: 160),
+            
+            buttonStack.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor, constant: 20),
+                   buttonStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+                   buttonStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+                   buttonStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
+            ])
     }
     
-    private func stackViewButton() {
-        let stackViewButton = UIStackView(arrangedSubviews: [cancelButton,createButton])
+//    private func stackViewButton() {
+//        let stackViewButton = UIStackView(arrangedSubviews: [cancelButton,createButton])
+//        stackViewButton.axis = .horizontal
+//        stackViewButton.spacing = 15
+//        stackViewButton.distribution = .fillEqually
+//        stackViewButton.alignment = .fill
+//        view.addSubview(stackViewButton)
+//        stackViewButton.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        NSLayoutConstraint.activate([
+//            stackViewButton.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor),
+//            stackViewButton.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+//            stackViewButton.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20)
+////            stackViewButton.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor)
+//        ])
+//    }
+    
+    private func stackViewButton() -> UIStackView {
+        let stackViewButton = UIStackView(arrangedSubviews: [cancelButton, createButton])
         stackViewButton.axis = .horizontal
         stackViewButton.spacing = 15
         stackViewButton.distribution = .fillEqually
         stackViewButton.alignment = .fill
-        view.addSubview(stackViewButton)
         stackViewButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            stackViewButton.topAnchor.constraint(equalTo: colorCollectionView.bottomAnchor),
-            stackViewButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            stackViewButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            stackViewButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
+        return stackViewButton
     }
     
     private func updateCategoryLabel() {

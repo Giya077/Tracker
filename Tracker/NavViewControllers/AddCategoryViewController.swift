@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AddCategoryViewController: UIViewController {
+final class AddCategoryViewController: UIViewController {
     
     weak var delegate: NewCategoryViewControllerDelegate?
     weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
@@ -39,6 +39,7 @@ class AddCategoryViewController: UIViewController {
         return categoryNameTextField
     }()
     
+    // MARK: - Initializers
     init(trackerCategoryStore: TrackerCategoryStore) {
         self.trackerCategoryStore = trackerCategoryStore
         super.init(nibName: nil, bundle: nil)

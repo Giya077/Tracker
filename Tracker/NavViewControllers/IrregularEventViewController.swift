@@ -8,20 +8,21 @@
 import Foundation
 import UIKit
 
-class IrregularEventViewController: UIViewController {
+final class IrregularEventViewController: UIViewController {
     
+    // MARK: - Public Properties
     weak var trackerDelegate: NewTrackerDelegate?
-    
     var trackerType: TrackerType?
-    private var selectedCategory: TrackerCategory?
-    var trackerCategoryStore: TrackerCategoryStore
-    var categoryViewController: CategoryViewController?
     
+    // MARK: - Private Properties
+    private var selectedCategory: TrackerCategory?
+    private var trackerCategoryStore: TrackerCategoryStore
+    private var categoryViewController: CategoryViewController?
     
     private var selectedColor: UIColor?
     private var selectedEmoji: String?
-    var selectedEmojiIndex: IndexPath?
-    var selectedColorIndex: IndexPath?
+    private var selectedEmojiIndex: IndexPath?
+    private var selectedColorIndex: IndexPath?
     
     private let label: UILabel = {
         let label = BasicTextLabel(text: "Новое нерегулярное событие")
@@ -143,6 +144,7 @@ class IrregularEventViewController: UIViewController {
         return createButton
     }()
     
+    // MARK: - Initializers
     init(trackerCategoryStore: TrackerCategoryStore) {
         self.trackerCategoryStore = trackerCategoryStore
         super.init(nibName: nil, bundle: nil)

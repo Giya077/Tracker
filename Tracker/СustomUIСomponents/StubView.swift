@@ -22,7 +22,7 @@ final class StubView: UIView {
     
     let textLabel: UILabel = {
         let textLabel = UILabel()
-        textLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+        textLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         textLabel.textAlignment = .center
         textLabel.textColor = .black
         textLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -62,8 +62,8 @@ final class StubView: UIView {
             vStack.topAnchor.constraint(equalTo: topAnchor),
             vStack.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            stubImage.heightAnchor.constraint(equalToConstant: 100),
-            stubImage.widthAnchor.constraint(equalToConstant: 100),
+            stubImage.heightAnchor.constraint(equalToConstant: 80),
+            stubImage.widthAnchor.constraint(equalToConstant: 80),
             
             textLabel.leadingAnchor.constraint(equalTo: vStack.leadingAnchor),
             textLabel.trailingAnchor.constraint(equalTo: vStack.trailingAnchor)

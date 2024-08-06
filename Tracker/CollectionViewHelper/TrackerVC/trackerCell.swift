@@ -11,7 +11,13 @@ import UIKit
 
 class TrackerCell: UICollectionViewCell {
     
-    let emojiLabel: UILabel = {
+    var isCompleted: Bool = false {
+        didSet {
+            updateButtonAppearance()
+        }
+    }
+
+    private let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 23)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -19,7 +25,7 @@ class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    let nameLabel: UILabel = {
+    private  let nameLabel: UILabel = {
         let nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textColor = .white
@@ -28,7 +34,7 @@ class TrackerCell: UICollectionViewCell {
         return nameLabel
     }()
     
-    let emojiPlaceholder: UIView = {
+    private let emojiPlaceholder: UIView = {
         let placeholder = UIView()
         placeholder.translatesAutoresizingMaskIntoConstraints = false
         placeholder.backgroundColor = UIColor.lightGray.withAlphaComponent(0.4)
@@ -37,7 +43,7 @@ class TrackerCell: UICollectionViewCell {
         return placeholder
     }()
     
-    let daysLabel: UILabel = {
+    private let daysLabel: UILabel = {
         let daysLabel = UILabel()
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
         daysLabel.textColor = .black
@@ -45,7 +51,7 @@ class TrackerCell: UICollectionViewCell {
         return daysLabel
     }()
     
-    let contrainerViewCell: UIView = {
+    private let contrainerViewCell: UIView = {
         let contrainerView = UIView()
         contrainerView.layer.cornerRadius = 16
         contrainerView.layer.masksToBounds = true
@@ -54,7 +60,7 @@ class TrackerCell: UICollectionViewCell {
         return contrainerView
     }()
     
-    let buttonContainer: UIView = {
+    private let buttonContainer: UIView = {
         let placeholder = UIView()
         placeholder.translatesAutoresizingMaskIntoConstraints = false
         placeholder.layer.cornerRadius = 20
@@ -70,18 +76,10 @@ class TrackerCell: UICollectionViewCell {
         button.imageView?.contentMode = .scaleAspectFit
         button.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
         let imageSize: CGFloat = 20
-//        button.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
-//        button.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
         return button
-        
     }()
     
     private var tracker: Tracker?
-    var isCompleted: Bool = false {
-        didSet {
-            updateButtonAppearance()
-        }
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -90,6 +88,18 @@ class TrackerCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int) {
+        self.tracker = tracker
+        nameLabel.text = tracker.name
+        daysLabel.text = formatDaysString(completionCount)
+        emojiLabel.text = String(tracker.emoji)
+        contrainerViewCell.backgroundColor = tracker.color
+        contrainerViewCell.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
+        buttonContainer.backgroundColor = tracker.color
+        self.isCompleted = isCompleted
+        updateButtonAppearance()
     }
     
     private func setupViews() {
@@ -158,18 +168,6 @@ class TrackerCell: UICollectionViewCell {
         default:
             return "\(count) дней"
         }
-    }
-    
-    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int) {
-        self.tracker = tracker
-        nameLabel.text = tracker.name
-        daysLabel.text = formatDaysString(completionCount)
-        emojiLabel.text = String(tracker.emoji)
-        contrainerViewCell.backgroundColor = tracker.color
-        contrainerViewCell.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
-        buttonContainer.backgroundColor = tracker.color
-        self.isCompleted = isCompleted
-        updateButtonAppearance()
     }
     
     @objc private func actionButtonTapped() {

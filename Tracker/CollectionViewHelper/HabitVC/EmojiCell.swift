@@ -33,6 +33,10 @@ class EmojiCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func setSelected( _ selected: Bool) {
+        selectedPlaceholder.isHidden = !selected
+    }
 
     private func setupUI() {
         contentView.addSubview(selectedPlaceholder)
@@ -48,9 +52,5 @@ class EmojiCell: UICollectionViewCell {
             emojiLabel.centerXAnchor.constraint(equalTo: selectedPlaceholder.centerXAnchor),
             emojiLabel.centerYAnchor.constraint(equalTo: selectedPlaceholder.centerYAnchor)
         ])
-    }
-    
-    func setSelected( _ selected: Bool) {
-        selectedPlaceholder.isHidden = !selected
     }
 }

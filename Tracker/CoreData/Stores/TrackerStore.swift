@@ -9,12 +9,20 @@ enum TrackerStoreError: Error {
 
 final class TrackerStore: NSObject {
     
+    // MARK: - Public Properties
+    var trackers: [Tracker] {
+        guard
+            let objects = fetchedResultController.fetchedObjects,
+            let trackers = try? objects.map({ try loadTrackerFromCoreData(from: $0) })
+        else { return [] }
+        return trackers
+    }
+    
+    // MARK: - Private Properties
     private let colorTransformedToData = ColorTransformedToData()
     private let scheduleTransformedToData = ScheduleTransformedToData()
-    
     private let context: NSManagedObjectContext
     
-    //автоматически управляет получением данных из Core Data и их отображением
     private lazy var fetchedResultController: NSFetchedResultsController<TrackerCoreData> = {
         let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCoreData.name, ascending: true)
@@ -25,7 +33,7 @@ final class TrackerStore: NSObject {
             sectionNameKeyPath: nil,
             cacheName: nil
         )
-        
+
         do {
             try controller.performFetch()
         } catch {
@@ -33,15 +41,7 @@ final class TrackerStore: NSObject {
         }
         return controller
     }()
-    
-    var trackers: [Tracker] {
-        guard
-            let objects = fetchedResultController.fetchedObjects,
-            let trackers = try? objects.map({ try loadTrackerFromCoreData(from: $0) })
-        else { return [] }
-        return trackers
-    }
-    
+        
     convenience override init() {
         if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
             let context = appDelegate.persistantContainer.viewContext
@@ -66,11 +66,8 @@ final class TrackerStore: NSObject {
         else {
             throw TrackerStoreError.decodingErrorInvalidItem
         }
-        
-        // Преобразование цвета
+
         let color = colorTransformedToData.color(from: colorHex)
-        
-        // Преобразование расписания
         let schedule = scheduleTransformedToData.makeWeekDayArrayFromString(scheduleString)
             .compactMap { Days(rawValue: $0) }
         

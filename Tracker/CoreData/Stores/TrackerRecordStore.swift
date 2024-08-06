@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-class TrackerRecordStore {
+final class TrackerRecordStore {
     private let context: NSManagedObjectContext
     private var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData>?
     
@@ -38,18 +38,6 @@ class TrackerRecordStore {
     func fetchAllRecords() -> [TrackerRecordCoreData] {
         return fetchedResultsController?.fetchedObjects ?? []
     }
-    
-//    func saveRecord(id: UUID, date: Date) {
-//        let record = TrackerRecordCoreData(context: context)
-//        record.id = id
-//        record.date = date
-//        
-//        do {
-//            try context.save()
-//        } catch {
-//            fatalError("Failed to save record \(error)")
-//        }
-//    }
     
     func saveRecord(date: Date) {
         context.performAndWait {
