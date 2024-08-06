@@ -104,15 +104,10 @@ final class CategoryViewController: UIViewController {
             tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -20)
         ])
     }
-    
+        
     private func updateViewVisibility() {
-        if categories.isEmpty {
-            stubView.isHidden = false
-            tableView.isHidden = true
-        } else {
-            stubView.isHidden = true
-            tableView.isHidden = false
-        }
+        stubView.isHidden = !categories.isEmpty
+        tableView.isHidden = categories.isEmpty
     }
     
     private func updateCategories() {

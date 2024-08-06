@@ -33,11 +33,9 @@ final class TrackerViewController: UIViewController {
         didSet {
             print("Категории обновлены. Текущее количество категорий: \(categories.count)")
             if categories.isEmpty {
-                // Если categories пустой, показываем stubView
                 stubView.isHidden = false
                 collectionView.isHidden = true
             } else {
-                // Если categories не пустой, скрываем stubView и показываем collectionView
                 stubView.isHidden = true
                 collectionView.isHidden = false
                 collectionView.reloadData()
@@ -185,7 +183,7 @@ final class TrackerViewController: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 20),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -217,17 +215,12 @@ final class TrackerViewController: UIViewController {
             trackerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
         ])
     }
-    
-    private func updateStubViewVisibility() {
-        if categories.isEmpty {
-            stubView.isHidden = false
-            collectionView.isHidden = true
-        } else {
-            stubView.isHidden = true
-            collectionView.isHidden = false
-        }
-    }
         
+    private func updateStubViewVisibility() {
+        stubView.isHidden = !categories.isEmpty
+        collectionView.isHidden = categories.isEmpty
+    }
+
     private func filterTrackersByDate() {
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
         guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }

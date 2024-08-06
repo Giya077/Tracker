@@ -36,7 +36,7 @@ final class HabitViewController: UIViewController {
         let trackNaming = UITextField()
         trackNaming.textColor = .black
         trackNaming.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
-        trackNaming.layer.cornerRadius = 10
+        trackNaming.layer.cornerRadius = 16
         trackNaming.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: trackNaming.frame.height))
         trackNaming.leftViewMode = .always
         trackNaming.font = UIFont.systemFont(ofSize: 18)
@@ -88,7 +88,7 @@ final class HabitViewController: UIViewController {
         let label = UILabel()
         label.textColor = .black
         label.text = "Emoji"
-        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -97,7 +97,7 @@ final class HabitViewController: UIViewController {
         let label = UILabel()
         label.textColor = .black
         label.text = "Цвет"
-        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -133,13 +133,13 @@ final class HabitViewController: UIViewController {
         cancelButton.setTitle("Отменить", for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         cancelButton.backgroundColor = .white
-        cancelButton.layer.cornerRadius = 12
+        cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.red.cgColor
         cancelButton.layer.masksToBounds = true
         cancelButton.tintColor = .red
-        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
-        cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        cancelButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         return cancelButton
     }()
     
@@ -147,11 +147,11 @@ final class HabitViewController: UIViewController {
         let createButton = UIButton(type: .system)
         createButton.setTitle("Создать", for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
-        createButton.layer.cornerRadius = 12
+        createButton.layer.cornerRadius = 16
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
-        createButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        createButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         return createButton
     }()
     
@@ -190,6 +190,7 @@ final class HabitViewController: UIViewController {
     private func setupScrollView() {
         scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.contentInsetAdjustmentBehavior = .never
         view.addSubview(scrollView)
         
         NSLayoutConstraint.activate([
@@ -238,7 +239,7 @@ final class HabitViewController: UIViewController {
             trackNaming.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 30),
             trackNaming.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             trackNaming.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            trackNaming.heightAnchor.constraint(equalToConstant: 50),
+            trackNaming.heightAnchor.constraint(equalToConstant: 75),
             
             characterLimitLabel.topAnchor.constraint(equalTo: trackNaming.bottomAnchor, constant: 5),
             characterLimitLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -261,7 +262,7 @@ final class HabitViewController: UIViewController {
             //EmojiCollectionvView
             
             emojiHeaderLabel.topAnchor.constraint(equalTo: contrainerView.bottomAnchor, constant: 15),
-            emojiHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
+            emojiHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             
             emojiCollectionView.topAnchor.constraint(equalTo: emojiHeaderLabel.bottomAnchor, constant: 10),
             emojiCollectionView.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
@@ -269,7 +270,7 @@ final class HabitViewController: UIViewController {
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 130),
             
             colorsHeaderLabel.topAnchor.constraint(equalTo: emojiCollectionView.bottomAnchor, constant: 10),
-            colorsHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
+            colorsHeaderLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
             
             //ColorCollectionvView
             
