@@ -48,7 +48,7 @@ final class TrackerRecordStore {
             do {
                 try context.save()
             } catch {
-                fatalError("Failed to save record \(error)")
+                print("Failed to save record \(error)")
             }
         }
     }

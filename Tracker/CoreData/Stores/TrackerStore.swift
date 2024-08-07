@@ -5,6 +5,7 @@ import UIKit
 enum TrackerStoreError: Error {
     case decodingErrorInvalidItem
     case saveFailed
+    case failedToFetchTrackers
 }
 
 final class TrackerStore: NSObject {
@@ -23,7 +24,7 @@ final class TrackerStore: NSObject {
     private let scheduleTransformedToData = ScheduleTransformedToData()
     private let context: NSManagedObjectContext
     
-    private lazy var fetchedResultController: NSFetchedResultsController<TrackerCoreData> = {
+    private func createFetchedResultsController() throws -> NSFetchedResultsController<TrackerCoreData> {
         let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         let sortDescriptor = NSSortDescriptor(keyPath: \TrackerCoreData.name, ascending: true)
         request.sortDescriptors = [sortDescriptor]
@@ -37,9 +38,18 @@ final class TrackerStore: NSObject {
         do {
             try controller.performFetch()
         } catch {
-            fatalError("Failed to fetch trackers: \(error)")
+            throw TrackerStoreError.failedToFetchTrackers
         }
         return controller
+    }
+    
+    private lazy var fetchedResultController: NSFetchedResultsController<TrackerCoreData> = {
+        do {
+            return try createFetchedResultsController()
+        } catch {
+            assertionFailure("Failed to initialize FetchedResultsController: \(error)")
+            return NSFetchedResultsController()
+        }
     }()
         
     convenience override init() {
@@ -47,7 +57,8 @@ final class TrackerStore: NSObject {
             let context = appDelegate.persistantContainer.viewContext
             self.init(context: context)
         } else {
-            fatalError("Unable to access the AppDelegate")
+            print("Unable to acces the AppDelegate")
+            self.init(context: NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType))
         }
     }
     

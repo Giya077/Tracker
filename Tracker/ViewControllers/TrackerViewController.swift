@@ -53,7 +53,8 @@ final class TrackerViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
     }
     
     override func viewDidLoad() {
@@ -330,7 +331,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         let tracker = categories[indexPath.section].trackers[indexPath.item]
         let completionCount = completedTrackers.filter { $0.id == tracker.id }.count
         let isCompleted = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
-        cell.configure(with: tracker, isCompleted: isCompleted, completionCount: completionCount)
+        cell.configure(with: tracker, isCompleted: isCompleted, completionCount: completionCount, currentDate: currentDate)
         print("Трекер: \(tracker.name), Количество завершений: \(completionCount), Завершен сегодня: \(isCompleted)")
         return cell
     }

@@ -15,7 +15,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            fatalError("Unable to access AppDelegate")
+            print("Unable to access AppDelegate")
+            return
         }
         
         let context = appDelegate.persistantContainer.viewContext

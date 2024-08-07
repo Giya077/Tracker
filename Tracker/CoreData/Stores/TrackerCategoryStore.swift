@@ -52,7 +52,7 @@ final class TrackerCategoryStore: NSObject{
         do {
             try fetchedResultsController.performFetch()
         } catch {
-            fatalError("Unresolved error \(error)")
+            print("Unresolved error \(error)")
         }
         
         return fetchedResultsController
@@ -63,7 +63,8 @@ final class TrackerCategoryStore: NSObject{
             let context = appDelegate.persistantContainer.viewContext
             self.init(context: context)
         } else {
-            fatalError("Unable to acces the AppDelegate")
+            print("Unable to acces the AppDelegate")
+            self.init(context: NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType))
         }
     }
     
@@ -165,7 +166,7 @@ final class TrackerCategoryStore: NSObject{
              try fetchedResultsController.performFetch()
              trackerCategoryStoreDelegate?.categoriesDidChange()
          } catch {
-             fatalError("Failed to fetch categories: \(error)")
+             print("Failed to fetch categories: \(error)")
          }
      }
 }
@@ -180,20 +181,31 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     ) {
         switch type {
         case .insert:
-            guard let indexPath = newIndexPath else { fatalError() }
+            guard let indexPath = newIndexPath else {
+                print("Insert indexPath is nil")
+                return
+            }
             insertedIndexes?.insert(indexPath.item)
         case .delete:
-            guard let indexPath = indexPath else { fatalError() }
+            guard let indexPath = indexPath else {
+                print("Delete indexPath is nil")
+                return
+            }
             deletedIndexes?.insert(indexPath.item)
         case .update:
-            guard let indexPath = indexPath else { fatalError() }
+            guard let indexPath = indexPath else {
+                print("Update indexPath is nil")
+                return
+            }
             updatedIndexes?.insert(indexPath.item)
         case .move:
-            guard let oldIndexPath = indexPath, let newIndexPath = newIndexPath else { fatalError() }
+            guard let oldIndexPath = indexPath, let newIndexPath = newIndexPath else {
+                print("Move indexPaths are nil")
+                return
+            }
             movedIndexes?.insert(.init(oldIndex: oldIndexPath.item, newIndex: newIndexPath.item))
-            
         @unknown default:
-            fatalError()
+            print("Unknown NSFetchedResultsChangeType")
         }
     }
     

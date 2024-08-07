@@ -11,12 +11,15 @@ import UIKit
 
 class TrackerCell: UICollectionViewCell {
     
+    
     var isCompleted: Bool = false {
         didSet {
             updateButtonAppearance()
         }
     }
 
+    private var currentDate: Date = Date()
+    
     private let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 23)
@@ -96,11 +99,13 @@ class TrackerCell: UICollectionViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
     }
     
-    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int) {
+    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int, currentDate: Date) {
         self.tracker = tracker
+        self.currentDate = currentDate
         nameLabel.text = tracker.name
         daysLabel.text = formatDaysString(completionCount)
         emojiLabel.text = String(tracker.emoji)
@@ -123,8 +128,6 @@ class TrackerCell: UICollectionViewCell {
         
         emojiPlaceholder.addSubview(emojiLabel)
         buttonContainer.addSubview(actionButton)
-        
-        actionButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             
@@ -151,8 +154,6 @@ class TrackerCell: UICollectionViewCell {
             
             buttonContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
             buttonContainer.topAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: 8),
-            buttonContainer.widthAnchor.constraint(equalToConstant: 40),
-            buttonContainer.heightAnchor.constraint(equalToConstant: 40),
             
             actionButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor),
             actionButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor),
@@ -189,6 +190,15 @@ class TrackerCell: UICollectionViewCell {
     
     @objc private func actionButtonTapped() {
         guard let tracker = tracker else { return }
+        
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: currentDate)
+        
+        if selectedDay > today {
+            print("Нельзя отмечать трекеры для будущих дат.")
+            return
+        }
+        
         isCompleted.toggle()
         NotificationCenter.default.post(name: .trackerCompletionChanged, object: nil, userInfo: ["trackerId": tracker.id, "isCompleted": isCompleted])
         updateButtonAppearance()
@@ -215,7 +225,8 @@ class HeaderViewTrackerCollection: UICollectionReusableView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
     }
 }
 
