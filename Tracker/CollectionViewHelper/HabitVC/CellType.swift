@@ -32,6 +32,10 @@ class CellType1: UICollectionViewCell {
         return chevronImageView
     }()
     
+    private var titleLabelTopConstraint: NSLayoutConstraint!
+    private var titleLabelCenterYConstraint: NSLayoutConstraint!
+    private var resultLabelTopConstraint: NSLayoutConstraint!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -48,16 +52,15 @@ class CellType1: UICollectionViewCell {
         contentView.addSubview(resultLabel)
         contentView.addSubview(chevronImageView)
         
+        titleLabelCenterYConstraint = titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+        titleLabelTopConstraint = titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15)
+        resultLabelTopConstraint = resultLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8)
+                
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             titleLabel.trailingAnchor.constraint(equalTo: chevronImageView.leadingAnchor, constant: -10),
-            titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            
             resultLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             resultLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            resultLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
-            resultLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 10),
-            
             chevronImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             chevronImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             chevronImageView.widthAnchor.constraint(equalToConstant: 12),
@@ -76,9 +79,15 @@ class CellType1: UICollectionViewCell {
         if let daysText = days, !daysText.isEmpty {
             resultLabel.text = daysText
             resultLabel.isHidden = false
+            titleLabelCenterYConstraint.isActive = false
+            titleLabelTopConstraint.isActive = true
+            resultLabelTopConstraint.isActive = true
         } else {
             resultLabel.text = nil
             resultLabel.isHidden = true
+            titleLabelTopConstraint.isActive = false
+            titleLabelCenterYConstraint.isActive = true
+            resultLabelTopConstraint.isActive = false
         }
     }
 }
