@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 
-enum cellColors {
+enum CellColors {
     static let sfBlue = UIColor(named: "sfBlue")
     static let sfCaesarPurple = UIColor(named: "sfCaesarPurple")
     static let sfChampagne = UIColor(named: "sfChampagne")

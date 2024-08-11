@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class ScheduleViewController: UIViewController {
+final class ScheduleViewController: UIViewController {
     
     weak var delegate: TimetableDelegate?
     private let days: [Days] = [.monday,.tuesday,.wednesday,.thursday,.friday,.saturday,.sunday]
@@ -32,7 +32,8 @@ class ScheduleViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
     }
     
     lazy var label: UILabel = {

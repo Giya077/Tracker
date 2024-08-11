@@ -1,19 +1,13 @@
-//
-//  CategoryViewController.swift
-//  Tracker
-//
-//  Created by GiyaDev on 14.05.2024.
-//
 
-import Foundation
+
 import UIKit
 
-class CategoryViewController: UIViewController, NewCategoryViewControllerDelegate {
+final class CategoryViewController: UIViewController {
     
-    weak var delegate: NewCategoryViewControllerDelegate? // для связи между AddCategoryViewController и CategoryViewController
-    weak var habitDelegate: HabitViewController?
+    // MARK: - Public Properties
+    weak var delegate: NewCategoryViewControllerDelegate?
+    weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
     weak var categorySelectionDelegate: CategorySelectionDelegate?
-    private var selectedCategories: Set<Int> = []
     
     var categories: [TrackerCategory] = [] {
         didSet {
@@ -21,9 +15,10 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
             updateViewVisibility()
         }
     }
-    
+    // MARK: - Private Properties
+    private var selectedCategories: Set<Int> = []
+    private let trackerCategoryStore: TrackerCategoryStore
     private lazy var stubView = StubView(text: "Привычки и события можно\nобъединить по смыслу")
-    
     private lazy var label: UILabel = {
         let label = BasicTextLabel(text: "Категория")
         return label
@@ -44,6 +39,20 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         return tableView
     }()
     
+    // MARK: - Initializers
+    init(trackerCategoryStore: TrackerCategoryStore) {
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+        
+        //Загрузка категорий из Core Data
+        self.categories = trackerCategoryStore.categories
+        trackerCategoryStore.trackerCategoryStoreDelegate = self
+    }
+    
+    required init?(coder: NSCoder) {
+        print("init(coder:) has not been implemented")
+        return nil
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,17 +61,15 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
         setupStubView()
         setupTableView()
         updateViewVisibility()
-        addCategoryViewController()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        tableView.reloadData() // Обновляем таблицу при появлении контроллера на экране
+        tableView.reloadData()
     }
     
     private func setupView() {
         view.backgroundColor = .white
-        
         view.addSubview(label)
         view.addSubview(addCategoryButton)
         
@@ -74,11 +81,6 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
             addCategoryButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             addCategoryButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
         ])
-    }
-    
-    private func addCategoryViewController() {
-        let addCategoryViewController = AddCategoryViewController()
-        addCategoryViewController.delegate = self
     }
     
     private func setupStubView() {
@@ -103,33 +105,76 @@ class CategoryViewController: UIViewController, NewCategoryViewControllerDelegat
             tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -20)
         ])
     }
-    
+        
     private func updateViewVisibility() {
-        if categories.isEmpty {
-            stubView.isHidden = false
-            tableView.isHidden = true
-        } else {
-            stubView.isHidden = true
-            tableView.isHidden = false
+        stubView.isHidden = !categories.isEmpty
+        tableView.isHidden = categories.isEmpty
+    }
+    
+    private func updateCategories() {
+        self.categories = trackerCategoryStore.categories
+    }
+    
+    private func editCategory(at indexPath: IndexPath) {
+        let category = categories[indexPath.row]
+        let alertController = UIAlertController(title: "Редактировать категорию", message: nil, preferredStyle: .alert)
+        
+        alertController.addTextField { textField in
+            textField.text = category.titles
         }
+        
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel)
+        alertController.addAction(cancelAction)
+        
+        let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
+            guard let newName = alertController.textFields?.first?.text else { return }
+            
+            do {
+                try self? .trackerCategoryStore.updateCategory(oldTitle: category.titles, newTitle: newName)
+                self?.updateCategories()
+            } catch {
+                print("Failed to update category: \(error)")
+            }
+        }
+        alertController.addAction(saveAction)
+        present(alertController, animated: true)
+    }
+    
+    private func deleteCategory(at indexPath: IndexPath) {
+        let category = categories[indexPath.row]
+        
+        do {
+            try trackerCategoryStore.deleteCategory(with: category.titles)
+            
+        } catch {
+            print("Failed to delete category: \(error)")
+        }
+    }
+    
+    private func presentActions(for indexPath: IndexPath) {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        let editAction = UIAlertAction(title: "Редактировать", style: .default) { [weak self] _ in
+            self?.editCategory(at: indexPath)
+        }
+
+        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+            self?.deleteCategory(at: indexPath)
+        }
+
+        alertController.addAction(editAction)
+        alertController.addAction(deleteAction)
+
+        present(alertController, animated: true, completion: nil)
     }
     
     @objc
     private func addCategoryButtonTapped() {
-        let addCategoryViewController = AddCategoryViewController()
+        let addCategoryViewController = AddCategoryViewController(trackerCategoryStore: trackerCategoryStore)
         addCategoryViewController.delegate = self
+        addCategoryViewController.trackerCategoryStoreDelegate = trackerCategoryStoreDelegate
         let nav = UINavigationController(rootViewController: addCategoryViewController)
         present(nav, animated: true)
-    }
-    
-    func removeStubAndShowCategories() {
-        updateViewVisibility()
-    }
-    
-    func didAddCategory(_ category: TrackerCategory) {
-        categories.append(category)
-        removeStubAndShowCategories()
-        dismiss(animated: true)
     }
 }
 
@@ -144,6 +189,14 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         let category = categories[indexPath.row]
         let isSelected = selectedCategories.contains(indexPath.row)
         cell.configure(withTitle: category.titles, backgroundColor: Colors.systemSearchColor!, isSelected: isSelected)
+        
+        cell.onLongPress = { [weak self, weak cell] in
+            guard let self = self else { return }
+            let point = cell?.center ?? CGPoint.zero
+            let indexPath = tableView.indexPathForRow(at: point) ?? indexPath
+            self.presentActions(for: indexPath)
+        }
+        
         return cell
     }
     
@@ -153,22 +206,56 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        // Обновляем множество выбранных категорий
-        
         let selectedCategoryIndex = indexPath.row
-        
         if selectedCategories.contains(selectedCategoryIndex) {
             selectedCategories.remove(selectedCategoryIndex)
         } else {
             selectedCategories.removeAll()
             selectedCategories.insert(selectedCategoryIndex)
         }
-        
         // Если у делегата есть метод didSelectCategory, вызываем его и передаем выбранную категорию
         if let selectedCategory = selectedCategories.first.map({ categories[$0] }) {
             categorySelectionDelegate?.didSelectCategory(selectedCategory)
         }
         navigationController?.popViewController(animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let category = categories[indexPath.row]
+            do {
+                try trackerCategoryStore.deleteCategory(with: category.titles)
+            } catch {
+                print("Failed to delete category: \(error)")
+            }
+        }
+    }
+}
+
+extension CategoryViewController: TrackerCategoryStoreDelegate {
+    
+    func categoryDidUpdate(_ updatedCategory: TrackerCategory) {
+        if let index = categories.firstIndex(where: { $0.titles == updatedCategory.titles }) {
+            categories[index] = updatedCategory
+            tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
+    func categoriesDidChange() {
+        updateCategories()
+        tableView.reloadData()
+    }
+}
+
+extension CategoryViewController: NewCategoryViewControllerDelegate {
+    
+    func removeStubAndShowCategories() {
+        updateViewVisibility()
+    }
+    
+    func didAddCategory(_ category: TrackerCategory) {
+        categories.append(category)
+        removeStubAndShowCategories()
+        dismiss(animated: true)
     }
 }

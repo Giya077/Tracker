@@ -10,6 +10,8 @@ import UIKit
 
 class CategoryCell: UITableViewCell {
     
+    var onLongPress: (() -> Void)?
+    
     private var isSelectedCell: Bool = false
     
     private let customBackgroundView: UIView = {
@@ -42,10 +44,12 @@ class CategoryCell: UITableViewCell {
         backgroundColor = .white
         selectedBackgroundView = UIView()
         selectedBackgroundView?.backgroundColor = .clear
+        addLongPressGestureRecognizer()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
     }
     
     private func setupView() {
@@ -72,14 +76,26 @@ class CategoryCell: UITableViewCell {
         ])
     }
     
-    private func updateCheckmarkVisibility() {
-        checkMarkImageView.isHidden = !isSelectedCell
-    }
-    
     func configure(withTitle title: String, backgroundColor: UIColor, isSelected: Bool) {
         categoryLabel.text = title
         customBackgroundView.backgroundColor = backgroundColor
         isSelectedCell = isSelected
         updateCheckmarkVisibility()
+    }
+    
+    private func updateCheckmarkVisibility() {
+        checkMarkImageView.isHidden = !isSelectedCell
+    }
+    
+    private func addLongPressGestureRecognizer() {
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        self.addGestureRecognizer(longPressGesture)
+    }
+    
+    @objc
+    private func handleLongPress(gesture: UILongPressGestureRecognizer) {
+        if gesture.state == .began {
+            onLongPress?()
+        }
     }
 }

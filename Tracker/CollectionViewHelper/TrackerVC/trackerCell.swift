@@ -11,7 +11,16 @@ import UIKit
 
 class TrackerCell: UICollectionViewCell {
     
-    let emojiLabel: UILabel = {
+    
+    var isCompleted: Bool = false {
+        didSet {
+            updateButtonAppearance()
+        }
+    }
+
+    private var currentDate: Date = Date()
+    
+    private let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 23)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -19,16 +28,16 @@ class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    let nameLabel: UILabel = {
+    private  let nameLabel: UILabel = {
         let nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.textColor = .white
-        nameLabel.font = UIFont.systemFont(ofSize: 16)
+        nameLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         nameLabel.numberOfLines = 0
         return nameLabel
     }()
     
-    let emojiPlaceholder: UIView = {
+    private let emojiPlaceholder: UIView = {
         let placeholder = UIView()
         placeholder.translatesAutoresizingMaskIntoConstraints = false
         placeholder.backgroundColor = UIColor.lightGray.withAlphaComponent(0.4)
@@ -37,28 +46,31 @@ class TrackerCell: UICollectionViewCell {
         return placeholder
     }()
     
-    let daysLabel: UILabel = {
+    private let daysLabel: UILabel = {
         let daysLabel = UILabel()
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
         daysLabel.textColor = .black
-        daysLabel.font = UIFont.systemFont(ofSize: 16)
+        daysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return daysLabel
     }()
     
-    let contrainerViewCell: UIView = {
+    private let contrainerViewCell: UIView = {
         let contrainerView = UIView()
         contrainerView.layer.cornerRadius = 16
         contrainerView.layer.masksToBounds = true
-        contrainerView.layer.borderWidth = 2
+        contrainerView.layer.borderWidth = 1
         contrainerView.translatesAutoresizingMaskIntoConstraints = false
         return contrainerView
     }()
     
-    let buttonContainer: UIView = {
+    private let buttonContainer: UIView = {
         let placeholder = UIView()
         placeholder.translatesAutoresizingMaskIntoConstraints = false
-        placeholder.layer.cornerRadius = 20
+        placeholder.layer.borderWidth = 1
+        placeholder.layer.cornerRadius = 17
         placeholder.layer.masksToBounds = true
+        placeholder.heightAnchor.constraint(equalToConstant: 34).isActive = true
+        placeholder.widthAnchor.constraint(equalToConstant: 34).isActive = true
         return placeholder
     }()
     
@@ -68,20 +80,18 @@ class TrackerCell: UICollectionViewCell {
         button.tintColor = .white
         button.setImage(UIImage(systemName: "plus"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
-        let imageSize: CGFloat = 20
-        button.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
-        button.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        button.isUserInteractionEnabled = false
         return button
-        
+    }()
+    
+    private lazy var tapAreaButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
+        return button
     }()
     
     private var tracker: Tracker?
-    var isCompleted: Bool = false {
-        didSet {
-            updateButtonAppearance()
-        }
-    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -89,7 +99,22 @@ class TrackerCell: UICollectionViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
+    }
+    
+    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int, currentDate: Date) {
+        self.tracker = tracker
+        self.currentDate = currentDate
+        nameLabel.text = tracker.name
+        daysLabel.text = formatDaysString(completionCount)
+        emojiLabel.text = String(tracker.emoji)
+        contrainerViewCell.backgroundColor = tracker.color
+        contrainerViewCell.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
+        buttonContainer.backgroundColor = tracker.color
+        buttonContainer.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
+        self.isCompleted = isCompleted
+        updateButtonAppearance()
     }
     
     private func setupViews() {
@@ -99,18 +124,17 @@ class TrackerCell: UICollectionViewCell {
         addSubview(daysLabel)
         addSubview(buttonContainer)
         addSubview(emojiPlaceholder)
+        addSubview(tapAreaButton)
         
         emojiPlaceholder.addSubview(emojiLabel)
         buttonContainer.addSubview(actionButton)
-        
-        actionButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             
             contrainerViewCell.topAnchor.constraint(equalTo: topAnchor),
             contrainerViewCell.leadingAnchor.constraint(equalTo: leadingAnchor),
             contrainerViewCell.trailingAnchor.constraint(equalTo: trailingAnchor),
-            contrainerViewCell.heightAnchor.constraint(equalToConstant: 100),
+            contrainerViewCell.heightAnchor.constraint(equalToConstant: 90),
             
             emojiPlaceholder.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             emojiPlaceholder.topAnchor.constraint(equalTo: topAnchor, constant: 12),
@@ -125,28 +149,32 @@ class TrackerCell: UICollectionViewCell {
             nameLabel.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: 10),
             nameLabel.bottomAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: -5),
             
-            daysLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
-            daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            daysLabel.topAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: 16),
+            daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             
-            buttonContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            buttonContainer.centerYAnchor.constraint(equalTo: daysLabel.centerYAnchor),
-            buttonContainer.widthAnchor.constraint(equalToConstant: 40),
-            buttonContainer.heightAnchor.constraint(equalToConstant: 40),
+            buttonContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+            buttonContainer.topAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: 8),
             
             actionButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor),
             actionButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor),
-            actionButton.widthAnchor.constraint(equalToConstant: 40),
-            actionButton.heightAnchor.constraint(equalToConstant: 40)
+            actionButton.widthAnchor.constraint(equalToConstant: 10.63),
+            actionButton.heightAnchor.constraint(equalToConstant: 10.21),
+            
+            tapAreaButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor),
+            tapAreaButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor),
+            tapAreaButton.widthAnchor.constraint(equalToConstant: 44),
+            tapAreaButton.heightAnchor.constraint(equalToConstant: 44)
         ])
-        
-        actionButton.addTarget(self, action: #selector(actionButtonTapped), for: .touchUpInside)
+
         updateButtonAppearance()
     }
     
     private func updateButtonAppearance() {
-        let buttonImage = isCompleted ? UIImage(named: "done") : UIImage(systemName: "plus")
+        let buttonImage = isCompleted ? UIImage(systemName: "checkmark") : UIImage(systemName: "plus")
         actionButton.setImage(buttonImage, for: .normal)
-        actionButton.tintColor = isCompleted ? UIColor.white.withAlphaComponent(0.2) : UIColor.white
+        actionButton.tintColor = isCompleted ? UIColor.white.withAlphaComponent(0.5) : UIColor.white
+        let configuration = UIImage.SymbolConfiguration(pointSize: 20, weight: .bold)
+        actionButton.setPreferredSymbolConfiguration(configuration, forImageIn: .normal)
     }
     
     private func formatDaysString(_ count: Int) -> String {
@@ -160,23 +188,20 @@ class TrackerCell: UICollectionViewCell {
         }
     }
     
-    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int) {
-        self.tracker = tracker
-        nameLabel.text = tracker.name
-        daysLabel.text = formatDaysString(completionCount)
-        emojiLabel.text = String(tracker.emoji)
-        contrainerViewCell.backgroundColor = tracker.color
-        contrainerViewCell.layer.borderColor = tracker.color.withAlphaComponent(0.9).cgColor
-        buttonContainer.backgroundColor = tracker.color
-        actionButton.tintColor = .white
-        self.isCompleted = isCompleted
-        backgroundColor = .white
-    }
-    
     @objc private func actionButtonTapped() {
         guard let tracker = tracker else { return }
+        
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: currentDate)
+        
+        if selectedDay > today {
+            print("Нельзя отмечать трекеры для будущих дат.")
+            return
+        }
+        
         isCompleted.toggle()
         NotificationCenter.default.post(name: .trackerCompletionChanged, object: nil, userInfo: ["trackerId": tracker.id, "isCompleted": isCompleted])
+        updateButtonAppearance()
     }
     
 }
@@ -188,7 +213,7 @@ class HeaderViewTrackerCollection: UICollectionReusableView {
         super.init(frame: frame)
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
         titleLabel.textColor = .black
         
         NSLayoutConstraint.activate([
@@ -200,7 +225,8 @@ class HeaderViewTrackerCollection: UICollectionReusableView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        print("init(coder:) has not been implemented")
+        return nil
     }
 }
 
