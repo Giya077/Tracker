@@ -14,6 +14,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
+        window = UIWindow(windowScene: windowScene)
+        
+        if shouldsShowOnboarding() {
+            let onboardingVC = OnboardingViewController()
+            onboardingVC.onboardingCompleted = {
+                self.showMainApp()
+            }
+            window?.rootViewController = onboardingVC
+        } else {
+            showMainApp()
+        }
+        window?.makeKeyAndVisible()
+    }
+    
+    private func shouldsShowOnboarding() -> Bool {
+        return !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+    }
+    
+    private func showMainApp() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             print("Unable to access AppDelegate")
             return
@@ -21,7 +40,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let context = appDelegate.persistantContainer.viewContext
         
-        let window = UIWindow(windowScene: windowScene)
         let tabBarController = UITabBarController()
         let trackerStore = TrackerStore(context: context)
         let trackerCategoryStore = TrackerCategoryStore(context: context)
@@ -33,9 +51,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         statisticNav.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(systemName: "hare.fill"), tag: 1)
         tabBarController.viewControllers = [trackNav, statisticNav]
         
-        window.rootViewController = tabBarController
-        self.window = window
-        window.makeKeyAndVisible()
+        window?.rootViewController = tabBarController
         
         let tabBarTopLine = UIView()
         tabBarTopLine.backgroundColor = UIColor.lightGray
@@ -49,6 +65,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             tabBarTopLine.heightAnchor.constraint(equalToConstant: 1)
         ])
     }
-    
 }
 

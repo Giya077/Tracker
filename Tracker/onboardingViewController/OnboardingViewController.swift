@@ -4,22 +4,25 @@ import UIKit
 
 class OnboardingViewController: UIPageViewController {
     
+    var onboardingCompleted: (() -> Void)?
+    
     private let buttom: UIButton = {
         let buttom = UIButton()
         buttom.backgroundColor = .black
         buttom.tintColor = .white
-        buttom.titleLabel?.text = "Вот это технологии!"
+        buttom.setTitle("Вот это технологии!", for: .normal)
+        buttom.titleLabel?.textColor = .white
         buttom.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         buttom.layer.cornerRadius = 16
         buttom.layer.masksToBounds = true
-        buttom.addTarget(<#T##target: Any?##Any?#>, action: <#T##Selector#>, for: .touchUpInside)
+        buttom.addTarget(self, action: #selector(didTapStartButton), for: .touchUpInside)
         buttom.translatesAutoresizingMaskIntoConstraints = false
         return buttom
     }()
     
     private lazy var pages: [UIViewController] = {
-        let blue = createPage(imageName: "onboardingBue")
-        let red = createPage(imageName: "onboardingRed")
+        let blue = createPage(imageName: "onboardingBue", labelText: "Отслеживайте только \n то, что хотите")
+        let red = createPage(imageName: "onboardingRed", labelText: "Даже если это \n не литры воды и йога")
         return [blue, red]
     }()
     
@@ -37,22 +40,41 @@ class OnboardingViewController: UIPageViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         dataSource = self
         delegate = self
         
         if let first = pages.first {
             setViewControllers([first], direction: .forward, animated: true, completion: nil)
         }
+        
+        setupUI()
+
     }
     
-    private func createPage(imageName: String) -> UIViewController {
+    private func createPage(imageName: String, labelText: String) -> UIViewController {
         let page = UIViewController()
+        
         let backgroundImage = UIImageView(frame: view.bounds)
         backgroundImage.image = UIImage(named: imageName)
         backgroundImage.contentMode = .scaleAspectFill
         page.view.addSubview(backgroundImage)
         page.view.sendSubviewToBack(backgroundImage)
+        
+        let label = UILabel()
+        label.text = labelText
+        label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+        label.textColor = .black
+        label.textAlignment = .center
+        label.numberOfLines = 2
+        label.translatesAutoresizingMaskIntoConstraints = false
+        page.view.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: page.view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: page.view.centerYAnchor,constant: 70)
+        ])
+        
         return page
     }
     
@@ -64,13 +86,20 @@ class OnboardingViewController: UIPageViewController {
         NSLayoutConstraint.activate([
             
             pageControl.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            pageControl.bottomAnchor.constraint(equalTo: buttom.topAnchor, constant: -20),
             
-            buttom.leftAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            buttom.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -20),
-            buttom.widthAnchor.constraint(equalToConstant: 335),
+            buttom.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            buttom.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            buttom.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60),
             buttom.heightAnchor.constraint(equalToConstant: 60)
             
         ])
+    }
+    
+    @objc
+    private func didTapStartButton() {
+        UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+        onboardingCompleted?()
     }
 }
 
