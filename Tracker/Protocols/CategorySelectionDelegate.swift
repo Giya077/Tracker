@@ -8,9 +8,9 @@
 
 // делегат для передачи выбранной категории от CategoryViewController к HabitViewController.
 
-import Foundation
-
-protocol CategorySelectionDelegate: AnyObject {
-    func didSelectCategory(_ category: TrackerCategory)
-}
+//import Foundation
+//
+//protocol CategorySelectionDelegate: AnyObject {
+//    func didSelectCategory(_ category: TrackerCategory)
+//}
 

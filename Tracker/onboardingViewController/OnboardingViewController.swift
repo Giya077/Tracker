@@ -15,7 +15,7 @@ class OnboardingViewController: UIPageViewController {
         buttom.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         buttom.layer.cornerRadius = 16
         buttom.layer.masksToBounds = true
-        buttom.addTarget(self, action: #selector(didTapStartButton), for: .touchUpInside)
+        buttom.addTarget(OnboardingViewController.self, action: #selector(didTapStartButton), for: .touchUpInside)
         buttom.translatesAutoresizingMaskIntoConstraints = false
         return buttom
     }()

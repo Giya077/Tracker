@@ -19,6 +19,7 @@ final class TrackerCategoryStore: NSObject{
     
     // MARK: - Public Properties
     weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
+  
     var categories: [TrackerCategory] {
         guard
             let objects = self.fetchedResultsController.fetchedObjects,
