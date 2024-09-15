@@ -292,7 +292,7 @@
 		1AA642332BE7E9AA002D6B32 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
-				1AF201722C8F623A00AF269A /* onboardingViewController */,
+				1AF201722C8F623A00AF269A /* OnboardingViewController */,
 				1A7E1A0D2C1D860200A35B34 /* CoreData */,
 				1A7E1A0A2C1B22E500A35B34 /* Transformers */,
 				1A877D4F2BF740F2007EF036 /* Resource */,
@@ -320,12 +320,12 @@
 			path = Protocols;
 			sourceTree = "<group>";
 		};
-		1AF201722C8F623A00AF269A /* onboardingViewController */ = {
+		1AF201722C8F623A00AF269A /* OnboardingViewController */ = {
 			isa = PBXGroup;
 			children = (
 				1AF201702C8F605E00AF269A /* OnboardingViewController.swift */,
 			);
-			path = onboardingViewController;
+			path = OnboardingViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

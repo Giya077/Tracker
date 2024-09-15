@@ -2,23 +2,9 @@
 
 import UIKit
 
-class OnboardingViewController: UIPageViewController {
+final class OnboardingViewController: UIPageViewController {
     
     var onboardingCompleted: (() -> Void)?
-    
-    private let buttom: UIButton = {
-        let buttom = UIButton()
-        buttom.backgroundColor = .black
-        buttom.tintColor = .white
-        buttom.setTitle("Вот это технологии!", for: .normal)
-        buttom.titleLabel?.textColor = .white
-        buttom.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        buttom.layer.cornerRadius = 16
-        buttom.layer.masksToBounds = true
-        buttom.addTarget(OnboardingViewController.self, action: #selector(didTapStartButton), for: .touchUpInside)
-        buttom.translatesAutoresizingMaskIntoConstraints = false
-        return buttom
-    }()
     
     private lazy var pages: [UIViewController] = {
         let blue = createPage(imageName: "onboardingBue", labelText: "Отслеживайте только \n то, что хотите")
@@ -49,7 +35,6 @@ class OnboardingViewController: UIPageViewController {
         }
         
         setupUI()
-
     }
     
     private func createPage(imageName: String, labelText: String) -> UIViewController {
@@ -70,9 +55,27 @@ class OnboardingViewController: UIPageViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         page.view.addSubview(label)
         
+        let button = UIButton()
+        button.backgroundColor = .black
+        button.tintColor = .white
+        button.setTitle("Вот это технологии!", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        page.view.addSubview(button)
+        button.addTarget(self, action: #selector(didTapStartButton), for: .touchUpInside)
+        
+        
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: page.view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: page.view.centerYAnchor,constant: 70)
+            label.centerYAnchor.constraint(equalTo: page.view.centerYAnchor,constant: 70),
+        
+            button.leadingAnchor.constraint(equalTo: page.view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            button.trailingAnchor.constraint(equalTo: page.view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            button.bottomAnchor.constraint(equalTo: page.view.safeAreaLayoutGuide.bottomAnchor, constant: -60),
+            button.heightAnchor.constraint(equalToConstant: 60)
+
         ])
         
         return page
@@ -81,18 +84,10 @@ class OnboardingViewController: UIPageViewController {
     private func setupUI() {
         
         view.addSubview(pageControl)
-        view.addSubview(buttom)
         
         NSLayoutConstraint.activate([
-            
             pageControl.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            pageControl.bottomAnchor.constraint(equalTo: buttom.topAnchor, constant: -20),
-            
-            buttom.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            buttom.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            buttom.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60),
-            buttom.heightAnchor.constraint(equalToConstant: 60)
-            
+            pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -140),
         ])
     }
     
