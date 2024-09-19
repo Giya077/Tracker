@@ -178,14 +178,9 @@ class TrackerCell: UICollectionViewCell {
     }
     
     private func formatDaysString(_ count: Int) -> String {
-        switch count {
-        case 1:
-            return "\(count) день"
-        case 2...4:
-            return "\(count) дня"
-        default:
-            return "\(count) дней"
-        }
+        return String.localizedStringWithFormat(
+            NSLocalizedString("daysCount", comment: "Количество дней"), count
+        )
     }
     
     @objc private func actionButtonTapped() {
