@@ -9,7 +9,6 @@ import UIKit
 
 final class AddCategoryViewController: UIViewController {
     
-    weak var delegate: NewCategoryViewControllerDelegate?
     weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
     
     private let trackerCategoryStore: TrackerCategoryStore

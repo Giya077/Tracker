@@ -37,7 +37,6 @@ class CategoryCell: UITableViewCell {
         return imageView
     }()
     
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
@@ -75,14 +74,7 @@ class CategoryCell: UITableViewCell {
             
         ])
     }
-    
-    func configure(withTitle title: String, backgroundColor: UIColor, isSelected: Bool) {
-        categoryLabel.text = title
-        customBackgroundView.backgroundColor = backgroundColor
-        isSelectedCell = isSelected
-        updateCheckmarkVisibility()
-    }
-    
+        
     private func updateCheckmarkVisibility() {
         checkMarkImageView.isHidden = !isSelectedCell
     }
@@ -97,5 +89,12 @@ class CategoryCell: UITableViewCell {
         if gesture.state == .began {
             onLongPress?()
         }
+    }
+    
+    func configure(withTitle title: String, backgroundColor: UIColor, isSelected: Bool) {
+        categoryLabel.text = title
+        customBackgroundView.backgroundColor = Colors.systemCellColor
+        isSelectedCell = isSelected
+        updateCheckmarkVisibility()
     }
 }

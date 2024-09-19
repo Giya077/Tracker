@@ -172,8 +172,14 @@ final class HabitViewController: UIViewController {
         setupScrollView()
         setupView()
         
-        categoryViewController = CategoryViewController(trackerCategoryStore: trackerCategoryStore)
-        categoryViewController?.categorySelectionDelegate = self
+        let categoryViewModel = CategoryViewModel(trackerCategoryStore: trackerCategoryStore)
+        categoryViewController = CategoryViewController(viewModel: categoryViewModel)
+
+        categoryViewController?.onCategorySelected = { [weak self] category in
+            self?.selectedCategory = category
+            self?.updateCategoryLabel()
+            self?.updateCreateButtonState()
+        }
         
         categoryAndScheduleCollectionView.delegate = self
         categoryAndScheduleCollectionView.dataSource = self
@@ -188,6 +194,22 @@ final class HabitViewController: UIViewController {
     }
     
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let selectedCategory = selectedCategory {
+            if let updatedCategory = trackerCategoryStore.categories.first(where: { $0.titles == selectedCategory.titles }) {
+                self.selectedCategory = updatedCategory
+            } else {
+                self.selectedCategory = nil
+            }
+        }
+        
+        updateCategoryLabel()
+        updateCreateButtonState()
+    }
+
+
     private func setupScrollView() {
         scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -299,10 +321,9 @@ final class HabitViewController: UIViewController {
     
     private func updateCategoryLabel() {
         guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
-        // Создаем строку, содержащую названия всех выбранных категорий, разделенные запятыми
         let categoriesText = selectedCategory?.titles ?? ""
-        // Обновляем текст в ячейке с категорией
         categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+        print("Selected category: \(selectedCategory?.titles ?? "No Category")")
     }
     
     private func checkFields() -> Bool {
@@ -375,13 +396,11 @@ extension HabitViewController: UICollectionViewDataSource {
     
     private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
-        
-        // Проверяем, является ли текущая ячейка Расписанием
+
         if indexPath.row == 1 {
             let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
             cell.configure(title: arrayCells[indexPath.row], days: daysText.isEmpty ? nil : daysText)
         } else {
-            // Если это не ячейка Расписание, передаем nil для daysLabel
             cell.configure(title: arrayCells[indexPath.item], days: selectedCategory?.titles)
         }
         return cell
@@ -528,25 +547,5 @@ extension HabitViewController: TimetableDelegate {
             self.categoryAndScheduleCollectionView.reloadData()
             self.updateCreateButtonState()
         }
-    }
-}
-
-extension HabitViewController: NewCategoryViewControllerDelegate {
-    func removeStubAndShowCategories() {
-    }
-    
-    func didAddCategory(_ category: TrackerCategory) {
-        selectedCategory = category
-        updateCategoryLabel()
-        updateCreateButtonState()
-    }
-}
-
-extension HabitViewController: CategorySelectionDelegate { // делегат для передачи выбранной категории от CategoryViewController к HabitViewController.
-    
-    func didSelectCategory(_ category: TrackerCategory) {
-        selectedCategory = category
-        updateCategoryLabel()
-        updateCreateButtonState()
     }
 }

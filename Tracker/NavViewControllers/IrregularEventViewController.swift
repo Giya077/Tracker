@@ -166,8 +166,16 @@ final class IrregularEventViewController: UIViewController {
         setupScrollView()
         setupView()
         
-        categoryViewController = CategoryViewController(trackerCategoryStore: trackerCategoryStore)
-        categoryViewController?.categorySelectionDelegate = self
+        let categoryViewModel = CategoryViewModel(trackerCategoryStore: trackerCategoryStore)
+        categoryViewController = CategoryViewController(viewModel: categoryViewModel)
+
+        categoryViewController?.onCategorySelected = { [weak self] category in
+            self?.selectedCategory = category
+            self?.updateCategoryLabel()
+            self?.updateCreateButtonState()
+        }
+        
+        
         categoryCollectionView.delegate = self
         categoryCollectionView.dataSource = self
         emojiCollectionView.delegate = self
@@ -178,7 +186,20 @@ final class IrregularEventViewController: UIViewController {
         
         createButton.isEnabled = false
         createButton.backgroundColor = .lightGray
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        if let selectedCategory = selectedCategory {
+            if let updatedCategory = trackerCategoryStore.categories.first(where: { $0.titles == selectedCategory.titles }) {
+                self.selectedCategory = updatedCategory
+            } else {
+                self.selectedCategory = nil
+            }
+        }
+        updateCategoryLabel()
+        updateCreateButtonState()
     }
     
     private func setupScrollView() {
@@ -286,8 +307,8 @@ final class IrregularEventViewController: UIViewController {
     private func updateCategoryLabel() {
         guard let categoryCell = categoryCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
         let categoriesText = selectedCategory?.titles ?? ""
-        // Обновляем текст в ячейке с категорией
         categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+        print("Selected category: \(selectedCategory?.titles ?? "No Category")")
     }
     
     private func checkFields() -> Bool {
@@ -310,7 +331,7 @@ final class IrregularEventViewController: UIViewController {
               let color = selectedColor,
               let emoji = selectedEmoji,
               let category = selectedCategory else {
-            return // Handle the error or show an alert
+            return
         }
         
         let newTracker = Tracker(
@@ -456,19 +477,15 @@ extension IrregularEventViewController: UITextFieldDelegate {
         updateCreateButtonState()
         return true
     }
+    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        // Проверяем, что это наше текстовое поле
         if textField == trackNaming {
-            // Проверяем, что текст после изменений не превышает 38 символов
             if let text = textField.text,
                let textRange = Range(range, in: text) {
                 let updatedText = text.replacingCharacters(in: textRange, with: string)
-                // Проверяем, достигнуто ли ограничение
                 if updatedText.count >= 38 {
-                    // Отображаем метку
                     showCharacterLimitLabel()
                 } else {
-                    // Скрываем метку, если текст в пределах ограничения
                     hideCharacterLimitLabel()
                 }
                 updateCreateButtonState()
@@ -484,25 +501,5 @@ extension IrregularEventViewController: UITextFieldDelegate {
     
     private func hideCharacterLimitLabel() {
         characterLimitLabel.isHidden = true
-    }
-}
-
-extension IrregularEventViewController: NewCategoryViewControllerDelegate {
-    func removeStubAndShowCategories() {
-    }
-    
-    func didAddCategory(_ category: TrackerCategory) {
-        selectedCategory = category
-        updateCategoryLabel()
-        updateCreateButtonState()
-    }
-}
-
-extension IrregularEventViewController: CategorySelectionDelegate { // делегат для передачи выбранной категории от CategoryViewController к HabitViewController.
-    
-    func didSelectCategory(_ category: TrackerCategory) {
-        selectedCategory = category
-        updateCategoryLabel()
-        updateCreateButtonState()
     }
 }
