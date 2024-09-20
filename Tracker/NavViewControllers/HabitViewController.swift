@@ -28,7 +28,7 @@ final class HabitViewController: UIViewController {
     private var contentView: UIView!
     
     private let label: UILabel = {
-        let label = BasicTextLabel(text: "Новая привычка")
+        let label = BasicTextLabel(text: NSLocalizedString("New Habit", comment: "Новая привычка"))
         return label
     }()
     
@@ -40,21 +40,25 @@ final class HabitViewController: UIViewController {
         trackNaming.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: trackNaming.frame.height))
         trackNaming.leftViewMode = .always
         trackNaming.font = UIFont.systemFont(ofSize: 18)
-        trackNaming.attributedPlaceholder = NSAttributedString(string: "Введите название трекера", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        trackNaming.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("Enter tracker name", comment: "Введите название трекера"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
         trackNaming.translatesAutoresizingMaskIntoConstraints = false
         return trackNaming
     }()
     
     private let characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("Character limit: 38", comment: "Ограничение 38 символов")
         label.textColor = .red
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let arrayCells = ["Категория", "Расписание"]
+    private let arrayCells = [
+        NSLocalizedString("Category", comment: "Категория"),
+        NSLocalizedString("Schedule", comment: "Расписание")
+    ]
+    
     private let cellIdentifier = "CellType1"
     private lazy var categoryAndScheduleCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -87,7 +91,7 @@ final class HabitViewController: UIViewController {
     private let emojiHeaderLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
-        label.text = "Emoji"
+        label.text = NSLocalizedString("Emoji", comment: "Emoji")
         label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -96,7 +100,7 @@ final class HabitViewController: UIViewController {
     private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
-        label.text = "Цвет"
+        label.text = NSLocalizedString("Color", comment: "Цвет")
         label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -130,7 +134,7 @@ final class HabitViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .system)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Отменить"), for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         cancelButton.backgroundColor = .white
         cancelButton.layer.cornerRadius = 16
@@ -145,7 +149,7 @@ final class HabitViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let createButton = UIButton(type: .system)
-        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("Create", comment: "Создать"), for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         createButton.layer.cornerRadius = 16
         createButton.layer.masksToBounds = true
@@ -322,7 +326,7 @@ final class HabitViewController: UIViewController {
     private func updateCategoryLabel() {
         guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
         let categoriesText = selectedCategory?.titles ?? ""
-        categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+        categoryCell.configure(title: NSLocalizedString("Category", comment: "Категория"), days: categoriesText.isEmpty ? nil : categoriesText)
         print("Selected category: \(selectedCategory?.titles ?? "No Category")")
     }
     
@@ -380,7 +384,6 @@ final class HabitViewController: UIViewController {
     }
 }
 
-
 extension HabitViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -398,7 +401,7 @@ extension HabitViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
 
         if indexPath.row == 1 {
-            let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
+            let daysText = selectedDays.map { $0.localizedShortName }.joined(separator: ", ")
             cell.configure(title: arrayCells[indexPath.row], days: daysText.isEmpty ? nil : daysText)
         } else {
             cell.configure(title: arrayCells[indexPath.item], days: selectedCategory?.titles)
@@ -508,18 +511,13 @@ extension HabitViewController: UITextFieldDelegate {
         return true
     }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        // Проверяем, что это наше текстовое поле
         if textField == trackNaming {
-            // Проверяем, что текст после изменений не превышает 38 символов
             if let text = textField.text,
                let textRange = Range(range, in: text) {
                 let updatedText = text.replacingCharacters(in: textRange, with: string)
-                // Проверяем, достигнуто ли ограничение
                 if updatedText.count >= 38 {
-                    // Отображаем метку
                     showCharacterLimitLabel()
                 } else {
-                    // Скрываем метку, если текст в пределах ограничения
                     hideCharacterLimitLabel()
                 }
                 updateCreateButtonState()

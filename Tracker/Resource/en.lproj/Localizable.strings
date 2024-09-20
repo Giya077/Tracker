@@ -1,0 +1,59 @@
+/*
+  LocalizableRU.strings
+  Tracker
+
+  Created by GiyaDev on 20.09.2024.
+  
+*/
+
+/* Localizable.strings (English) */
+
+/* General */
+"Add Category" = "Add Category";
+"Category" = "Category";
+"Schedule" = "Schedule";
+"New Category" = "New Category";
+"Enter category name" = "Enter category name";
+"Trackers" = "Trackers";
+"Tracker" = "Tracker";
+"Statistics" = "Statistics";
+"Habit" = "Habit";
+"Irregular event" = "Irregular event";
+"Creating tracker" = "Creating tracker";
+"New Habit" = "New Habit";
+"Enter tracker name" = "Enter tracker name";
+"Character limit is 38" = "Character limit is 38";
+"Schedule" = "Schedule";
+"Search" = "Search";
+"Color" = "Color";
+"Edit" = "Edit";
+"Delete" = "Delete";
+"Cancel" = "Cancel";
+"Save" = "Save";
+"Done" = "Done";
+"New Irregular Event" = "New Irregular Event";
+"What to track?" = "What to track?";
+"Habits and events can be\ncombined by meaning" = "Habits and events can be\ncombined by meaning";
+
+/* Alerts */
+"Are you sure you want to delete this category?" = "Are you sure you want to delete this category?";
+"Category deleted" = "Category deleted";
+"Tracker created" = "Tracker created";
+"Please enter a valid name" = "Please enter a valid name";
+
+//SCHEDULE
+"Monday" = "Monday";
+"Tuesday" = "Tuesday";
+"Wednesday" = "Wednesday";
+"Thursday" = "Thursday";
+"Friday" = "Friday";
+"Saturday" = "Saturday";
+"Sunday" = "Sunday";
+
+"monday_short" = "Mon";
+"tuesday_short" = "Tue";
+"wednesday_short" = "Wed";
+"thursday_short" = "Thu";
+"friday_short" = "Fri";
+"saturday_short" = "Sat";
+"sunday_short" = "Sun";

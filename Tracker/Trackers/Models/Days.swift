@@ -16,6 +16,25 @@ enum Days: String, CaseIterable, Codable {
     case friday = "Пт"
     case saturday = "Сб"
     case sunday = "Вс"
+    
+    var localizedShortName: String {
+        switch self {
+        case .monday:
+            return NSLocalizedString("monday_short", comment: "Short form for Monday")
+        case .tuesday:
+            return NSLocalizedString("tuesday_short", comment: "Short form for Tuesday")
+        case .wednesday:
+            return NSLocalizedString("wednesday_short", comment: "Short form for Wednesday")
+        case .thursday:
+            return NSLocalizedString("thursday_short", comment: "Short form for Thursday")
+        case .friday:
+            return NSLocalizedString("friday_short", comment: "Short form for Friday")
+        case .saturday:
+            return NSLocalizedString("saturday_short", comment: "Short form for Saturday")
+        case .sunday:
+            return NSLocalizedString("sunday_short", comment: "Short form for Sunday")
+        }
+    }
 }
 
 extension Days {

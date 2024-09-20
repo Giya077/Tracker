@@ -4,15 +4,15 @@ final class CategoryViewController: UIViewController {
     
     // MARK: - Privat Properties
     private var viewModel: CategoryViewModel
-    private lazy var stubView = StubView(text: "Привычки и события можно\nобъединить по смыслу")
+    private lazy var stubView = StubView(text: NSLocalizedString("Habits and events can be\ncombined by meaning", comment: "Stub text for empty category screen"))
     
     private lazy var label: UILabel = {
-        let label = BasicTextLabel(text: "Категория")
+        let label = BasicTextLabel(text: NSLocalizedString("Category", comment: "Category label"))
         return label
     }()
     
     private lazy var addCategoryButton: UIButton = {
-        let addCategoryButton = BasicButton(title: "Добавить категорию")
+        let addCategoryButton = BasicButton(title: NSLocalizedString("Add Category", comment: "Button to add a new category"))
         addCategoryButton.addTarget(self, action: #selector(addCategoryButtonTapped), for: .touchUpInside)
         addCategoryButton.translatesAutoresizingMaskIntoConstraints = false
         return addCategoryButton
@@ -91,17 +91,16 @@ final class CategoryViewController: UIViewController {
     private func presentActions(for indexPath: IndexPath) {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let editAction = UIAlertAction(title: "Редактировать", style: .default) { [weak self] _ in
+        let editAction = UIAlertAction(title: NSLocalizedString("Edit", comment: "Edit category action"), style: .default) { [weak self] _ in
             self?.editCategory(at: indexPath)
         }
         
-        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
+        let deleteAction = UIAlertAction(title: NSLocalizedString("Delete", comment: "Delete category action"), style: .destructive) { [weak self] _ in
             self?.viewModel.deleteCategory(at: indexPath.row)
             self?.tableView.reloadData()
         }
         
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel) { _ in
-        }
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel action"), style: .cancel) { _ in }
         
         alertController.addAction(editAction)
         alertController.addAction(deleteAction)
@@ -119,14 +118,14 @@ final class CategoryViewController: UIViewController {
     
     private func editCategory(at indexPath: IndexPath) {
         let category = viewModel.categories[indexPath.row]
-        let alertController = UIAlertController(title: "Редактировать категорию", message: nil, preferredStyle: .alert)
+        let alertController = UIAlertController(title: NSLocalizedString("", comment: "Edit category title"), message: nil, preferredStyle: .alert)
         
         alertController.addTextField { textField in
             textField.text = category.titles
         }
         
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel)
-        let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel action"), style: .cancel)
+        let saveAction = UIAlertAction(title: NSLocalizedString("Save", comment: "Save category action"), style: .default) { [weak self] _ in
             if let newName = alertController.textFields?.first?.text, !newName.isEmpty {
                 self?.viewModel.updateCategory(at: indexPath.row, with: newName)
                 
@@ -146,13 +145,13 @@ final class CategoryViewController: UIViewController {
     // MARK: - Actions
     @objc
     private func addCategoryButtonTapped() {
-        let alertController = UIAlertController(title: "Новая категория", message: nil, preferredStyle: .alert)
+        let alertController = UIAlertController(title: NSLocalizedString("New Category", comment: "New category title"), message: nil, preferredStyle: .alert)
         alertController.addTextField { textField in
-            textField.placeholder = "Введите название категории"
+            textField.placeholder = NSLocalizedString("Enter category name", comment: "Category name placeholder")
         }
         
-        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel)
-        let saveAction = UIAlertAction(title: "Сохранить", style: .default) { [weak self] _ in
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: "Cancel action"), style: .cancel)
+        let saveAction = UIAlertAction(title: NSLocalizedString("Save", comment: "Save action"), style: .default) { [weak self] _ in
             if let categoryName = alertController.textFields?.first?.text, !categoryName.isEmpty {
                 self?.viewModel.addCategory(categoryName)
             }

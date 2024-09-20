@@ -1,0 +1,53 @@
+/* 
+  LocalizableRU.strings
+  Tracker
+
+  Created by GiyaDev on 20.09.2024.
+  
+*/
+
+"Add Category" = "Добавить категорию";
+"Tracker" = "Трекер";
+"Trackers" = "Трекеры";
+"Statistics" = "Статистика";
+"What to track?" = "Что будем отслеживать?";
+"Search" = "Поиск";
+"Schedule" = "Расписание";
+"Habit" = "Привычка";
+"Irregular event" = "Нерегулярные события";
+"Creating tracker" = "Создание трекера";
+"New Habit" = "Новая привычка";
+"Enter tracker name" = "Введите название трекера";
+"38 characters limit" = "Ограничение 38 символов";
+"Category" = "Категория";
+"Schedule" = "Расписание";
+"Color" = "Цвет";
+"Enter category name" = "Введите название категории";
+"New irregular event" = "Новое нерегулярное событие";
+"New Category" = "Новая категория";
+"Cancel" = "Отменить";
+"Create" = "Создать";
+"Save" = "Сохранить";
+"Done" = "Готово";
+"Edit" = "Редактировать";
+"Delete" = "Удалить";
+"Habits and events can be\ncombined by meaning" = "Привычки и события можно \nобъединить по смыслу";
+
+
+//SCHEDULE
+"Monday" = "Понедельник";
+"Tuesday" = "Вторник";
+"Wednesday" = "Среда";
+"Thursday" = "Четверг";
+"Friday" = "Пятница";
+"Saturday" = "Суббота";
+"Sunday" = "Воскресенье";
+
+"monday_short" = "Пн";
+"tuesday_short" = "Вт";
+"wednesday_short" = "Ср";
+"thursday_short" = "Чт";
+"friday_short" = "Пт";
+"saturday_short" = "Сб";
+"sunday_short" = "Вс";
+

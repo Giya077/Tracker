@@ -21,7 +21,7 @@ final class TrackerViewController: UIViewController {
     private var searchBar = UISearchBar()
     private var datePicker = UIDatePicker()
     private var collectionView: UICollectionView!
-    private let stubView = StubView(text: "Что будем отслеживать?")
+    private let stubView = StubView(text: NSLocalizedString("What to track?", comment: "Что будем отслеживать?"))
     private var currentDate: Date = Date()
     private var searchText: String = ""
     
@@ -149,7 +149,7 @@ final class TrackerViewController: UIViewController {
             textField.textColor = .black
             textField.tintColor = .black
             
-            let placeholderText = "Поиск"
+            let placeholderText = NSLocalizedString("Search", comment: "Поиск")
             let placeholderColor = UIColor.lightGray
             textField.attributedPlaceholder = NSAttributedString(
                 string: placeholderText,
@@ -203,14 +203,13 @@ final class TrackerViewController: UIViewController {
     private func setupUI() {
         
         view.backgroundColor = .white
-        
-        trackerLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(trackerLabel)
+        trackerLabel.translatesAutoresizingMaskIntoConstraints = false
         trackerLabel.textColor = .black
         trackerLabel.font = UIFont.boldSystemFont(ofSize: 34)
         trackerLabel.numberOfLines = 0
-        trackerLabel.text = "Трекеры"
-        
+        trackerLabel.text = NSLocalizedString("Trackers", comment: "Трекеры")
+
         NSLayoutConstraint.activate([
             trackerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             trackerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
@@ -369,7 +368,7 @@ extension TrackerViewController: UISearchBarDelegate {
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         searchBar.setShowsCancelButton(true, animated: true)
         if let cancelButton = searchBar.value(forKey: "cancelButton") as? UIButton {
-            cancelButton.setTitle("Отменить", for: .normal)
+            cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Отменить"), for: .normal)
         }
     }
     
