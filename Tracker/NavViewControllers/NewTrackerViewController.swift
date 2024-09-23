@@ -39,7 +39,7 @@ final class NewTrackerViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(label)
         
         NSLayoutConstraint.activate([

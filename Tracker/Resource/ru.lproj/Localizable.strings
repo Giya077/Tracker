@@ -33,6 +33,8 @@
 "Delete" = "Удалить";
 "Habits and events can be\ncombined by meaning" = "Привычки и события можно \nобъединить по смыслу";
 
+"Character limit: 38" = "Ограничение 38 символов";
+
 
 //SCHEDULE
 "Monday" = "Понедельник";

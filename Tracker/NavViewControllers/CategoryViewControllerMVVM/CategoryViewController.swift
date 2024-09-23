@@ -52,7 +52,7 @@ final class CategoryViewController: UIViewController {
     
     // MARK: - Setup Methods
     private func setupView() {
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(label)
         view.addSubview(addCategoryButton)
         view.addSubview(stubView)
@@ -115,7 +115,6 @@ final class CategoryViewController: UIViewController {
         present(alertController, animated: true)
     }
 
-    
     private func editCategory(at indexPath: IndexPath) {
         let category = viewModel.categories[indexPath.row]
         let alertController = UIAlertController(title: NSLocalizedString("", comment: "Edit category title"), message: nil, preferredStyle: .alert)
@@ -193,5 +192,4 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         navigationController?.popViewController(animated: true)
         tableView.reloadData()
     }
-
 }

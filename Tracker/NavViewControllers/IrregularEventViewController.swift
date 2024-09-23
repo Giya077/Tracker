@@ -28,26 +28,26 @@ final class IrregularEventViewController: UIViewController {
     private var contentView: UIView!
     
     private let label: UILabel = {
-        let label = BasicTextLabel(text: "Новое нерегулярное событие")
+        let label = BasicTextLabel(text: NSLocalizedString("Irregular event", comment: "Новое нерегулярное событие"))
         return label
     }()
     
     private let trackNaming: UITextField = {
         let trackNaming = UITextField()
-        trackNaming.textColor = .black
-        trackNaming.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
-        trackNaming.layer.cornerRadius = 10
+        trackNaming.textColor = ThemeManager.shared.textColor()
+        trackNaming.backgroundColor = Colors.systemSearchColor
+        trackNaming.layer.cornerRadius = 16
         trackNaming.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: trackNaming.frame.height))
         trackNaming.leftViewMode = .always
         trackNaming.font = UIFont.systemFont(ofSize: 18)
-        trackNaming.attributedPlaceholder = NSAttributedString(string: "Введите название трекера", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        trackNaming.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("Enter tracker name", comment: "Введите название трекера"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
         trackNaming.translatesAutoresizingMaskIntoConstraints = false
         return trackNaming
     }()
     
     private let characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("Character limit: 38", comment: "Ограничение 38 символов")
         label.textColor = .red
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -79,7 +79,7 @@ final class IrregularEventViewController: UIViewController {
     
     private let emojiHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.text = "Emoji"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -88,7 +88,7 @@ final class IrregularEventViewController: UIViewController {
     
     private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.text = "Цвет"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -122,28 +122,28 @@ final class IrregularEventViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .system)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Отменить"), for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        cancelButton.backgroundColor = .white
-        cancelButton.layer.cornerRadius = 12
+        cancelButton.backgroundColor = ThemeManager.shared.backgroundColor()
+        cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.red.cgColor
         cancelButton.layer.masksToBounds = true
         cancelButton.tintColor = .red
-        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
-        cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        cancelButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         return cancelButton
     }()
     
     private lazy var createButton: UIButton = {
         let createButton = UIButton(type: .system)
-        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("Create", comment: "Создать"), for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
-        createButton.layer.cornerRadius = 12
+        createButton.layer.cornerRadius = 16
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
-        createButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        createButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         return createButton
     }()
     
@@ -160,9 +160,8 @@ final class IrregularEventViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         navigationItem.hidesBackButton = true
-        
         setupScrollView()
         setupView()
         
@@ -322,8 +321,21 @@ final class IrregularEventViewController: UIViewController {
     }
     
     private func updateCreateButtonState() {
-        createButton.isEnabled = checkFields()
-        createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
+        let isValid = checkFields()
+        createButton.isEnabled = isValid
+        
+        if isValid {
+            if traitCollection.userInterfaceStyle == .dark {
+                createButton.backgroundColor = .white
+                createButton.setTitleColor(.black, for: .normal)
+            } else {
+                createButton.backgroundColor = .black
+                createButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            createButton.backgroundColor = .lightGray
+            createButton.setTitleColor(.white, for: .normal)
+        }
     }
     
     private func saveEvent() {
@@ -473,7 +485,7 @@ extension IrregularEventViewController: UICollectionViewDelegateFlowLayout {
 
 extension IrregularEventViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()// Скрыть клавиатуру
+        textField.resignFirstResponder()
         updateCreateButtonState()
         return true
     }

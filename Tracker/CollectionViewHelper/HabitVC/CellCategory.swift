@@ -16,7 +16,7 @@ class CategoryCell: UITableViewCell {
     
     private let customBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = Colors.systemSearchColor
         view.layer.cornerRadius = 10
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -24,7 +24,7 @@ class CategoryCell: UITableViewCell {
     
     private let categoryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.font = UIFont.systemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -32,7 +32,7 @@ class CategoryCell: UITableViewCell {
     
     private let checkMarkImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "checkmark"))
-        imageView.tintColor = .black
+        imageView.tintColor = UIColor.label
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -40,7 +40,7 @@ class CategoryCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
-        backgroundColor = .white
+        backgroundColor = Colors.systemSearchColor
         selectedBackgroundView = UIView()
         selectedBackgroundView?.backgroundColor = .clear
         addLongPressGestureRecognizer()
@@ -93,7 +93,7 @@ class CategoryCell: UITableViewCell {
     
     func configure(withTitle title: String, backgroundColor: UIColor, isSelected: Bool) {
         categoryLabel.text = title
-        customBackgroundView.backgroundColor = Colors.systemCellColor
+        customBackgroundView.backgroundColor = ThemeManager.shared.backgroundColor()
         isSelectedCell = isSelected
         updateCheckmarkVisibility()
     }

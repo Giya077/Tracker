@@ -28,7 +28,7 @@ final class ScheduleViewController: UIViewController {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(TimetableTableViewCell.self, forCellReuseIdentifier: "DaysCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = .white
+        tableView.backgroundColor = ThemeManager.shared.backgroundColor()
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         return tableView
     }()
@@ -64,7 +64,7 @@ final class ScheduleViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(label)
         view.addSubview(doneButton)
         view.addSubview(tableView)

@@ -18,7 +18,7 @@ class EmojiCell: UICollectionViewCell {
     
     private let selectedPlaceholder: UIView = {
         let view = UIView()
-        view.backgroundColor = Colors.systemSearchColor
+        view.backgroundColor = ThemeManager.shared.emojiPlaceholderColor()
         view.layer.cornerRadius = 10
         view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false

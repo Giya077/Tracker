@@ -34,8 +34,8 @@ final class HabitViewController: UIViewController {
     
     private let trackNaming: UITextField = {
         let trackNaming = UITextField()
-        trackNaming.textColor = .black
-        trackNaming.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        trackNaming.textColor = ThemeManager.shared.textColor()
+        trackNaming.backgroundColor = Colors.systemSearchColor
         trackNaming.layer.cornerRadius = 16
         trackNaming.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: trackNaming.frame.height))
         trackNaming.leftViewMode = .always
@@ -90,7 +90,7 @@ final class HabitViewController: UIViewController {
     
     private let emojiHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.text = NSLocalizedString("Emoji", comment: "Emoji")
         label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -99,7 +99,7 @@ final class HabitViewController: UIViewController {
     
     private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.text = NSLocalizedString("Color", comment: "Цвет")
         label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -136,7 +136,7 @@ final class HabitViewController: UIViewController {
         let cancelButton = UIButton(type: .system)
         cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Отменить"), for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        cancelButton.backgroundColor = .white
+        cancelButton.backgroundColor = ThemeManager.shared.backgroundColor()
         cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.red.cgColor
@@ -171,7 +171,7 @@ final class HabitViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         navigationItem.hidesBackButton = true
         setupScrollView()
         setupView()
@@ -342,17 +342,29 @@ final class HabitViewController: UIViewController {
     }
     
     private func updateCreateButtonState() {
-        createButton.isEnabled = checkFields()
-        createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
+        let isValid = checkFields()
+        createButton.isEnabled = isValid
+        
+        if isValid {
+            if traitCollection.userInterfaceStyle == .dark {
+                createButton.backgroundColor = .white
+                createButton.setTitleColor(.black, for: .normal)
+            } else {
+                createButton.backgroundColor = .black
+                createButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            createButton.backgroundColor = .lightGray
+            createButton.setTitleColor(.white, for: .normal)
+        }
     }
-    
+
     private func saveTracker() {
         guard let name = trackNaming.text, !name.isEmpty,
               let color = selectedColor,
               let emoji = selectedEmoji,
               !selectedDays.isEmpty,
               let category = selectedCategory else {
-            // добавить обработку ошибки или показать уведомление
             return
         }
         

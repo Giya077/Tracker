@@ -40,6 +40,7 @@
 "Category deleted" = "Category deleted";
 "Tracker created" = "Tracker created";
 "Please enter a valid name" = "Please enter a valid name";
+"Character limit: 38" = "Character limit: 38";
 
 //SCHEDULE
 "Monday" = "Monday";

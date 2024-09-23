@@ -117,14 +117,13 @@ final class TrackerViewController: UIViewController {
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
         datePicker.locale = Locale(identifier: "ru_RU")
-        datePicker.tintColor = .black
+        datePicker.tintColor = UIColor.label
         datePicker.date = Date()
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(datePicker)
         
-        // Установка цвета текста
-        datePicker.setValue(UIColor.black, forKey: "textColor")
+        datePicker.setValue(ThemeManager.shared.textColor(), forKey: "textColor")
     }
     
     private func setupNavigationBar() {
@@ -145,9 +144,9 @@ final class TrackerViewController: UIViewController {
         searchBar.backgroundImage = UIImage()
         
         if let textField = searchBar.value(forKey: "searchField") as? UITextField {
-            textField.backgroundColor = Colors.systemSearchColor // Цвет фона текстового поля
-            textField.textColor = .black
-            textField.tintColor = .black
+            textField.backgroundColor = Colors.systemSearchColor
+            textField.textColor = ThemeManager.shared.textColor()
+            textField.tintColor = ThemeManager.shared.textColor()
             
             let placeholderText = NSLocalizedString("Search", comment: "Поиск")
             let placeholderColor = UIColor.lightGray
@@ -194,7 +193,7 @@ final class TrackerViewController: UIViewController {
     private func addPlusButton() {
         plusButton = UIButton(type: .system)
         plusButton.setImage(UIImage(named: "plus"), for: .normal)
-        plusButton.tintColor = .black
+        plusButton.tintColor = ThemeManager.shared.textColor()
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(plusButton)
         plusButton.addTarget(self, action: #selector(didTapPlusButton), for: .touchUpInside)
@@ -202,10 +201,10 @@ final class TrackerViewController: UIViewController {
     
     private func setupUI() {
         
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(trackerLabel)
         trackerLabel.translatesAutoresizingMaskIntoConstraints = false
-        trackerLabel.textColor = .black
+        trackerLabel.textColor = ThemeManager.shared.textColor()
         trackerLabel.font = UIFont.boldSystemFont(ofSize: 34)
         trackerLabel.numberOfLines = 0
         trackerLabel.text = NSLocalizedString("Trackers", comment: "Трекеры")
@@ -305,7 +304,6 @@ extension TrackerViewController: NewTrackerDelegate {
     
     func didFinishCreatingTracker(trackerType: TrackerType) {
         print("Трекер типа \(trackerType) был создан.")
-        // Обновите интерфейс или выполните другие необходимые действия
         loadTrackers()
     }
 }

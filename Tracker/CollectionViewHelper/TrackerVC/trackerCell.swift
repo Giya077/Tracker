@@ -31,7 +31,7 @@ class TrackerCell: UICollectionViewCell {
     private  let nameLabel: UILabel = {
         let nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.textColor = .white
+        nameLabel.textColor = UIColor.white
         nameLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         nameLabel.numberOfLines = 0
         return nameLabel
@@ -49,7 +49,7 @@ class TrackerCell: UICollectionViewCell {
     private let daysLabel: UILabel = {
         let daysLabel = UILabel()
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
-        daysLabel.textColor = .black
+        daysLabel.textColor = UIColor.label
         daysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return daysLabel
     }()
@@ -146,7 +146,7 @@ class TrackerCell: UICollectionViewCell {
             
             nameLabel.leadingAnchor.constraint(equalTo: emojiPlaceholder.leadingAnchor),
             nameLabel.topAnchor.constraint(equalTo: emojiPlaceholder.topAnchor, constant: 40),
-            nameLabel.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: 10),
+            nameLabel.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: -10),
             nameLabel.bottomAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: -5),
             
             daysLabel.topAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: 16),
@@ -209,7 +209,7 @@ class HeaderViewTrackerCollection: UICollectionReusableView {
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textColor = .black
+        titleLabel.textColor = UIColor.label
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),

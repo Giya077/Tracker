@@ -24,7 +24,7 @@ final class StubView: UIView {
         let textLabel = UILabel()
         textLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         textLabel.textAlignment = .center
-        textLabel.textColor = .black
+        textLabel.textColor = ThemeManager.shared.textColor()
         textLabel.translatesAutoresizingMaskIntoConstraints = false
         return textLabel
     }()
