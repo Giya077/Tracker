@@ -16,7 +16,7 @@ class CategoryCell: UITableViewCell {
     
     private let customBackgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = Colors.systemSearchColor
+//        view.backgroundColor = UIColor.red
         view.layer.cornerRadius = 10
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -40,12 +40,13 @@ class CategoryCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
-        backgroundColor = Colors.systemSearchColor
+        backgroundColor = .clear
+        contentView.backgroundColor = .clear
         selectedBackgroundView = UIView()
         selectedBackgroundView?.backgroundColor = .clear
         addLongPressGestureRecognizer()
     }
-    
+
     required init?(coder: NSCoder) {
         print("init(coder:) has not been implemented")
         return nil
@@ -93,7 +94,7 @@ class CategoryCell: UITableViewCell {
     
     func configure(withTitle title: String, backgroundColor: UIColor, isSelected: Bool) {
         categoryLabel.text = title
-        customBackgroundView.backgroundColor = ThemeManager.shared.backgroundColor()
+        customBackgroundView.backgroundColor = backgroundColor
         isSelectedCell = isSelected
         updateCheckmarkVisibility()
     }

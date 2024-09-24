@@ -20,7 +20,7 @@ final class CategoryViewController: UIViewController {
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
-        tableView.backgroundColor = UIColor.white
+        tableView.backgroundColor = UIColor.clear
         tableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
@@ -175,7 +175,7 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         
         // Проверка, выбрана ли категория
         let isSelected = indexPath.row == viewModel.selectedCategoryIndex
-        let backgroundColor: UIColor = isSelected ? .lightGray : .white
+        let backgroundColor: UIColor = isSelected ? .lightGray : (Colors.systemSearchColor ?? .white)
         
         cell.configure(withTitle: category.titles, backgroundColor: backgroundColor, isSelected: isSelected)
 
