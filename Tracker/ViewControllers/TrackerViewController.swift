@@ -132,6 +132,14 @@ final class TrackerViewController: UIViewController {
         
         let plusNavButton = UIBarButtonItem(customView: plusButton)
         navigationItem.leftBarButtonItem = plusNavButton
+        
+        NSLayoutConstraint.activate([
+            plusButton.topAnchor.constraint(equalTo: view.topAnchor),
+            plusButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            
+            datePicker.topAnchor.constraint(equalTo: view.topAnchor),
+            datePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
     }
     
     private func setupSearchBar() {

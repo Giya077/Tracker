@@ -16,7 +16,6 @@ class CategoryCell: UITableViewCell {
     
     private let customBackgroundView: UIView = {
         let view = UIView()
-//        view.backgroundColor = UIColor.red
         view.layer.cornerRadius = 10
         view.translatesAutoresizingMaskIntoConstraints = false
         return view

@@ -15,7 +15,7 @@ enum TrackerCategoryStoreError: Error {
     case decodingErrorInvalidCategoryModel
 }
 
-final class TrackerCategoryStore: NSObject{
+ class TrackerCategoryStore: NSObject{
     
     // MARK: - Public Properties
     weak var trackerCategoryStoreDelegate: TrackerCategoryStoreDelegate?
