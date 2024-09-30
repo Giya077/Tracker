@@ -122,7 +122,6 @@ final class TrackerViewController: UIViewController {
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(datePicker)
-        
         datePicker.setValue(ThemeManager.shared.textColor(), forKey: "textColor")
     }
     
@@ -237,7 +236,7 @@ final class TrackerViewController: UIViewController {
         for category in allCategories {
             let filteredTrackers = category.trackers.filter { tracker in
                 (tracker.schedule.isEmpty || tracker.schedule.contains(selectedDay)) &&
-                (searchText.isEmpty || tracker.name.localizedCaseInsensitiveContains(searchText))
+                (searchText.isEmpty || tracker.name.lowercased().hasPrefix(searchText.lowercased()))
             }
             if !filteredTrackers.isEmpty {
                 updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
