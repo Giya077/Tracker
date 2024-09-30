@@ -277,6 +277,7 @@ final class TrackerViewController: UIViewController {
     
     @objc
     private func didTapPlusButton() {
+        AnalyticsService.shared.logEvent("PlusButtonTapped", parameters: ["screen": "Tracker"])
         let viewController = NewTrackerViewController()
         viewController.delegate = self
         let nav = UINavigationController(rootViewController: viewController)

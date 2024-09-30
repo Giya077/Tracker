@@ -39,7 +39,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        printAllTrackers()
+//        guard let configuration = YMMYandexMetricaConfiguration(apiKey: "f1b4973d-43ff-40be-94b0-0ec95c61c693") else {
+//            printAllTrackers()
+//            return true
+//        }
+//        YMMYandexMetrica.activate(with: configuration)
         return true
     }
     
