@@ -12,6 +12,10 @@ final class StatisticViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    private func setupUI() {
+        title = NSLocalizedString("Статистика", comment: "Заголовок экрана статистики")
         view.backgroundColor = ThemeManager.shared.backgroundColor()
     }
 }

@@ -10,7 +10,6 @@ import UIKit
 final class NewTrackerViewController: UIViewController {
         
     weak var delegate: NewTrackerDelegate?
-    
     private let trackerCategoryStore = TrackerCategoryStore()
     
     private lazy var habitButton: UIButton = {

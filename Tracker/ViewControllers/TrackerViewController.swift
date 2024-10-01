@@ -10,8 +10,6 @@ import UIKit
 final class TrackerViewController: UIViewController {
     
     // MARK: - Public Properties
-    var habitTrackers: [Tracker] = []
-    var eventTrackers: [Tracker] = []
     var completedTrackers: [TrackerRecord] = []
     var allCategories: [TrackerCategory] = []
     
@@ -24,6 +22,7 @@ final class TrackerViewController: UIViewController {
     private let stubView = StubView(text: NSLocalizedString("What to track?", comment: "Что будем отслеживать?"))
     private var currentDate: Date = Date()
     private var searchText: String = ""
+    private var pinnedTrackerIDs: [UUID] = []
     
     private var trackerStore: TrackerStore
     private var trackerCategoryStore: TrackerCategoryStore
@@ -248,6 +247,7 @@ final class TrackerViewController: UIViewController {
         updateStubViewVisibility()
     }
 
+
     @objc
     private func trackerCompletionChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -340,6 +340,106 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         print("Трекер: \(tracker.name), Количество завершений: \(completionCount), Завершен сегодня: \(isCompleted)")
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let tracker = categories[indexPath.section].trackers[indexPath.item]
+        
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { suggestedActions in
+            return self.createContextMenu(for: tracker, at: indexPath)
+        }
+    }
+    
+    private func createContextMenu(for tracker: Tracker, at indexPath: IndexPath) -> UIMenu {
+        let pinTitle = pinnedTrackerIDs.contains(tracker.id) ? NSLocalizedString("Unpin", comment: "Открепить") : NSLocalizedString("Pin", comment: "Закрепить")
+        
+        let pinAction = UIAction(title: pinTitle) { [weak self] _ in
+            self?.togglePin(for: tracker)
+        }
+        
+        let editAction = UIAction(title: NSLocalizedString("Edit", comment: "Редактировать")) { [weak self] _ in
+//            self?.editTracker(tracker)
+        }
+        
+        let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "Удалить"), attributes: .destructive) { [weak self] _ in
+            self?.deleteTracker(tracker, at: indexPath)
+        }
+        
+        return UIMenu(children: [pinAction, editAction, deleteAction])
+    }
+
+    
+    // Закрепление/открепление трекера
+    private func togglePin(for tracker: Tracker) {
+        if let index = pinnedTrackerIDs.firstIndex(of: tracker.id) {
+            // Если трекер уже закреплен, открепляем его
+            pinnedTrackerIDs.remove(at: index)
+        } else {
+            // Если трекер не закреплен, добавляем его в список закрепленных
+            pinnedTrackerIDs.append(tracker.id)
+        }
+        // Перезагружаем данные для обновления отображения закрепленных трекеров
+        loadTrackers()
+    }
+
+    
+//    private func editTracker(_ tracker: Tracker) {
+//        // Проверяем тип трекера, чтобы открыть нужный контроллер
+//        if tracker.type == .habit {
+//            // Инициализируем HabitViewController с передачей данных трекера
+//            let habitVC = HabitViewController(trackerCategoryStore: trackerCategoryStore)
+//            habitVC.title = NSLocalizedString("Edit Habit", comment: "Редактирование привычки") // Меняем заголовок на "Редактирование привычки"
+//            habitVC.configureForEditing(tracker) // Метод для настройки контроллера
+//            navigationController?.pushViewController(habitVC, animated: true)
+//        } else if tracker.type == .event {
+//            // Инициализируем контроллер для событий (похожий на HabitViewController)
+//            let eventVC = IrregularEventViewController(trackerCategoryStore: trackerCategoryStore)
+//            eventVC.title = NSLocalizedString("Edit Event", comment: "Редактирование события") // Меняем заголовок на "Редактирование события"
+//            eventVC.configureForEditing(tracker) // Метод для настройки контроллера
+//            navigationController?.pushViewController(eventVC, animated: true)
+//        }
+//    }
+
+    
+    private func deleteTracker(_ tracker: Tracker, at indexPath: IndexPath) {
+        do {
+            try trackerStore.deleteTracker(with: tracker.id) // Удаляем трекер по его ID
+            if let pinnedIndex = pinnedTrackerIDs.firstIndex(of: tracker.id) {
+                pinnedTrackerIDs.remove(at: pinnedIndex) // Удаляем из закрепленных, если он был закреплен
+            }
+            loadTrackers()
+        } catch {
+            print("Failed to delete tracker: \(error)")
+            // Можно добавить обработку ошибки, например, показать пользователю сообщение об ошибке
+        }
+    }
+
+    private func pinTracker(_ tracker: Tracker) {
+        // Найдем категорию "Pinned"
+        var pinnedCategory = allCategories.first { $0.titles == "Pinned" }
+        if pinnedCategory == nil {
+            // Если категории "Pinned" нет, создаем её
+            pinnedCategory = TrackerCategory(titles: "Pinned", trackers: [])
+            allCategories.append(pinnedCategory!)
+        }
+        // Проверим, что трекер еще не закреплен
+        if !pinnedTrackerIDs.contains(tracker.id) {
+            // Создаем новый массив трекеров и добавляем туда наш трекер
+            var updatedTrackers = pinnedCategory?.trackers ?? []
+            updatedTrackers.append(tracker)
+            // Заменяем старый массив трекеров на новый
+            let updatedCategory = TrackerCategory(titles: pinnedCategory!.titles, trackers: updatedTrackers)
+            // Обновляем нашу категорию в allCategories
+            if let index = allCategories.firstIndex(where: { $0.titles == "Pinned" }) {
+                allCategories[index] = updatedCategory
+            }
+            pinnedTrackerIDs.append(tracker.id) // Добавляем ID трекера в список закрепленных
+            // Сохраняем трекер
+            trackerCategoryStore.saveTracker(tracker, forCategoryTitle: "Pinned")
+            loadTrackers() // Обновляем трекеры
+        }
+    }
+
+
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection", for: indexPath) as! HeaderViewTrackerCollection
