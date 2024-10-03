@@ -31,6 +31,8 @@ enum TrackerCategoryStoreError: Error {
     // MARK: - Private Properties
     private let context: NSManagedObjectContext
     private var trackerStore: TrackerStore
+     private let colorTransformedToData = ColorTransformedToData()
+     private let scheduleTransformedToData = ScheduleTransformedToData()
     
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
@@ -114,36 +116,73 @@ enum TrackerCategoryStoreError: Error {
             trackerCategoryStoreDelegate?.categoryDidUpdate(updatedCategory)
         }
     }
-        
-    func saveTracker(_ tracker: Tracker, forCategoryTitle categoryTitle: String) {
-        do {
-            let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
-            let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "titles == %@", categoryTitle)
-            let categories = try context.fetch(fetchRequest)
-            
-            if let currentCategory = categories.first {
-                // Добавление трекера в категорию
-                if let trackers = currentCategory.trackers?.allObjects as? [TrackerCoreData] {
-                    var updatedTrackers = trackers
-                    updatedTrackers.append(trackerCoreData)
-                    currentCategory.trackers = NSSet(array: updatedTrackers)
-                } else {
-                    currentCategory.trackers = NSSet(array: [trackerCoreData])
-                }
-            } else {
-                // Создание новой категории, если она не найдена
-                let newCategory = TrackerCategoryCoreData(context: context)
-                newCategory.titles = categoryTitle
-                newCategory.trackers = NSSet(array: [trackerCoreData])
-            }
-            try context.save()
-            trackerCategoryStoreDelegate?.categoriesDidChange()
-        } catch {
-            print("Unable to save tracker. Error: \(error), \(error.localizedDescription)")
-        }
-    }
-    
+     
+     func saveTracker(_ tracker: Tracker, forCategoryTitle categoryTitle: String) {
+         do {
+             let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+             fetchRequest.predicate = NSPredicate(format: "titles == %@", categoryTitle)
+             let categories = try context.fetch(fetchRequest)
+             
+             if categories.isEmpty {
+                 print("Категория с названием \(categoryTitle) не найдена")
+             }
+             
+             if let currentCategory = categories.first {
+                 // Проверяем, есть ли уже трекер с таким же ID
+                 if let existingTracker = currentCategory.trackers?.allObjects as? [TrackerCoreData],
+                    let trackerToUpdate = existingTracker.first(where: { $0.id == tracker.id }) {
+                     
+                     // Обновляем существующий трекер
+                     trackerToUpdate.name = tracker.name
+                     trackerToUpdate.color = colorTransformedToData.hexString(from: tracker.color)
+                     trackerToUpdate.emoji = String(tracker.emoji)
+                     trackerToUpdate.schedule = scheduleTransformedToData.makeStringFromArray(tracker.schedule.map { $0.rawValue })
+                 } else {
+                     // Создаем новый трекер
+                     let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
+                     
+                     if let trackers = currentCategory.trackers?.allObjects as? [TrackerCoreData] {
+                         var updatedTrackers = trackers
+                         updatedTrackers.append(trackerCoreData)
+                         currentCategory.trackers = NSSet(array: updatedTrackers)
+                     } else {
+                         currentCategory.trackers = NSSet(array: [trackerCoreData])
+                     }
+                 }
+                 
+             } else {
+                 let newCategory = TrackerCategoryCoreData(context: context)
+                 newCategory.titles = categoryTitle
+                 let trackerCoreData = try trackerStore.createTrackerCoreData(from: tracker)
+                 newCategory.trackers = NSSet(array: [trackerCoreData])
+             }
+             
+             try context.save()
+             trackerCategoryStoreDelegate?.categoriesDidChange()
+         } catch {
+             print("Unable to save tracker. Error: \(error), \(error.localizedDescription)")
+         }
+     }
+     
+     func removeTrackerFromCategory(_ tracker: Tracker, fromCategoryTitle categoryTitle: String) {
+         do {
+             let fetchRequest: NSFetchRequest<TrackerCategoryCoreData> = TrackerCategoryCoreData.fetchRequest()
+             fetchRequest.predicate = NSPredicate(format: "titles == %@", categoryTitle)
+             let categories = try context.fetch(fetchRequest)
+             
+             if let currentCategory = categories.first, let trackerCoreDataList = currentCategory.trackers?.allObjects as? [TrackerCoreData] {
+                 if let trackerToRemove = trackerCoreDataList.first(where: { $0.id == tracker.id }) {
+                     currentCategory.removeFromTrackers(trackerToRemove)
+                     context.delete(trackerToRemove)
+                 }
+             }
+             
+             try context.save()
+         } catch {
+             print("Failed to remove tracker from category. Error: \(error)")
+         }
+     }
+
     //преобразования данных из Core Data в модели
     private func makeCategories(from trackerCategoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
         guard let title = trackerCategoryCoreData.titles else {

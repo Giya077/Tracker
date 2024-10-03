@@ -12,6 +12,9 @@ final class HabitViewController: UIViewController {
     // MARK: - Public Properties
     var trackerType: TrackerType?
     weak var trackerDelegate: NewTrackerDelegate?
+    var isEditingTracker: Bool = false
+    var trackerBeingEdited: Tracker?
+    var existingTracker: Tracker?
     
     // MARK: - Private Properties
     private var categoryViewController: CategoryViewController?
@@ -28,7 +31,7 @@ final class HabitViewController: UIViewController {
     private var contentView: UIView!
     
     private let label: UILabel = {
-        let label = BasicTextLabel(text: NSLocalizedString("New Habit", comment: "Новая привычка"))
+        let label = BasicTextLabel(text: NSLocalizedString("New habit", comment: "Новая привычка"))
         return label
     }()
     
@@ -178,7 +181,7 @@ final class HabitViewController: UIViewController {
         
         let categoryViewModel = CategoryViewModel(trackerCategoryStore: trackerCategoryStore)
         categoryViewController = CategoryViewController(viewModel: categoryViewModel)
-
+        
         categoryViewController?.onCategorySelected = { [weak self] category in
             self?.selectedCategory = category
             self?.updateCategoryLabel()
@@ -209,11 +212,11 @@ final class HabitViewController: UIViewController {
             }
         }
         
+        updateTrackerLabel(label, isEditingTracker: isEditingTracker, trackerType: trackerType)
         updateCategoryLabel()
         updateCreateButtonState()
     }
-
-
+    
     private func setupScrollView() {
         scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -358,7 +361,7 @@ final class HabitViewController: UIViewController {
             createButton.setTitleColor(.white, for: .normal)
         }
     }
-
+    
     private func saveTracker() {
         guard let name = trackNaming.text, !name.isEmpty,
               let color = selectedColor,
@@ -376,22 +379,66 @@ final class HabitViewController: UIViewController {
             schedule: Array(selectedDays)
         )
         
-        do {
-            trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
-            trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
-        } catch {
-            print("ошибка сохранение трекера \(error)")
+        trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
+    }
+    
+    private func updateTracker(_ tracker: Tracker) {
+        guard let name = trackNaming.text, !name.isEmpty,
+              let color = selectedColor,
+              let emoji = selectedEmoji,
+              !selectedDays.isEmpty,
+              let category = selectedCategory else {
+            return
         }
+        
+        if let oldCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
+            // Удаляем трекер из старой категории
+            trackerCategoryStore.removeTrackerFromCategory(tracker, fromCategoryTitle: oldCategory.titles)
+        }
+        
+        let updatedTracker = Tracker(
+            id: tracker.id,
+            name: name,
+            color: color,
+            emoji: emoji,
+            schedule: Array(selectedDays)
+        )
+
+        trackerCategoryStore.saveTracker(updatedTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
+    }
+    
+    
+    func configureForEditing(_ tracker: Tracker) {
+        self.trackerBeingEdited = tracker
+        self.trackNaming.text = tracker.name
+        self.selectedColor = tracker.color
+        self.selectedEmoji = tracker.emoji
+        self.selectedDays = Set(tracker.schedule)
+        self.selectedCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) })
+        isEditingTracker = true
+        trackerBeingEdited = tracker
+        updateCategoryLabel()
+        updateCreateButtonState()
     }
     
     @objc
     private func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
+        if isEditingTracker {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc
     private func createButtonTapped() {
-        saveTracker()
+        if isEditingTracker, let trackerBeingEdited = trackerBeingEdited {
+            updateTracker(trackerBeingEdited)
+        } else {
+            saveTracker()
+        }
         navigationController?.popToRootViewController(animated: true)
     }
 }
@@ -411,7 +458,7 @@ extension HabitViewController: UICollectionViewDataSource {
     
     private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
-
+        
         if indexPath.row == 1 {
             let daysText = selectedDays.map { $0.localizedShortName }.joined(separator: ", ")
             cell.configure(title: arrayCells[indexPath.row], days: daysText.isEmpty ? nil : daysText)
@@ -559,3 +606,4 @@ extension HabitViewController: TimetableDelegate {
         }
     }
 }
+

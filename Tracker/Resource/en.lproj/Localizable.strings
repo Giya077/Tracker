@@ -20,7 +20,8 @@
 "Habit" = "Habit";
 "Irregular event" = "Irregular event";
 "Creating tracker" = "Creating tracker";
-"New Habit" = "New Habit";
+"New habit" = "New habit";
+"New event" = "New event";
 "Enter tracker name" = "Enter tracker name";
 "Character limit is 38" = "Character limit is 38";
 "Schedule" = "Schedule";
@@ -34,6 +35,8 @@
 "Unpin" = "Unpin";
 "Pin" = "Pin";
 "New Irregular Event" = "New Irregular Event";
+"Edit habit" = "Edit habit";
+"Edit event" = "Edit event";
 "What to track?" = "What to track?";
 "Habits and events can be\ncombined by meaning" = "Habits and events can be\ncombined by meaning";
 

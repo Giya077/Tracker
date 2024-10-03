@@ -27,7 +27,7 @@ final class TrackerViewController: UIViewController {
     private var trackerStore: TrackerStore
     private var trackerCategoryStore: TrackerCategoryStore
     private var trackers: [Tracker] = []
-
+    
     internal var categories: [TrackerCategory] = [] {
         didSet {
             print("Категории обновлены. Текущее количество категорий: \(categories.count)")
@@ -206,7 +206,6 @@ final class TrackerViewController: UIViewController {
     }
     
     private func setupUI() {
-        
         view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(trackerLabel)
         trackerLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -214,24 +213,24 @@ final class TrackerViewController: UIViewController {
         trackerLabel.font = UIFont.boldSystemFont(ofSize: 34)
         trackerLabel.numberOfLines = 0
         trackerLabel.text = NSLocalizedString("Trackers", comment: "Трекеры")
-
+        
         NSLayoutConstraint.activate([
             trackerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             trackerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
         ])
     }
-        
+    
     private func updateStubViewVisibility() {
         stubView.isHidden = !categories.isEmpty
         collectionView.isHidden = categories.isEmpty
     }
-
+    
     private func filterTrackersByDate() {
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
         guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
-
+        
         var updatedCategories: [TrackerCategory] = []
-
+        
         for category in allCategories {
             let filteredTrackers = category.trackers.filter { tracker in
                 (tracker.schedule.isEmpty || tracker.schedule.contains(selectedDay)) &&
@@ -241,13 +240,13 @@ final class TrackerViewController: UIViewController {
                 updatedCategories.append(TrackerCategory(titles: category.titles, trackers: filteredTrackers))
             }
         }
-
+        
         categories = updatedCategories
         collectionView.reloadData()
         updateStubViewVisibility()
     }
-
-
+    
+    
     @objc
     private func trackerCompletionChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -307,7 +306,6 @@ final class TrackerViewController: UIViewController {
     }
 }
 
-
 extension TrackerViewController: NewTrackerDelegate {
     
     func didFinishCreatingTracker(trackerType: TrackerType) {
@@ -357,7 +355,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         }
         
         let editAction = UIAction(title: NSLocalizedString("Edit", comment: "Редактировать")) { [weak self] _ in
-//            self?.editTracker(tracker)
+            self?.editTracker(tracker)
         }
         
         let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "Удалить"), attributes: .destructive) { [weak self] _ in
@@ -366,9 +364,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         
         return UIMenu(children: [pinAction, editAction, deleteAction])
     }
-
     
-    // Закрепление/открепление трекера
     private func togglePin(for tracker: Tracker) {
         if let index = pinnedTrackerIDs.firstIndex(of: tracker.id) {
             // Если трекер уже закреплен, открепляем его
@@ -377,28 +373,35 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
             // Если трекер не закреплен, добавляем его в список закрепленных
             pinnedTrackerIDs.append(tracker.id)
         }
-        // Перезагружаем данные для обновления отображения закрепленных трекеров
+        
         loadTrackers()
     }
-
     
-//    private func editTracker(_ tracker: Tracker) {
-//        // Проверяем тип трекера, чтобы открыть нужный контроллер
-//        if tracker.type == .habit {
-//            // Инициализируем HabitViewController с передачей данных трекера
-//            let habitVC = HabitViewController(trackerCategoryStore: trackerCategoryStore)
-//            habitVC.title = NSLocalizedString("Edit Habit", comment: "Редактирование привычки") // Меняем заголовок на "Редактирование привычки"
-//            habitVC.configureForEditing(tracker) // Метод для настройки контроллера
-//            navigationController?.pushViewController(habitVC, animated: true)
-//        } else if tracker.type == .event {
-//            // Инициализируем контроллер для событий (похожий на HabitViewController)
-//            let eventVC = IrregularEventViewController(trackerCategoryStore: trackerCategoryStore)
-//            eventVC.title = NSLocalizedString("Edit Event", comment: "Редактирование события") // Меняем заголовок на "Редактирование события"
-//            eventVC.configureForEditing(tracker) // Метод для настройки контроллера
-//            navigationController?.pushViewController(eventVC, animated: true)
-//        }
-//    }
-
+    private func editTracker(_ tracker: Tracker) {
+        if isHabit(tracker) {
+            let habitVC = HabitViewController(trackerCategoryStore: trackerCategoryStore)
+            habitVC.trackerType = .habit
+            habitVC.isEditingTracker = true
+            habitVC.configureForEditing(tracker)
+            habitVC.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(habitVC, animated: true)
+        } else if isEvent(tracker) {
+            let eventVC = IrregularEventViewController(trackerCategoryStore: trackerCategoryStore)
+            eventVC.trackerType = .event
+            eventVC.isEditingTracker = true
+            eventVC.configureForEditing(tracker)
+            eventVC.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(eventVC, animated: true)
+        }
+    }
+    
+    private func isHabit(_ tracker: Tracker) -> Bool {
+        return !tracker.schedule.isEmpty
+    }
+    
+    private func isEvent(_ tracker: Tracker) -> Bool {
+        return tracker.schedule.isEmpty
+    }
     
     private func deleteTracker(_ tracker: Tracker, at indexPath: IndexPath) {
         do {
@@ -409,10 +412,9 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
             loadTrackers()
         } catch {
             print("Failed to delete tracker: \(error)")
-            // Можно добавить обработку ошибки, например, показать пользователю сообщение об ошибке
         }
     }
-
+    
     private func pinTracker(_ tracker: Tracker) {
         // Найдем категорию "Pinned"
         var pinnedCategory = allCategories.first { $0.titles == "Pinned" }
@@ -438,8 +440,6 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
             loadTrackers() // Обновляем трекеры
         }
     }
-
-
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection", for: indexPath) as! HeaderViewTrackerCollection
@@ -479,8 +479,8 @@ extension TrackerViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-            self.searchText = searchText
-            filterTrackersByDate()
+        self.searchText = searchText
+        filterTrackersByDate()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {

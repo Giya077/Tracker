@@ -16,7 +16,10 @@
 "Habit" = "Привычка";
 "Irregular event" = "Нерегулярные события";
 "Creating tracker" = "Создание трекера";
-"New Habit" = "Новая привычка";
+"New habit" = "Новая привычка";
+"New event" = "Новое событие";
+"Edit event" = "Редактирование события";
+"Edit habit" = "Редактирование привычки";
 "Enter tracker name" = "Введите название трекера";
 "38 characters limit" = "Ограничение 38 символов";
 "Category" = "Категория";
@@ -34,7 +37,6 @@
 "Unpin" = "Открепить";
 "Pin" = "Закрепить";
 "Habits and events can be\ncombined by meaning" = "Привычки и события можно \nобъединить по смыслу";
-
 "Character limit: 38" = "Ограничение 38 символов";
 
 

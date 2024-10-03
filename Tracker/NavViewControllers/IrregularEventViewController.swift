@@ -11,8 +11,11 @@ import UIKit
 final class IrregularEventViewController: UIViewController {
     
     // MARK: - Public Properties
-    weak var trackerDelegate: NewTrackerDelegate?
     var trackerType: TrackerType?
+    weak var trackerDelegate: NewTrackerDelegate?
+    var isEditingTracker: Bool = false
+    var trackerBeingEdited: Tracker?
+    var existingTracker: Tracker?
     
     // MARK: - Private Properties
     private var selectedCategory: TrackerCategory?
@@ -54,7 +57,7 @@ final class IrregularEventViewController: UIViewController {
         return label
     }()
     
-    private let arrayCells = ["Категория"]
+    private let arrayCells = [NSLocalizedString("Category", comment: "Категория")]
     private let cellIdentifier = "CellType1"
     private lazy var categoryCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -89,7 +92,7 @@ final class IrregularEventViewController: UIViewController {
     private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
         label.textColor = ThemeManager.shared.textColor()
-        label.text = "Цвет"
+        label.text = NSLocalizedString("Color", comment: "Цвет")
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -197,6 +200,8 @@ final class IrregularEventViewController: UIViewController {
                 self.selectedCategory = nil
             }
         }
+        
+        updateTrackerLabel(label, isEditingTracker: isEditingTracker, trackerType: trackerType)
         updateCategoryLabel()
         updateCreateButtonState()
     }
@@ -306,7 +311,7 @@ final class IrregularEventViewController: UIViewController {
     private func updateCategoryLabel() {
         guard let categoryCell = categoryCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
         let categoriesText = selectedCategory?.titles ?? ""
-        categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+        categoryCell.configure(title: NSLocalizedString("Category", comment: "Категория"), days: categoriesText.isEmpty ? nil : categoriesText)
         print("Selected category: \(selectedCategory?.titles ?? "No Category")")
     }
     
@@ -355,18 +360,61 @@ final class IrregularEventViewController: UIViewController {
         )
         
         trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
-        trackerDelegate?.didFinishCreatingTracker(trackerType: .event)
-        navigationController?.popViewController(animated: true)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .event)
     }
-    
+        
+    private func updateEvent(_ tracker: Tracker) {
+        guard let name = trackNaming.text, !name.isEmpty,
+              let color = selectedColor,
+              let emoji = selectedEmoji,
+              let category = selectedCategory else {
+            return
+        }
+
+        if let oldCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
+            // Удаляем трекер из старой категории
+            trackerCategoryStore.removeTrackerFromCategory(tracker, fromCategoryTitle: oldCategory.titles)
+        }
+
+        let updatedTracker = Tracker(
+            id: tracker.id,  // сохраняем старый идентификатор
+            name: name,
+            color: color,
+            emoji: emoji,
+            schedule: []
+        )
+
+        trackerCategoryStore.saveTracker(updatedTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: .event)
+    }
+
+    func configureForEditing(_ tracker: Tracker) {
+        self.trackNaming.text = tracker.name
+        self.selectedColor = tracker.color
+        self.selectedEmoji = tracker.emoji
+        self.selectedCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) })
+        isEditingTracker = true
+        trackerBeingEdited = tracker
+        updateCategoryLabel()
+        updateCreateButtonState()
+    }
+
     @objc
     private func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
+        if isEditingTracker {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc
     private func createButtonTapped() {
-        saveEvent()
+        if isEditingTracker, let trackerBeingEdited = trackerBeingEdited {
+            updateEvent(trackerBeingEdited)
+        } else {
+            saveEvent()
+        }
         navigationController?.popToRootViewController(animated: true)
     }
 }
@@ -387,7 +435,6 @@ extension IrregularEventViewController: UICollectionViewDataSource {
     
     private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
-        
             cell.configure(title: arrayCells[indexPath.item], days: selectedCategory?.titles)
         return cell
     }
