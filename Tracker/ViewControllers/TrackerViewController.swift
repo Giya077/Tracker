@@ -66,33 +66,44 @@ final class TrackerViewController: UIViewController {
         collectionView.register(HeaderViewTrackerCollection.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "HeaderViewTrackerCollection")
         NotificationCenter.default.addObserver(self, selector: #selector(trackerCompletionChanged(_:)), name: .trackerCompletionChanged, object: nil)
     }
-    
+        
     private func loadTrackers() {
         let categoryCoreDataList = trackerCategoryStore.fetchAllCategories()
         var allCategories: [TrackerCategory] = []
-        
+        var pinnedTrackers: [Tracker] = []
+
+        // Перебор категорий и трекеров
         for categoryCoreData in categoryCoreDataList {
             if let categoryName = categoryCoreData.titles {
                 var trackers: [Tracker] = []
-                
+
                 if let trackerCoreDataList = categoryCoreData.trackers?.allObjects as? [TrackerCoreData] {
                     for trackerCoreData in trackerCoreDataList {
                         if let tracker = try? trackerStore.loadTrackerFromCoreData(from: trackerCoreData) {
-                            trackers.append(tracker)
+                            if pinnedTrackerIDs.contains(tracker.id) {
+                                pinnedTrackers.append(tracker)
+                            } else {
+                                trackers.append(tracker)
+                            }
                         }
                     }
                 }
-                
                 let trackerCategory = TrackerCategory(titles: categoryName, trackers: trackers)
                 allCategories.append(trackerCategory)
             }
         }
-        
+
+        // Создаем категорию Закрепленные, если есть закрепленные трекеры
+        if !pinnedTrackers.isEmpty {
+            let pinnedCategory = TrackerCategory(titles: NSLocalizedString("Pinned", comment: "Закрепленные"), trackers: pinnedTrackers)
+            allCategories.insert(pinnedCategory, at: 0)  // Вставляем в начало списка
+        }
+
         self.allCategories = allCategories
         filterTrackersByDate()
         collectionView.reloadData()
     }
-    
+
     private func setupViews() {
         setupStubView()
         setupSearchBar()
