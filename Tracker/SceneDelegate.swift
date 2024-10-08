@@ -41,10 +41,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let context = appDelegate.persistantContainer.viewContext
         
         let tabBarController = UITabBarController()
+        
         let trackerStore = TrackerStore(context: context)
         let trackerCategoryStore = TrackerCategoryStore(context: context)
-        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore)
-        let statisticViewController = StatisticViewController()
+        let trackerRecordStore = TrackerRecordStore(context: context)
+        
+        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore, trackerRecordStore: trackerRecordStore)
+        let statisticViewController = StatisticViewController(trackerRecordStore: trackerRecordStore)
+        
         let trackNav = UINavigationController(rootViewController: trackerViewController)
         let statisticNav = UINavigationController(rootViewController: statisticViewController)
         

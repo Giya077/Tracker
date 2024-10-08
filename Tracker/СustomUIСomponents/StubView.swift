@@ -70,4 +70,8 @@ final class StubView: UIView {
             textLabel.trailingAnchor.constraint(equalTo: vStack.trailingAnchor)
         ])
     }
+    
+    func updateImage(_ image: UIImage) {
+        stubImage.image = image
+    }
 }

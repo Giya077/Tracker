@@ -40,6 +40,17 @@
 "Habits and events can be\ncombined by meaning" = "Привычки и события можно \nобъединить по смыслу";
 "Character limit: 38" = "Ограничение 38 символов";
 
+"Best Period" = "Лучший период";
+"Ideal Days" = "Идеальные дни";
+"Trackers Completed" = "Трекеров завершено";
+"Average Completed" = "Среднее значение";
+"No data" = "Нет данных";
+"Filters" = "Фильтры";
+
+"All Trackers" = "Все трекеры";
+"Trackers for Today" = "Трекеры на сегодня";
+"Completed" = "Завершенные";
+"Not Completed" = "Не завершенные";
 
 //SCHEDULE
 "Monday" = "Понедельник";

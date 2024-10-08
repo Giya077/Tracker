@@ -106,6 +106,7 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         cell.switchView.addTarget(self, action: #selector(switchValueChanged(_:)), for: .valueChanged)
         
         cell.selectionStyle = .none
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
         
         return cell
     }

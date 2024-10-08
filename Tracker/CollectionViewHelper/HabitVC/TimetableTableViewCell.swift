@@ -36,10 +36,10 @@ final class TimetableTableViewCell: UITableViewCell {
         
         NSLayoutConstraint.activate([
                    switchView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-                   switchView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16), // Примерное расположение
-                   switchView.heightAnchor.constraint(equalToConstant: 31), // Устанавливаем высоту переключателя
+                   switchView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+                   switchView.heightAnchor.constraint(equalToConstant: 31),
                    
-                   contentView.bottomAnchor.constraint(greaterThanOrEqualTo: switchView.bottomAnchor, constant: 22) // Растягиваем ячейку до нижней границы switchView с отступом
+                   contentView.bottomAnchor.constraint(greaterThanOrEqualTo: switchView.bottomAnchor, constant: 22)
                ])
     }
     
