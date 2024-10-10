@@ -5,7 +5,6 @@
 //  Created by GiyaDev on 05.05.2024.
 //
 
-import Foundation
 import UIKit
 
 final class StatisticViewController: UIViewController {
@@ -19,7 +18,16 @@ final class StatisticViewController: UIViewController {
         return label
     }()
     
-    private let tableView = UITableView()
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 10
+        layout.sectionInset = UIEdgeInsets(top: 20, left: 0, bottom: 20, right: 0)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        return collectionView
+    }()
+    
+    
     private var stubView: StubView!
     private let trackerRecordStore: TrackerRecordStore
     
@@ -36,7 +44,7 @@ final class StatisticViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = ThemeManager.shared.backgroundColor()
         setupHeader()
-        setupTableView()
+        setupCollectionView()
         setupStubView()
         updateUI()
     }
@@ -49,18 +57,18 @@ final class StatisticViewController: UIViewController {
         ])
     }
     
-    private func setupTableView() {
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "StatsCell")
-        tableView.dataSource = self
-        tableView.delegate = self
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+    private func setupCollectionView() {
+        collectionView.register(GradientBorderCell.self, forCellWithReuseIdentifier: "StatsCell")
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.backgroundColor = ThemeManager.shared.backgroundColor()
+        view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            collectionView.topAnchor.constraint(equalTo: statisticsHeaderLabel.bottomAnchor, constant: 20),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
     
@@ -81,8 +89,8 @@ final class StatisticViewController: UIViewController {
     private func updateUI() {
         let totalCompleted = trackerRecordStore.completedTrackersCount()
         stubView.isHidden = totalCompleted > 0
-        tableView.isHidden = totalCompleted == 0
-        tableView.reloadData()
+        collectionView.isHidden = totalCompleted == 0
+        collectionView.reloadData()
     }
     
     private func formattedBestPeriod() -> String {
@@ -98,31 +106,31 @@ final class StatisticViewController: UIViewController {
         let records = trackerRecordStore.fetchAllRecords()
         if records.isEmpty {
             stubView.isHidden = false
-            tableView.isHidden = true
+            collectionView.isHidden = true
         } else {
             stubView.isHidden = true
-            tableView.isHidden = false
+            collectionView.isHidden = false
         }
     }
 }
 
-extension StatisticViewController: UITableViewDataSource {
+extension StatisticViewController: UICollectionViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 4
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "StatsCell", for: indexPath)
-        switch indexPath.row {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "StatsCell", for: indexPath) as! GradientBorderCell
+        switch indexPath.item {
         case 0:
-            cell.textLabel?.text = NSLocalizedString("Best Period", comment: "Лучший период") + ": " + formattedBestPeriod()
+            cell.configure(title: formattedBestPeriod(), subtitle: NSLocalizedString("Лучший период", comment: "Лучший период"))
         case 1:
-            cell.textLabel?.text = NSLocalizedString("Ideal Days", comment: "Идеальные дни") + ": \(trackerRecordStore.idealDays())"
+            cell.configure(title: "\(trackerRecordStore.idealDays())", subtitle: NSLocalizedString("Идеальные дни", comment: "Идеальные дни"))
         case 2:
-            cell.textLabel?.text = NSLocalizedString("Trackers Completed", comment: "Трекеров завершено") + ": \(trackerRecordStore.completedTrackersCount())"
+            cell.configure(title: "\(trackerRecordStore.completedTrackersCount())", subtitle: NSLocalizedString("Трекеров завершено", comment: "Трекеров завершено"))
         case 3:
-            cell.textLabel?.text = NSLocalizedString("Average Completed", comment: "Среднее значение") + ": \(trackerRecordStore.averageCompletedTrackers())"
+            cell.configure(title: "\(trackerRecordStore.averageCompletedTrackers())", subtitle: NSLocalizedString("Среднее значение", comment: "Среднее значение"))
         default:
             break
         }
@@ -130,13 +138,11 @@ extension StatisticViewController: UITableViewDataSource {
     }
 }
 
-extension StatisticViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-    }
+extension StatisticViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let padding: CGFloat = 0
+        let width = collectionView.frame.width - padding
+        return CGSize(width: width, height: 90)
     }
 }
-

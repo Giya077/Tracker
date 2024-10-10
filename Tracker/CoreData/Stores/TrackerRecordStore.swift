@@ -85,17 +85,16 @@ final class TrackerRecordStore {
         return idealDays.count
     }
 
-    // Среднее количество завершенных трекеров в день
-    func averageCompletedTrackers() -> Double {
+    func averageCompletedTrackers() -> Int {
         let records = fetchAllRecords()
         let uniqueDates = Set(records.map { Calendar.current.startOfDay(for: $0.date!) })
-        return Double(records.count) / Double(uniqueDates.count)
+        return Int(records.count) / Int(uniqueDates.count)
     }
 
     func bestPeriod() -> (start: Date, end: Date, count: Int)? {
         let records = fetchAllRecords()
         guard !records.isEmpty else { return nil }
-        var bestPeriod: (start: Date, end: Date, count: Int)? = nil
+        let bestPeriod: (start: Date, end: Date, count: Int)? = nil
         return bestPeriod
     }
 

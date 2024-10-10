@@ -21,9 +21,9 @@ class ColorCell: UICollectionViewCell {
     private let borderView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 10 // Угол скругления для внешней рамки
-        view.layer.borderWidth = 2 // Толщина рамки
-        view.layer.borderColor = UIColor.clear.cgColor // Цвет рамки по умолчанию
+        view.layer.cornerRadius = 10
+        view.layer.borderWidth = 2
+        view.layer.borderColor = UIColor.clear.cgColor
         view.layer.masksToBounds = true
         return view
     }()

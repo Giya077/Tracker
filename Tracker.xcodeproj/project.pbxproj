@@ -20,6 +20,7 @@
 		1A3599302CA18A5D00F24F6F /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A35992F2CA18A5D00F24F6F /* ThemeManager.swift */; };
 		1A42528A2C2D3A51000C2955 /* TrackerCategoryStoreUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4252892C2D3A51000C2955 /* TrackerCategoryStoreUpdate.swift */; };
 		1A5934652CB584680096EE54 /* FilterTableViewHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5934642CB584550096EE54 /* FilterTableViewHelper.swift */; };
+		1A59346C2CB7E0670096EE54 /* GradientBorderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A59346B2CB7E0670096EE54 /* GradientBorderCell.swift */; };
 		1A5CCC672C3C5E4200FAD465 /* TrackerCategoryStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5CCC662C3C5E4200FAD465 /* TrackerCategoryStoreDelegate.swift */; };
 		1A6DF0F32CAD68DD00C00B1D /* UIViewController + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6DF0F22CAD68D800C00B1D /* UIViewController + Extension.swift */; };
 		1A6DF0F82CB1B15F00C00B1D /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6DF0F72CB1B15600C00B1D /* FilterViewController.swift */; };
@@ -92,6 +93,7 @@
 		1A35992F2CA18A5D00F24F6F /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
 		1A4252892C2D3A51000C2955 /* TrackerCategoryStoreUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStoreUpdate.swift; sourceTree = "<group>"; };
 		1A5934642CB584550096EE54 /* FilterTableViewHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterTableViewHelper.swift; sourceTree = "<group>"; };
+		1A59346B2CB7E0670096EE54 /* GradientBorderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBorderCell.swift; sourceTree = "<group>"; };
 		1A5CCC662C3C5E4200FAD465 /* TrackerCategoryStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStoreDelegate.swift; sourceTree = "<group>"; };
 		1A6DF0F22CAD68D800C00B1D /* UIViewController + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController + Extension.swift"; sourceTree = "<group>"; };
 		1A6DF0F72CB1B15600C00B1D /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
@@ -232,6 +234,15 @@
 			path = ThemeManager;
 			sourceTree = "<group>";
 		};
+		1A5934682CB7D8E50096EE54 /* StatisticVC */ = {
+			isa = PBXGroup;
+			children = (
+				1A59346B2CB7E0670096EE54 /* GradientBorderCell.swift */,
+				1A5934642CB584550096EE54 /* FilterTableViewHelper.swift */,
+			);
+			path = StatisticVC;
+			sourceTree = "<group>";
+		};
 		1A5CCC682C3C5E5400FAD465 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
@@ -282,9 +293,9 @@
 		1A877D382BF374CF007EF036 /* CollectionViewHelper */ = {
 			isa = PBXGroup;
 			children = (
+				1A5934682CB7D8E50096EE54 /* StatisticVC */,
 				1A1E94FB2C071C32009DD79B /* TrackerVC */,
 				1A1E94F82C071A55009DD79B /* HabitVC */,
-				1A5934642CB584550096EE54 /* FilterTableViewHelper.swift */,
 			);
 			path = CollectionViewHelper;
 			sourceTree = "<group>";
@@ -613,6 +624,7 @@
 				1AA642372BE7E9AA002D6B32 /* SceneDelegate.swift in Sources */,
 				1AAFC20C2C14A5E8006982F0 /* trackerCell.swift in Sources */,
 				1AE0B5452CA454C000273D79 /* MockTrackerStore.swift in Sources */,
+				1A59346C2CB7E0670096EE54 /* GradientBorderCell.swift in Sources */,
 				1A1E94FA2C071AA5009DD79B /* ColorCell.swift in Sources */,
 				1A7E1A272C20127900A35B34 /* TrackerRecordStore.swift in Sources */,
 				1AF201712C8F605E00AF269A /* OnboardingViewController.swift in Sources */,
