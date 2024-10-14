@@ -50,7 +50,7 @@ final class GradientBorderCell: UICollectionViewCell {
         let borderThickness: CGFloat = 1.0
         let cornerRadius: CGFloat = 16.0
         
-        gradientLayer.colors = [UIColor.red.cgColor, UIColor.blue.cgColor, UIColor.green.cgColor]
+        gradientLayer.colors = [ColorResource.sfCaesarPurple, ColorResource.sfChampagne, ColorResource.sfDarkPurple] //TODO
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         gradientLayer.frame = bounds

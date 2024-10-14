@@ -487,7 +487,6 @@ final class TrackerViewController: UIViewController {
         ])
         print("Отправлено событие: click, screen: Main, item: add_track")
         
-        // Остальной ваш код
         let viewController = NewTrackerViewController()
         viewController.delegate = self
         let nav = UINavigationController(rootViewController: viewController)
@@ -733,7 +732,6 @@ extension TrackerViewController: FilterDelegate {
     func didSelectFilter(_ filter: TrackerFilter) {
         changeFilter(to: filter)
         
-        // Меняем цвет кнопки в зависимости от активного фильтра
         if filter == .all {
             filterButton.tintColor = .white
         } else {

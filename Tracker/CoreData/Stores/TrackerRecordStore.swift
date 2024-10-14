@@ -10,29 +10,9 @@ import CoreData
 
 final class TrackerRecordStore {
     private let context: NSManagedObjectContext
-    private var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData>?
     
     init(context: NSManagedObjectContext) {
         self.context = context
-        setupFetchedResultsController()
-    }
-    
-    private func setupFetchedResultsController() {
-        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-        
-        fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-        
-        do {
-            try fetchedResultsController?.performFetch()
-        } catch {
-            print("Error fetching records \(error.localizedDescription)")
-        }
     }
     
     func saveCompletedTracker(trackerId: UUID, date: Date) {
@@ -44,6 +24,9 @@ final class TrackerRecordStore {
             do {
                 try context.save()
                 print("Tracker completed and saved: \(trackerId)")
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .trackerRecordsDidChange, object: nil)
+                }
             } catch {
                 print("Failed to save completed tracker: \(error)")
             }
@@ -51,33 +34,46 @@ final class TrackerRecordStore {
     }
     
     func deleteCompletedTracker(trackerId: UUID, date: Date) {
-        let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@ AND date == %@", trackerId as CVarArg, date as CVarArg)
-        
-        do {
-            let results = try context.fetch(request)
-            if let recordToDelete = results.first {
-                context.delete(recordToDelete)
-                try context.save()
-                print("Completed tracker removed: \(trackerId)")
+        context.performAndWait {
+            let request: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@ AND date == %@", trackerId as CVarArg, date as CVarArg)
+            
+            do {
+                let results = try context.fetch(request)
+                if let recordToDelete = results.first {
+                    context.delete(recordToDelete)
+                    try context.save()
+                    print("Completed tracker removed: \(trackerId)")
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: .trackerRecordsDidChange, object: nil)
+                    }
+                }
+            } catch {
+                print("Failed to delete completed tracker: \(error)")
             }
-        } catch {
-            print("Failed to delete completed tracker: \(error)")
         }
     }
 
+    
     func fetchAllRecords() -> [TrackerRecordCoreData] {
-        let records = fetchedResultsController?.fetchedObjects ?? []
-        print("Fetched records: \(records)")
-        return records
+        let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
+        
+        do {
+            let records = try context.fetch(fetchRequest)
+            print("Fetched records: \(records)")
+            return records
+        } catch {
+            print("Error fetching records: \(error.localizedDescription)")
+            return []
+        }
     }
 
-    // Подсчет завершенных трекеров
+
     func completedTrackersCount() -> Int {
         return fetchAllRecords().count
     }
     
-    // Подсчет идеальных дней
     func idealDays() -> Int {
         let records = fetchAllRecords()
         let groupedByDay = Dictionary(grouping: records, by: { Calendar.current.startOfDay(for: $0.date!) })
@@ -103,6 +99,10 @@ final class TrackerRecordStore {
     }
 
     private func totalTrackersForDay(_ date: Date) -> Int {
-        return 5 // Пример
+        return 5
     }
+}
+
+extension Notification.Name {
+    static let trackerRecordsDidChange = Notification.Name("trackerRecordsDidChange")
 }

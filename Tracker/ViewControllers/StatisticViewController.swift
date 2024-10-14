@@ -39,6 +39,11 @@ final class StatisticViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .trackerRecordsDidChange, object: nil)
+        print("StatisticViewController deinitialized")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = ThemeManager.shared.backgroundColor()
@@ -47,6 +52,7 @@ final class StatisticViewController: UIViewController {
         setupStubView()
         updateUI()
         updateStatisticsView()
+        NotificationCenter.default.addObserver(self, selector: #selector(trackerRecordsDidChange(_:)), name: .trackerRecordsDidChange, object: nil)
     }
     
     private func setupHeader() {
@@ -110,6 +116,15 @@ final class StatisticViewController: UIViewController {
         } else {
             stubView.isHidden = true
             collectionView.isHidden = false
+        }
+    }
+    
+    @objc
+    private func trackerRecordsDidChange(_ notification: Notification) {
+        print("Received notification in StatisticViewController")
+        DispatchQueue.main.async {
+            self.updateStatisticsView()
+            self.updateUI()
         }
     }
 }
