@@ -74,6 +74,26 @@ final class TrackerViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(trackerCompletionChanged(_:)), name: .trackerCompletionChanged, object: nil)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Отправляем событие открытия экрана
+        AnalyticsService.shared.logEvent("open", parameters: [
+            "screen": "Main"
+        ])
+        print("Отправлено событие: open, screen: Main")
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // Отправляем событие закрытия экрана
+        AnalyticsService.shared.logEvent("close", parameters: [
+            "screen": "Main"
+        ])
+        print("Отправлено событие: close, screen: Main")
+    }
+    
     private func loadTrackers() {
         let categoryCoreDataList = trackerCategoryStore.fetchAllCategories()
         var allCategories: [TrackerCategory] = []
@@ -385,7 +405,33 @@ final class TrackerViewController: UIViewController {
         view.bringSubviewToFront(filterButton)
     }
     
-    @objc private func didTapFilterButton() {
+    private func showDeleteConfirmation(for tracker: Tracker, at indexPath: IndexPath) {
+        let alertController = UIAlertController(
+            title: NSLocalizedString("Удалить трекер", comment: "Заголовок алерта удаления трекера"),
+            message: NSLocalizedString("Вы уверены, что хотите удалить трекер?", comment: "Сообщение алерта удаления трекера"),
+            preferredStyle: .alert
+        )
+        
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Отмена", comment: "Кнопка отмены"), style: .cancel, handler: nil)
+        
+        let deleteAction = UIAlertAction(title: NSLocalizedString("Удалить", comment: "Кнопка удаления"), style: .destructive) { [weak self] _ in
+            self?.deleteTracker(tracker, at: indexPath)
+        }
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(deleteAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    @objc
+    private func didTapFilterButton() {
+        AnalyticsService.shared.logEvent("click", parameters: [
+            "screen": "Main",
+            "item": "filter"
+        ])
+        print("Отправлено событие: click, screen: Main, item: filter")
+        
         let filterVC = FilterViewController(delegate: self, selectedFilter: currentFilter)
         filterVC.modalPresentationStyle = .automatic
         present(filterVC, animated: true, completion: nil)
@@ -418,7 +464,8 @@ final class TrackerViewController: UIViewController {
         filterTrackersByState()
     }
     
-    @objc private func filterChanged(_ sender: UISegmentedControl) {
+    @objc
+    private func filterChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
         case 0:
             changeFilter(to: .all)
@@ -434,13 +481,19 @@ final class TrackerViewController: UIViewController {
     
     @objc
     private func didTapPlusButton() {
-        AnalyticsService.shared.logEvent("PlusButtonTapped", parameters: ["screen": "Tracker"])
+        AnalyticsService.shared.logEvent("click", parameters: [
+            "screen": "Main",
+            "item": "add_track"
+        ])
+        print("Отправлено событие: click, screen: Main, item: add_track")
+        
+        // Остальной ваш код
         let viewController = NewTrackerViewController()
         viewController.delegate = self
         let nav = UINavigationController(rootViewController: viewController)
-        present(nav,animated: true)
+        present(nav, animated: true)
     }
-    
+
     @objc
     private func datePickerValueChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
@@ -505,22 +558,35 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
     }
     
     private func createContextMenu(for tracker: Tracker, at indexPath: IndexPath) -> UIMenu {
-        let pinTitle = pinnedTrackerIDs.contains(tracker.id) ? NSLocalizedString("Unpin", comment: "Открепить") : NSLocalizedString("Pin", comment: "Закрепить")
+        let pinTitle = pinnedTrackerIDs.contains(tracker.id) ? NSLocalizedString("Открепить", comment: "Открепить") : NSLocalizedString("Закрепить", comment: "Закрепить")
         
         let pinAction = UIAction(title: pinTitle) { [weak self] _ in
             self?.togglePin(for: tracker)
         }
         
-        let editAction = UIAction(title: NSLocalizedString("Edit", comment: "Редактировать")) { [weak self] _ in
+        let editAction = UIAction(title: NSLocalizedString("Редактировать", comment: "Редактировать")) { [weak self] _ in
+            AnalyticsService.shared.logEvent("click", parameters: [
+                "screen": "Main",
+                "item": "edit"
+            ])
+            print("Отправлено событие: click, screen: Main, item: edit")
+            
             self?.editTracker(tracker)
         }
         
-        let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: "Удалить"), attributes: .destructive) { [weak self] _ in
-            self?.deleteTracker(tracker, at: indexPath)
+        let deleteAction = UIAction(title: NSLocalizedString("Удалить", comment: "Удалить"), attributes: .destructive) { [weak self] _ in
+            AnalyticsService.shared.logEvent("click", parameters: [
+                "screen": "Main",
+                "item": "delete"
+            ])
+            print("Отправлено событие: click, screen: Main, item: delete")
+            
+            self?.showDeleteConfirmation(for: tracker, at: indexPath)
         }
         
         return UIMenu(children: [pinAction, editAction, deleteAction])
     }
+
     
     private func togglePin(for tracker: Tracker) {
         loadPinnedTrackers()
@@ -673,8 +739,7 @@ extension TrackerViewController: FilterDelegate {
         } else {
             filterButton.tintColor = .red
         }
-
-        // Закрываем экран фильтров
+        
         dismiss(animated: true, completion: nil)
     }
 }

@@ -27,7 +27,6 @@ final class GradientBorderCell: UICollectionViewCell {
         titleLabel.numberOfLines = 1
         contentView.addSubview(titleLabel)
         
-        // Настройка subtitleLabel
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.textAlignment = .left
         subtitleLabel.textColor = UIColor.label
@@ -35,7 +34,6 @@ final class GradientBorderCell: UICollectionViewCell {
         subtitleLabel.numberOfLines = 1
         contentView.addSubview(subtitleLabel)
         
-        // Ограничения
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
@@ -49,10 +47,9 @@ final class GradientBorderCell: UICollectionViewCell {
     }
     
     private func setupGradientBorder() {
-        let borderThickness: CGFloat = 1.0 // Тонкие границы
+        let borderThickness: CGFloat = 1.0
         let cornerRadius: CGFloat = 16.0
         
-        // Настройка градиента для границы
         gradientLayer.colors = [UIColor.red.cgColor, UIColor.blue.cgColor, UIColor.green.cgColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
@@ -60,7 +57,6 @@ final class GradientBorderCell: UICollectionViewCell {
         gradientLayer.cornerRadius = cornerRadius
         gradientLayer.masksToBounds = true
         
-        // Создаем маску, чтобы градиент отображался только на границе
         let maskLayer = CAShapeLayer()
         let path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         let innerPath = UIBezierPath(roundedRect: bounds.insetBy(dx: borderThickness, dy: borderThickness), cornerRadius: cornerRadius)

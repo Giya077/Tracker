@@ -7,8 +7,16 @@ final class OnboardingViewController: UIPageViewController {
     var onboardingCompleted: (() -> Void)?
     
     private lazy var pages: [UIViewController] = {
-        let blue = createPage(imageName: "onboardingBue", labelText: "Отслеживайте только \n то, что хотите")
-        let red = createPage(imageName: "onboardingRed", labelText: "Даже если это \n не литры воды и йога")
+        let blue = createPage(
+            imageName: "onboardingBue",
+            labelText: NSLocalizedString("Track only \n what you want", comment: "Отслеживайте только \n то, что хотите")
+        )
+        
+        let red = createPage(
+            imageName: "onboardingRed",
+            labelText: NSLocalizedString("Even if it's not \n liters of water and yoga", comment: "Даже если это \n не литры воды и йога")
+        )
+        
         return [blue, red]
     }()
     
@@ -58,7 +66,7 @@ final class OnboardingViewController: UIPageViewController {
         let button = UIButton()
         button.backgroundColor = .black
         button.tintColor = .white
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(NSLocalizedString("These are technologies!", comment: "Вот это технологии!"), for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true

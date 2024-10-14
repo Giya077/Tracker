@@ -27,7 +27,6 @@ final class StatisticViewController: UIViewController {
         return collectionView
     }()
     
-    
     private var stubView: StubView!
     private let trackerRecordStore: TrackerRecordStore
     
@@ -47,6 +46,7 @@ final class StatisticViewController: UIViewController {
         setupCollectionView()
         setupStubView()
         updateUI()
+        updateStatisticsView()
     }
     
     private func setupHeader() {
@@ -73,7 +73,7 @@ final class StatisticViewController: UIViewController {
     }
     
     private func setupStubView() {
-        stubView = StubView(text: NSLocalizedString("Анализировать пока нечего", comment: "Текст для пустого экрана статистики"))
+        stubView = StubView(text: NSLocalizedString("Nothing to analyze yet", comment: "Анализировать пока нечего"))
         if let statisticStubImage = UIImage(named: "statisticStubView") {
             stubView.updateImage(statisticStubImage)
         }
@@ -95,7 +95,7 @@ final class StatisticViewController: UIViewController {
     
     private func formattedBestPeriod() -> String {
         guard let bestPeriod = trackerRecordStore.bestPeriod() else {
-            return NSLocalizedString("No data", comment: "Нет данных")
+            return NSLocalizedString("", comment: "Нет данных")
         }
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -124,13 +124,13 @@ extension StatisticViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "StatsCell", for: indexPath) as! GradientBorderCell
         switch indexPath.item {
         case 0:
-            cell.configure(title: formattedBestPeriod(), subtitle: NSLocalizedString("Лучший период", comment: "Лучший период"))
+            cell.configure(title: formattedBestPeriod(), subtitle: NSLocalizedString("Best Period", comment: "Лучший период"))
         case 1:
-            cell.configure(title: "\(trackerRecordStore.idealDays())", subtitle: NSLocalizedString("Идеальные дни", comment: "Идеальные дни"))
+            cell.configure(title: "\(trackerRecordStore.idealDays())", subtitle: NSLocalizedString("Ideal Days", comment: "Идеальные дни"))
         case 2:
-            cell.configure(title: "\(trackerRecordStore.completedTrackersCount())", subtitle: NSLocalizedString("Трекеров завершено", comment: "Трекеров завершено"))
+            cell.configure(title: "\(trackerRecordStore.completedTrackersCount())", subtitle: NSLocalizedString("Trackers Completed", comment: "Трекеров завершено"))
         case 3:
-            cell.configure(title: "\(trackerRecordStore.averageCompletedTrackers())", subtitle: NSLocalizedString("Среднее значение", comment: "Среднее значение"))
+            cell.configure(title: "\(trackerRecordStore.averageCompletedTrackers())", subtitle: NSLocalizedString("Average Completed", comment: "Среднее значение"))
         default:
             break
         }

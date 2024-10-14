@@ -15,7 +15,6 @@ final class AnalyticsService: AnalyticsServiceProtocol {
         }
     }
 
-    // Логируем событие с параметрами
     func logEvent(_ event: String, parameters: [String: Any]? = nil) {
         YMMYandexMetrica.reportEvent(event, parameters: parameters) { error in
             print("Error reporting event: \(String(describing: error))")

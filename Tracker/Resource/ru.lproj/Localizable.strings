@@ -52,6 +52,18 @@
 "Completed" = "Завершенные";
 "Not Completed" = "Не завершенные";
 
+"Track only \n what you want" = "Отслеживайте только \n то, что хотите";
+"Even if it's not \n liters of water and yoga" = "Даже если это \n не литры воды и йога";
+"These are technologies!" = "Вот это технологии!";
+
+"Statistics" = "Статистика";
+"Nothing to analyze yet" = "Анализировать пока нечего";
+"No data" = "Нет данных";
+"Best Period" = "Лучший период";
+"Ideal Days" = "Идеальные дни";
+"Trackers Completed" = "Трекеров завершено";
+"Average Completed" = "Среднее значение";
+
 //SCHEDULE
 "Monday" = "Понедельник";
 "Tuesday" = "Вторник";

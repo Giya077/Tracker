@@ -209,6 +209,13 @@ class TrackerCell: UICollectionViewCell {
     }
     
     @objc private func actionButtonTapped() {
+        
+        AnalyticsService.shared.logEvent("click", parameters: [
+            "screen": "Main",
+            "item": "track"
+        ])
+        print("Отправлено событие: click, screen: Main, item: track")
+        
         guard let tracker = tracker else { return }
         
         let today = Calendar.current.startOfDay(for: Date())
