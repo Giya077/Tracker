@@ -100,13 +100,12 @@ final class StatisticViewController: UIViewController {
     }
     
     private func formattedBestPeriod() -> String {
-        guard let bestPeriod = trackerRecordStore.bestPeriod() else {
-            return NSLocalizedString("", comment: "Нет данных")
+        guard let bestPeriodCount = trackerRecordStore.bestPeriod() else {
+            return NSLocalizedString("No data", comment: "Нет данных")
         }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return "\(formatter.string(from: bestPeriod.start)) - \(formatter.string(from: bestPeriod.end))"
+        return "\(bestPeriodCount)"
     }
+
     
     private func updateStatisticsView() {
         let records = trackerRecordStore.fetchAllRecords()

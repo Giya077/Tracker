@@ -21,6 +21,8 @@ final class CategoryViewController: UIViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.backgroundColor = UIColor.clear
+        tableView.separatorStyle = .singleLine
+        tableView.separatorInset = .init(top: 0, left: 10, bottom: 0, right: 10)
         tableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.delegate = self
@@ -128,7 +130,6 @@ final class CategoryViewController: UIViewController {
             if let newName = alertController.textFields?.first?.text, !newName.isEmpty {
                 self?.viewModel.updateCategory(at: indexPath.row, with: newName)
                 
-                // Сбрасываем выбор только если редактируется выбранная категория
                 if self?.viewModel.selectedCategoryIndex == indexPath.row {
                     self?.viewModel.selectedCategoryIndex = nil
                 }
@@ -162,7 +163,6 @@ final class CategoryViewController: UIViewController {
     }
 }
 
-
 extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -173,7 +173,6 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
         let category = viewModel.categories[indexPath.row]
         
-        // Проверка, выбрана ли категория
         let isSelected = indexPath.row == viewModel.selectedCategoryIndex
         let backgroundColor: UIColor = isSelected ? .lightGray : (Colors.systemSearchColor ?? .white)
         

@@ -91,11 +91,36 @@ final class TrackerRecordStore {
         return records.count / uniqueDates.count
     }
 
-    func bestPeriod() -> (start: Date, end: Date, count: Int)? {
+    func bestPeriod() -> Int? {
         let records = fetchAllRecords()
         guard !records.isEmpty else { return nil }
-        let bestPeriod: (start: Date, end: Date, count: Int)? = nil
-        return bestPeriod
+        
+        // Получаем уникальные даты, игнорируя время
+        let dates = Set(records.compactMap { $0.date }.map { Calendar.current.startOfDay(for: $0) })
+        let sortedDates = dates.sorted()
+        guard !sortedDates.isEmpty else { return nil }
+        
+        var maxStreak = 1
+        var currentStreak = 1
+        
+        for i in 1..<sortedDates.count {
+            let previousDate = sortedDates[i - 1]
+            let currentDate = sortedDates[i]
+            
+            let components = Calendar.current.dateComponents([.day], from: previousDate, to: currentDate)
+            if components.day == 1 {
+                // Даты последовательны
+                currentStreak += 1
+                if currentStreak > maxStreak {
+                    maxStreak = currentStreak
+                }
+            } else if components.day ?? 0 > 1 {
+                // Обнаружен разрыв в днях
+                currentStreak = 1
+            }
+        }
+        
+        return maxStreak
     }
 
     private func totalTrackersForDay(_ date: Date) -> Int {
