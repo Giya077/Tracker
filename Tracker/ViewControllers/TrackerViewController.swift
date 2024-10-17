@@ -1,9 +1,3 @@
-//
-//  tracksView.swift
-//  Tracker
-//
-//  Created by GiyaDev on 05.05.2024.
-//
 
 import UIKit
 
@@ -326,7 +320,7 @@ final class TrackerViewController: UIViewController {
             TrackerRecord(id: record.id!, date: record.date!)
         }
     }
-    
+
     private func filterTrackersByState() {
         let selectedDayOfWeek = Calendar.current.component(.weekday, from: currentDate)
         guard let selectedDay = Days(dayNumber: selectedDayOfWeek) else { return }
@@ -336,20 +330,37 @@ final class TrackerViewController: UIViewController {
         for category in allCategories {
             var filteredTrackers: [Tracker] = []
             for tracker in category.trackers {
-                let isCompleted = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
+                let isCompletedOnSelectedDate = completedTrackers.contains { $0.id == tracker.id && Calendar.current.isDate($0.date, inSameDayAs: currentDate) }
                 let isScheduledForToday = tracker.schedule.isEmpty || tracker.schedule.contains(selectedDay)
                 let matchesSearchText = searchText.isEmpty || tracker.name.lowercased().hasPrefix(searchText.lowercased())
 
+                let isEvent = tracker.schedule.isEmpty
+                let wasCompletedOnAnyDate = completedTrackers.contains { $0.id == tracker.id }
+
                 var shouldInclude = false
-                switch currentFilter {
-                case .all:
-                    shouldInclude = isScheduledForToday && matchesSearchText
-                case .completed:
-                    shouldInclude = isCompleted && matchesSearchText
-                case .notCompleted:
-                    shouldInclude = !isCompleted && isScheduledForToday && matchesSearchText
-                case .today:
-                    shouldInclude = isScheduledForToday && matchesSearchText && Calendar.current.isDate(currentDate, inSameDayAs: Date())
+
+                if isEvent {
+                    switch currentFilter {
+                    case .all:
+                        shouldInclude = !wasCompletedOnAnyDate && matchesSearchText
+                    case .completed:
+                        shouldInclude = wasCompletedOnAnyDate && matchesSearchText
+                    case .notCompleted:
+                        shouldInclude = !wasCompletedOnAnyDate && Calendar.current.isDate(currentDate, inSameDayAs: Date()) && matchesSearchText
+                    case .today:
+                        shouldInclude = Calendar.current.isDate(currentDate, inSameDayAs: Date()) && matchesSearchText
+                    }
+                } else {
+                    switch currentFilter {
+                    case .all:
+                        shouldInclude = isScheduledForToday && matchesSearchText
+                    case .completed:
+                        shouldInclude = isCompletedOnSelectedDate && matchesSearchText
+                    case .notCompleted:
+                        shouldInclude = !isCompletedOnSelectedDate && isScheduledForToday && matchesSearchText
+                    case .today:
+                        shouldInclude = isScheduledForToday && matchesSearchText && Calendar.current.isDate(currentDate, inSameDayAs: Date())
+                    }
                 }
 
                 if shouldInclude {
@@ -365,6 +376,7 @@ final class TrackerViewController: UIViewController {
         self.categories = filteredCategories
         collectionView.reloadData()
     }
+
 
     private func changeFilter(to newFilter: TrackerFilter) {
         currentFilter = newFilter
@@ -469,7 +481,6 @@ final class TrackerViewController: UIViewController {
             break
         }
     }
-
     
     @objc
     private func didTapPlusButton() {
