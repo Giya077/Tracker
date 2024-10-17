@@ -1,0 +1,83 @@
+/* 
+  LocalizableRU.strings
+  Tracker
+
+  Created by GiyaDev on 20.09.2024.
+  
+*/
+
+"Add Category" = "Добавить категорию";
+"Tracker" = "Трекер";
+"Trackers" = "Трекеры";
+"Statistics" = "Статистика";
+"What to track?" = "Что будем отслеживать?";
+"Search" = "Поиск";
+"Schedule" = "Расписание";
+"Habit" = "Привычка";
+"Irregular event" = "Нерегулярные события";
+"Creating tracker" = "Создание трекера";
+"New habit" = "Новая привычка";
+"New event" = "Новое событие";
+"Edit event" = "Редактирование события";
+"Edit habit" = "Редактирование привычки";
+"Enter tracker name" = "Введите название трекера";
+"38 characters limit" = "Ограничение 38 символов";
+"Category" = "Категория";
+"Schedule" = "Расписание";
+"Color" = "Цвет";
+"Enter category name" = "Введите название категории";
+"New irregular event" = "Новое нерегулярное событие";
+"New Category" = "Новая категория";
+"Cancel" = "Отменить";
+"Create" = "Создать";
+"Save" = "Сохранить";
+"Done" = "Готово";
+"Edit" = "Редактировать";
+"Delete" = "Удалить";
+"Pinned" = "Закрепленные";
+"Unpin" = "Открепить";
+"Pin" = "Закрепить";
+"Habits and events can be\ncombined by meaning" = "Привычки и события можно \nобъединить по смыслу";
+"Character limit: 38" = "Ограничение 38 символов";
+
+"Best Period" = "Лучший период";
+"Ideal Days" = "Идеальные дни";
+"Trackers Completed" = "Трекеров завершено";
+"Average Completed" = "Среднее значение";
+"No data" = "Нет данных";
+"Filters" = "Фильтры";
+
+"All Trackers" = "Все трекеры";
+"Trackers for Today" = "Трекеры на сегодня";
+"Completed" = "Завершенные";
+"Not Completed" = "Не завершенные";
+
+"Track only \n what you want" = "Отслеживайте только \n то, что хотите";
+"Even if it's not \n liters of water and yoga" = "Даже если это \n не литры воды и йога";
+"These are technologies!" = "Вот это технологии!";
+
+"Statistics" = "Статистика";
+"Nothing to analyze yet" = "Анализировать пока нечего";
+"No data" = "Нет данных";
+"Best Period" = "Лучший период";
+"Ideal Days" = "Идеальные дни";
+"Trackers Completed" = "Трекеров завершено";
+"Average Completed" = "Среднее значение";
+
+//SCHEDULE
+"Monday" = "Понедельник";
+"Tuesday" = "Вторник";
+"Wednesday" = "Среда";
+"Thursday" = "Четверг";
+"Friday" = "Пятница";
+"Saturday" = "Суббота";
+"Sunday" = "Воскресенье";
+
+"monday_short" = "Пн";
+"tuesday_short" = "Вт";
+"wednesday_short" = "Ср";
+"thursday_short" = "Чт";
+"friday_short" = "Пт";
+"saturday_short" = "Сб";
+"sunday_short" = "Вс";
+

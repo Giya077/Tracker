@@ -11,8 +11,11 @@ import UIKit
 final class IrregularEventViewController: UIViewController {
     
     // MARK: - Public Properties
-    weak var trackerDelegate: NewTrackerDelegate?
     var trackerType: TrackerType?
+    weak var trackerDelegate: NewTrackerDelegate?
+    var isEditingTracker: Bool = false
+    var trackerBeingEdited: Tracker?
+    var existingTracker: Tracker?
     
     // MARK: - Private Properties
     private var selectedCategory: TrackerCategory?
@@ -28,33 +31,33 @@ final class IrregularEventViewController: UIViewController {
     private var contentView: UIView!
     
     private let label: UILabel = {
-        let label = BasicTextLabel(text: "Новое нерегулярное событие")
+        let label = BasicTextLabel(text: NSLocalizedString("Irregular event", comment: "Новое нерегулярное событие"))
         return label
     }()
     
     private let trackNaming: UITextField = {
         let trackNaming = UITextField()
-        trackNaming.textColor = .black
-        trackNaming.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
-        trackNaming.layer.cornerRadius = 10
+        trackNaming.textColor = ThemeManager.shared.textColor()
+        trackNaming.backgroundColor = Colors.systemSearchColor
+        trackNaming.layer.cornerRadius = 16
         trackNaming.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: trackNaming.frame.height))
         trackNaming.leftViewMode = .always
         trackNaming.font = UIFont.systemFont(ofSize: 18)
-        trackNaming.attributedPlaceholder = NSAttributedString(string: "Введите название трекера", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        trackNaming.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("Enter tracker name", comment: "Введите название трекера"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
         trackNaming.translatesAutoresizingMaskIntoConstraints = false
         return trackNaming
     }()
     
     private let characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("Character limit: 38", comment: "Ограничение 38 символов")
         label.textColor = .red
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let arrayCells = ["Категория"]
+    private let arrayCells = [NSLocalizedString("Category", comment: "Категория")]
     private let cellIdentifier = "CellType1"
     private lazy var categoryCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -79,7 +82,7 @@ final class IrregularEventViewController: UIViewController {
     
     private let emojiHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.text = "Emoji"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -88,8 +91,8 @@ final class IrregularEventViewController: UIViewController {
     
     private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.text = "Цвет"
+        label.textColor = ThemeManager.shared.textColor()
+        label.text = NSLocalizedString("Color", comment: "Цвет")
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -122,28 +125,28 @@ final class IrregularEventViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .system)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Отменить"), for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        cancelButton.backgroundColor = .white
-        cancelButton.layer.cornerRadius = 12
+        cancelButton.backgroundColor = ThemeManager.shared.backgroundColor()
+        cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.red.cgColor
         cancelButton.layer.masksToBounds = true
         cancelButton.tintColor = .red
-        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
-        cancelButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        cancelButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         return cancelButton
     }()
     
     private lazy var createButton: UIButton = {
         let createButton = UIButton(type: .system)
-        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("Create", comment: "Создать"), for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
-        createButton.layer.cornerRadius = 12
+        createButton.layer.cornerRadius = 16
         createButton.layer.masksToBounds = true
         createButton.tintColor = .white
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 19)
-        createButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        createButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         return createButton
     }()
     
@@ -160,9 +163,8 @@ final class IrregularEventViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         navigationItem.hidesBackButton = true
-        
         setupScrollView()
         setupView()
         
@@ -198,6 +200,8 @@ final class IrregularEventViewController: UIViewController {
                 self.selectedCategory = nil
             }
         }
+        
+        updateTrackerLabel(label, isEditingTracker: isEditingTracker, trackerType: trackerType)
         updateCategoryLabel()
         updateCreateButtonState()
     }
@@ -307,8 +311,7 @@ final class IrregularEventViewController: UIViewController {
     private func updateCategoryLabel() {
         guard let categoryCell = categoryCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
         let categoriesText = selectedCategory?.titles ?? ""
-        categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
-        print("Selected category: \(selectedCategory?.titles ?? "No Category")")
+        categoryCell.configure(title: NSLocalizedString("Category", comment: "Категория"), days: categoriesText.isEmpty ? nil : categoriesText)
     }
     
     private func checkFields() -> Bool {
@@ -322,8 +325,21 @@ final class IrregularEventViewController: UIViewController {
     }
     
     private func updateCreateButtonState() {
-        createButton.isEnabled = checkFields()
-        createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
+        let isValid = checkFields()
+        createButton.isEnabled = isValid
+        
+        if isValid {
+            if traitCollection.userInterfaceStyle == .dark {
+                createButton.backgroundColor = .white
+                createButton.setTitleColor(.black, for: .normal)
+            } else {
+                createButton.backgroundColor = .black
+                createButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            createButton.backgroundColor = .lightGray
+            createButton.setTitleColor(.white, for: .normal)
+        }
     }
     
     private func saveEvent() {
@@ -343,18 +359,73 @@ final class IrregularEventViewController: UIViewController {
         )
         
         trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
-        trackerDelegate?.didFinishCreatingTracker(trackerType: .event)
-        navigationController?.popViewController(animated: true)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .event)
     }
-    
+        
+    private func updateEvent(_ tracker: Tracker) {
+        guard let name = trackNaming.text, !name.isEmpty,
+              let color = selectedColor,
+              let emoji = selectedEmoji,
+              let category = selectedCategory else {
+            return
+        }
+
+        if let oldCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
+            // Удаляем трекер из старой категории
+            trackerCategoryStore.removeTrackerFromCategory(tracker, fromCategoryTitle: oldCategory.titles)
+        }
+
+        let updatedTracker = Tracker(
+            id: tracker.id,  // сохраняем старый идентификатор
+            name: name,
+            color: color,
+            emoji: emoji,
+            schedule: []
+        )
+
+        trackerCategoryStore.saveTracker(updatedTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: .event)
+    }
+
+    func configureForEditing(_ tracker: Tracker) {
+        self.trackerBeingEdited = tracker
+        self.trackNaming.text = tracker.name
+        self.selectedColor = tracker.color
+        self.selectedEmoji = tracker.emoji
+        self.selectedCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) })
+        
+        if let emojiIndex = emojiArray.firstIndex(of: tracker.emoji) {
+            self.selectedEmojiIndex = IndexPath(item: emojiIndex, section: 0)
+        }
+        
+        if let colorIndex = colorArray.firstIndex(where: { $0.isEqualToColor(tracker.color) }) {
+            self.selectedColorIndex = IndexPath(item: colorIndex, section: 0)
+        }
+        
+        isEditingTracker = true
+        updateCategoryLabel()
+        updateCreateButtonState()
+        
+        emojiCollectionView.reloadData()
+        colorCollectionView.reloadData()
+    }
+
     @objc
     private func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
+        if isEditingTracker {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc
     private func createButtonTapped() {
-        saveEvent()
+        if isEditingTracker, let trackerBeingEdited = trackerBeingEdited {
+            updateEvent(trackerBeingEdited)
+        } else {
+            saveEvent()
+        }
         navigationController?.popToRootViewController(animated: true)
     }
 }
@@ -374,22 +445,30 @@ extension IrregularEventViewController: UICollectionViewDataSource {
     }
     
     private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
-        
+        guard  let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? CellType1 else {
+            return  UICollectionViewCell()
+        }
             cell.configure(title: arrayCells[indexPath.item], days: selectedCategory?.titles)
         return cell
     }
     
     private func cellEmoji(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! EmojiCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as? EmojiCell else {
+            return UICollectionViewCell()
+        }
+        
         cell.emojiLabel.text = emojiArray[indexPath.item]
         cell.setSelected(indexPath == selectedEmojiIndex)
         return cell
     }
     
     private func cellColor(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! ColorCell
-        cell.configure(with: colorArray[indexPath.item])
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as? ColorCell else {
+            return UICollectionViewCell()
+        }
+        
+        let color = colorArray[indexPath.item]
+        cell.configure(with: color)
         cell.setSelected(indexPath == selectedColorIndex)
         return cell
     }
@@ -473,7 +552,7 @@ extension IrregularEventViewController: UICollectionViewDelegateFlowLayout {
 
 extension IrregularEventViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()// Скрыть клавиатуру
+        textField.resignFirstResponder()
         updateCreateButtonState()
         return true
     }

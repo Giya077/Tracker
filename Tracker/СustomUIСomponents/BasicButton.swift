@@ -12,8 +12,8 @@ final class BasicButton: UIButton {
     init(title: String) {
         super.init(frame: .zero)
         
-        backgroundColor = .black
-        tintColor = .white
+        backgroundColor = ThemeManager.shared.buttonBackgroundColor()
+        setTitleColor(ThemeManager.shared.buttonTextColor(), for: .normal)
         layer.cornerRadius = 16
         titleLabel?.font = UIFont.systemFont(ofSize: 18)
         
