@@ -393,7 +393,6 @@ final class HabitViewController: UIViewController {
         }
         
         if let oldCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
-            // Удаляем трекер из старой категории
             trackerCategoryStore.removeTrackerFromCategory(tracker, fromCategoryTitle: oldCategory.titles)
         }
         
@@ -417,10 +416,21 @@ final class HabitViewController: UIViewController {
         self.selectedEmoji = tracker.emoji
         self.selectedDays = Set(tracker.schedule)
         self.selectedCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) })
+        
+        if let emojiIndex = emojiArray.firstIndex(of: tracker.emoji) {
+            self.selectedEmojiIndex = IndexPath(item: emojiIndex, section: 0)
+        }
+        
+        if let colorIndex = colorArray.firstIndex(where: { $0.isEqualToColor(tracker.color) }) {
+            self.selectedColorIndex = IndexPath(item: colorIndex, section: 0)
+        }
+
         isEditingTracker = true
-        trackerBeingEdited = tracker
         updateCategoryLabel()
         updateCreateButtonState()
+        
+        emojiCollectionView.reloadData()
+        colorCollectionView.reloadData()
     }
     
     @objc
@@ -457,7 +467,9 @@ extension HabitViewController: UICollectionViewDataSource {
     }
     
     private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? CellType1 else {
+            return UICollectionViewCell()
+        }
         
         if indexPath.row == 1 {
             let daysText = selectedDays.map { $0.localizedShortName }.joined(separator: ", ")
@@ -469,19 +481,25 @@ extension HabitViewController: UICollectionViewDataSource {
     }
     
     private func cellEmoji(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! EmojiCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as? EmojiCell else {
+            return UICollectionViewCell()
+        }
         cell.emojiLabel.text = emojiArray[indexPath.item]
         cell.setSelected(indexPath == selectedEmojiIndex)
         return cell
     }
     
     private func cellColor(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! ColorCell
-        cell.configure(with: colorArray[indexPath.item])
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as? ColorCell else {
+            return UICollectionViewCell()
+        }
+        
+        let color = colorArray[indexPath.item]
+        cell.configure(with: color)
         cell.setSelected(indexPath == selectedColorIndex)
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.categoryAndScheduleCollectionView {
             return cellCategoryAndSchedual(collectionView, indexPath)

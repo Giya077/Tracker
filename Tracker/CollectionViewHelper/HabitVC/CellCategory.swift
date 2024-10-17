@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class CategoryCell: UITableViewCell {
+final class CategoryCell: UITableViewCell {
     
     var onLongPress: (() -> Void)?
     

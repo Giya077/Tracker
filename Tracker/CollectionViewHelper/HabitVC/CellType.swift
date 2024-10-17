@@ -1,7 +1,6 @@
 import UIKit
 
-// Ячейка типа 1
-class CellType1: UICollectionViewCell {
+final class CellType1: UICollectionViewCell {
     
     var selectedDays: String? {
         didSet {

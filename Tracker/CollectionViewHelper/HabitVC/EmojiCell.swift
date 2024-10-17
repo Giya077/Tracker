@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class EmojiCell: UICollectionViewCell {
+final class EmojiCell: UICollectionViewCell {
     let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 30)

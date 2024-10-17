@@ -11,20 +11,22 @@ final class TrackerTests: XCTestCase {
     func testTrackerViewControllerLightMode() {
         let tabBarController = createTabBarController()
         let lightTraitCollection = UITraitCollection(userInterfaceStyle: .light)
-        assertSnapshot(matching: tabBarController, as: .image(on: .iPhone13Pro, traits: lightTraitCollection))
+        assertSnapshot(of: tabBarController, as: .image(on: .iPhone13Pro, traits: lightTraitCollection))
     }
 
     func testTrackerViewControllerDarkMode() {
         let tabBarController = createTabBarController()
         let darkTraitCollection = UITraitCollection(userInterfaceStyle: .dark)
-        assertSnapshot(matching: tabBarController, as: .image(on: .iPhone13Pro, traits: darkTraitCollection))
+        assertSnapshot(of: tabBarController, as: .image(on: .iPhone13Pro, traits: darkTraitCollection))
     }
 
     func createTabBarController() -> UITabBarController {
         let trackerStore = MockTrackerStore()
         let trackerCategoryStore = MockTrackerCategoryStore()
-        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore)
-        let statisticViewController = StatisticViewController()
+        let trackerRecordStore = MockTrackerRecordStore()
+        
+        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore, trackerRecordStore: trackerRecordStore)
+        let statisticViewController = StatisticViewController(trackerRecordStore: trackerRecordStore)
 
         let trackNav = UINavigationController(rootViewController: trackerViewController)
         let statisticNav = UINavigationController(rootViewController: statisticViewController)

@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-final class TrackerRecordStore {
+ class TrackerRecordStore {
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
@@ -54,7 +54,6 @@ final class TrackerRecordStore {
         }
     }
 
-    
     func fetchAllRecords() -> [TrackerRecordCoreData] {
         let fetchRequest: NSFetchRequest<TrackerRecordCoreData> = TrackerRecordCoreData.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
@@ -68,7 +67,6 @@ final class TrackerRecordStore {
             return []
         }
     }
-
 
     func completedTrackersCount() -> Int {
         return fetchAllRecords().count

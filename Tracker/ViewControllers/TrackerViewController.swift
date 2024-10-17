@@ -600,15 +600,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
             navigationController?.pushViewController(eventVC, animated: true)
         }
     }
-    
-    private func isHabit(_ tracker: Tracker) -> Bool {
-        return !tracker.schedule.isEmpty
-    }
-    
-    private func isEvent(_ tracker: Tracker) -> Bool {
-        return tracker.schedule.isEmpty
-    }
-    
+        
     private func deleteTracker(_ tracker: Tracker, at indexPath: IndexPath) {
         do {
             try trackerStore.deleteTracker(with: tracker.id)
@@ -622,6 +614,14 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout, UICollectio
         } catch {
             print("Failed to delete tracker: \(error)")
         }
+    }
+    
+    private func isHabit(_ tracker: Tracker) -> Bool {
+        return !tracker.schedule.isEmpty
+    }
+    
+    private func isEvent(_ tracker: Tracker) -> Bool {
+        return tracker.schedule.isEmpty
     }
     
     private func pinTracker(_ tracker: Tracker) {

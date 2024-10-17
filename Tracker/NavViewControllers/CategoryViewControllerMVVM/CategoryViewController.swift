@@ -170,9 +170,11 @@ extension CategoryViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! CategoryCell
-        let category = viewModel.categories[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as? CategoryCell else {
+            return UITableViewCell()
+        }
         
+        let category = viewModel.categories[indexPath.row]
         let isSelected = indexPath.row == viewModel.selectedCategoryIndex
         let backgroundColor: UIColor = isSelected ? .lightGray : (Colors.systemSearchColor ?? .white)
         
