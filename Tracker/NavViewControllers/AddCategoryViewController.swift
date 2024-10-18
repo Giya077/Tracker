@@ -56,7 +56,7 @@ final class AddCategoryViewController: UIViewController {
     }
     
     private func setupView() {
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         
         view.addSubview(label)
         view.addSubview(doneButton)
@@ -92,7 +92,7 @@ final class AddCategoryViewController: UIViewController {
 
 extension AddCategoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder() // Скрыть клавиатуру
+        textField.resignFirstResponder()
         return true
     }
 }

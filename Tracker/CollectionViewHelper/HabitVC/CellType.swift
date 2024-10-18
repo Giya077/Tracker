@@ -1,7 +1,6 @@
 import UIKit
 
-// Ячейка типа 1
-class CellType1: UICollectionViewCell {
+final class CellType1: UICollectionViewCell {
     
     var selectedDays: String? {
         didSet {
@@ -11,7 +10,7 @@ class CellType1: UICollectionViewCell {
     
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = ThemeManager.shared.textColor()
         label.font = UIFont.systemFont(ofSize: 17)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

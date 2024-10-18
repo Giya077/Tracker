@@ -12,7 +12,7 @@ final class BasicTextLabel: UILabel {
         super.init(frame: .zero)
         
         font = UIFont.boldSystemFont(ofSize: 18)
-        textColor = .black
+        textColor = ThemeManager.shared.textColor()
         translatesAutoresizingMaskIntoConstraints = false
         self.text = text
         

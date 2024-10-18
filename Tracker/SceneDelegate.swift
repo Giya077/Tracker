@@ -41,14 +41,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let context = appDelegate.persistantContainer.viewContext
         
         let tabBarController = UITabBarController()
+        
         let trackerStore = TrackerStore(context: context)
         let trackerCategoryStore = TrackerCategoryStore(context: context)
-        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore)
-        let statisticViewController = StatisticViewController()
+        let trackerRecordStore = TrackerRecordStore(context: context)
+        
+        let trackerViewController = TrackerViewController(trackerStore: trackerStore, trackerCategoryStore: trackerCategoryStore, trackerRecordStore: trackerRecordStore)
+        let statisticViewController = StatisticViewController(trackerRecordStore: trackerRecordStore)
+        
         let trackNav = UINavigationController(rootViewController: trackerViewController)
         let statisticNav = UINavigationController(rootViewController: statisticViewController)
-        trackNav.tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(systemName: "record.circle.fill"), tag: 0)
-        statisticNav.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(systemName: "hare.fill"), tag: 1)
+        
+        trackNav.tabBarItem = UITabBarItem(
+             title: NSLocalizedString("Trackers", comment: "Title for the Trackers tab"),
+             image: UIImage(systemName: "record.circle.fill"),
+             tag: 0
+           )
+             statisticNav.tabBarItem = UITabBarItem(
+                 title: NSLocalizedString("Statistics", comment: "Title for the Statistics tab"),
+                 image: UIImage(systemName: "hare.fill"),
+                 tag: 1
+             )   
         tabBarController.viewControllers = [trackNav, statisticNav]
         
         window?.rootViewController = tabBarController
