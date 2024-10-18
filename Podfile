@@ -7,6 +7,9 @@ target 'Tracker' do
   # Yandex Metrica
   pod 'YandexMobileMetrica/Dynamic', '4.5.0'
 
-  # SnapshotTesting from GitHub
-  pod 'SnapshotTesting', :git => 'https://github.com/pointfreeco/swift-snapshot-testing.git', :branch => 'main'
+  target 'TrackerTests' do
+    inherit! :search_paths
+    # SnapshotTesting
+    pod 'SnapshotTesting', '~> 1.9'
+  end
 end
