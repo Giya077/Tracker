@@ -12,6 +12,9 @@ final class HabitViewController: UIViewController {
     // MARK: - Public Properties
     var trackerType: TrackerType?
     weak var trackerDelegate: NewTrackerDelegate?
+    var isEditingTracker: Bool = false
+    var trackerBeingEdited: Tracker?
+    var existingTracker: Tracker?
     
     // MARK: - Private Properties
     private var categoryViewController: CategoryViewController?
@@ -28,33 +31,37 @@ final class HabitViewController: UIViewController {
     private var contentView: UIView!
     
     private let label: UILabel = {
-        let label = BasicTextLabel(text: "Новая привычка")
+        let label = BasicTextLabel(text: NSLocalizedString("New habit", comment: "Новая привычка"))
         return label
     }()
     
     private let trackNaming: UITextField = {
         let trackNaming = UITextField()
-        trackNaming.textColor = .black
-        trackNaming.backgroundColor = UIColor(red: 0.95, green: 0.95, blue: 0.95, alpha: 1.0)
+        trackNaming.textColor = ThemeManager.shared.textColor()
+        trackNaming.backgroundColor = Colors.systemSearchColor
         trackNaming.layer.cornerRadius = 16
         trackNaming.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: trackNaming.frame.height))
         trackNaming.leftViewMode = .always
         trackNaming.font = UIFont.systemFont(ofSize: 18)
-        trackNaming.attributedPlaceholder = NSAttributedString(string: "Введите название трекера", attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        trackNaming.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("Enter tracker name", comment: "Введите название трекера"), attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
         trackNaming.translatesAutoresizingMaskIntoConstraints = false
         return trackNaming
     }()
     
     private let characterLimitLabel: UILabel = {
         let label = UILabel()
-        label.text = "Ограничение 38 символов"
+        label.text = NSLocalizedString("Character limit: 38", comment: "Ограничение 38 символов")
         label.textColor = .red
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let arrayCells = ["Категория", "Расписание"]
+    private let arrayCells = [
+        NSLocalizedString("Category", comment: "Категория"),
+        NSLocalizedString("Schedule", comment: "Расписание")
+    ]
+    
     private let cellIdentifier = "CellType1"
     private lazy var categoryAndScheduleCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -86,8 +93,8 @@ final class HabitViewController: UIViewController {
     
     private let emojiHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.text = "Emoji"
+        label.textColor = ThemeManager.shared.textColor()
+        label.text = NSLocalizedString("Emoji", comment: "Emoji")
         label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -95,8 +102,8 @@ final class HabitViewController: UIViewController {
     
     private let colorsHeaderLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.text = "Цвет"
+        label.textColor = ThemeManager.shared.textColor()
+        label.text = NSLocalizedString("Color", comment: "Цвет")
         label.font = UIFont.boldSystemFont(ofSize: 19)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -130,9 +137,9 @@ final class HabitViewController: UIViewController {
     
     private lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .system)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Отменить"), for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        cancelButton.backgroundColor = .white
+        cancelButton.backgroundColor = ThemeManager.shared.backgroundColor()
         cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
         cancelButton.layer.borderColor = UIColor.red.cgColor
@@ -145,7 +152,7 @@ final class HabitViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let createButton = UIButton(type: .system)
-        createButton.setTitle("Создать", for: .normal)
+        createButton.setTitle(NSLocalizedString("Create", comment: "Создать"), for: .normal)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         createButton.layer.cornerRadius = 16
         createButton.layer.masksToBounds = true
@@ -167,14 +174,14 @@ final class HabitViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         navigationItem.hidesBackButton = true
         setupScrollView()
         setupView()
         
         let categoryViewModel = CategoryViewModel(trackerCategoryStore: trackerCategoryStore)
         categoryViewController = CategoryViewController(viewModel: categoryViewModel)
-
+        
         categoryViewController?.onCategorySelected = { [weak self] category in
             self?.selectedCategory = category
             self?.updateCategoryLabel()
@@ -205,11 +212,11 @@ final class HabitViewController: UIViewController {
             }
         }
         
+        updateTrackerLabel(label, isEditingTracker: isEditingTracker, trackerType: trackerType)
         updateCategoryLabel()
         updateCreateButtonState()
     }
-
-
+    
     private func setupScrollView() {
         scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -322,7 +329,7 @@ final class HabitViewController: UIViewController {
     private func updateCategoryLabel() {
         guard let categoryCell = categoryAndScheduleCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? CellType1 else { return }
         let categoriesText = selectedCategory?.titles ?? ""
-        categoryCell.configure(title: "Категория", days: categoriesText.isEmpty ? nil : categoriesText)
+        categoryCell.configure(title: NSLocalizedString("Category", comment: "Категория"), days: categoriesText.isEmpty ? nil : categoriesText)
         print("Selected category: \(selectedCategory?.titles ?? "No Category")")
     }
     
@@ -338,8 +345,21 @@ final class HabitViewController: UIViewController {
     }
     
     private func updateCreateButtonState() {
-        createButton.isEnabled = checkFields()
-        createButton.backgroundColor = createButton.isEnabled ? .black : .lightGray
+        let isValid = checkFields()
+        createButton.isEnabled = isValid
+        
+        if isValid {
+            if traitCollection.userInterfaceStyle == .dark {
+                createButton.backgroundColor = .white
+                createButton.setTitleColor(.black, for: .normal)
+            } else {
+                createButton.backgroundColor = .black
+                createButton.setTitleColor(.white, for: .normal)
+            }
+        } else {
+            createButton.backgroundColor = .lightGray
+            createButton.setTitleColor(.white, for: .normal)
+        }
     }
     
     private func saveTracker() {
@@ -348,7 +368,6 @@ final class HabitViewController: UIViewController {
               let emoji = selectedEmoji,
               !selectedDays.isEmpty,
               let category = selectedCategory else {
-            // добавить обработку ошибки или показать уведомление
             return
         }
         
@@ -360,26 +379,79 @@ final class HabitViewController: UIViewController {
             schedule: Array(selectedDays)
         )
         
-        do {
-            trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
-            trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
-        } catch {
-            print("ошибка сохранение трекера \(error)")
+        trackerCategoryStore.saveTracker(newTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
+    }
+    
+    private func updateTracker(_ tracker: Tracker) {
+        guard let name = trackNaming.text, !name.isEmpty,
+              let color = selectedColor,
+              let emoji = selectedEmoji,
+              !selectedDays.isEmpty,
+              let category = selectedCategory else {
+            return
         }
+        
+        if let oldCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
+            trackerCategoryStore.removeTrackerFromCategory(tracker, fromCategoryTitle: oldCategory.titles)
+        }
+        
+        let updatedTracker = Tracker(
+            id: tracker.id,
+            name: name,
+            color: color,
+            emoji: emoji,
+            schedule: Array(selectedDays)
+        )
+
+        trackerCategoryStore.saveTracker(updatedTracker, forCategoryTitle: category.titles)
+        trackerDelegate?.didFinishCreatingTracker(trackerType: trackerType ?? .habit)
+    }
+    
+    
+    func configureForEditing(_ tracker: Tracker) {
+        self.trackerBeingEdited = tracker
+        self.trackNaming.text = tracker.name
+        self.selectedColor = tracker.color
+        self.selectedEmoji = tracker.emoji
+        self.selectedDays = Set(tracker.schedule)
+        self.selectedCategory = trackerCategoryStore.categories.first(where: { $0.trackers.contains(where: { $0.id == tracker.id }) })
+        
+        if let emojiIndex = emojiArray.firstIndex(of: tracker.emoji) {
+            self.selectedEmojiIndex = IndexPath(item: emojiIndex, section: 0)
+        }
+        
+        if let colorIndex = colorArray.firstIndex(where: { $0.isEqualToColor(tracker.color) }) {
+            self.selectedColorIndex = IndexPath(item: colorIndex, section: 0)
+        }
+
+        isEditingTracker = true
+        updateCategoryLabel()
+        updateCreateButtonState()
+        
+        emojiCollectionView.reloadData()
+        colorCollectionView.reloadData()
     }
     
     @objc
     private func cancelButtonTapped() {
-        dismiss(animated: true, completion: nil)
+        if isEditingTracker {
+            navigationController?.popViewController(animated: true)
+        } else {
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc
     private func createButtonTapped() {
-        saveTracker()
+        if isEditingTracker, let trackerBeingEdited = trackerBeingEdited {
+            updateTracker(trackerBeingEdited)
+        } else {
+            saveTracker()
+        }
         navigationController?.popToRootViewController(animated: true)
     }
 }
-
 
 extension HabitViewController: UICollectionViewDataSource {
     
@@ -395,10 +467,12 @@ extension HabitViewController: UICollectionViewDataSource {
     }
     
     private func cellCategoryAndSchedual(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! CellType1
-
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? CellType1 else {
+            return UICollectionViewCell()
+        }
+        
         if indexPath.row == 1 {
-            let daysText = selectedDays.map { $0.rawValue }.joined(separator: ", ")
+            let daysText = selectedDays.map { $0.localizedShortName }.joined(separator: ", ")
             cell.configure(title: arrayCells[indexPath.row], days: daysText.isEmpty ? nil : daysText)
         } else {
             cell.configure(title: arrayCells[indexPath.item], days: selectedCategory?.titles)
@@ -407,19 +481,25 @@ extension HabitViewController: UICollectionViewDataSource {
     }
     
     private func cellEmoji(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as! EmojiCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath) as? EmojiCell else {
+            return UICollectionViewCell()
+        }
         cell.emojiLabel.text = emojiArray[indexPath.item]
         cell.setSelected(indexPath == selectedEmojiIndex)
         return cell
     }
     
     private func cellColor(_ collectionView: UICollectionView, _ indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as! ColorCell
-        cell.configure(with: colorArray[indexPath.item])
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ColorCell", for: indexPath) as? ColorCell else {
+            return UICollectionViewCell()
+        }
+        
+        let color = colorArray[indexPath.item]
+        cell.configure(with: color)
         cell.setSelected(indexPath == selectedColorIndex)
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == self.categoryAndScheduleCollectionView {
             return cellCategoryAndSchedual(collectionView, indexPath)
@@ -508,18 +588,13 @@ extension HabitViewController: UITextFieldDelegate {
         return true
     }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        // Проверяем, что это наше текстовое поле
         if textField == trackNaming {
-            // Проверяем, что текст после изменений не превышает 38 символов
             if let text = textField.text,
                let textRange = Range(range, in: text) {
                 let updatedText = text.replacingCharacters(in: textRange, with: string)
-                // Проверяем, достигнуто ли ограничение
                 if updatedText.count >= 38 {
-                    // Отображаем метку
                     showCharacterLimitLabel()
                 } else {
-                    // Скрываем метку, если текст в пределах ограничения
                     hideCharacterLimitLabel()
                 }
                 updateCreateButtonState()
@@ -549,3 +624,4 @@ extension HabitViewController: TimetableDelegate {
         }
     }
 }
+

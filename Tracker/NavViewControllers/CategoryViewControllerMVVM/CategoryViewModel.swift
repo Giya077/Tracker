@@ -40,12 +40,11 @@ final class CategoryViewModel {
              try trackerCategoryStore.deleteCategory(with: category.titles)
              fetchCategories()
              
-             // Корректируем выбранный индекс
              if let selectedIndex = selectedCategoryIndex {
                  if selectedIndex == index {
-                     selectedCategoryIndex = nil  // Сбрасываем выбор, если удалили выбранную категорию
+                     selectedCategoryIndex = nil
                  } else if selectedIndex > index {
-                     selectedCategoryIndex = selectedIndex - 1  // Корректируем индекс для оставшихся категорий
+                     selectedCategoryIndex = selectedIndex - 1
                  }
              }
              onCategoryDeleted?(categories)

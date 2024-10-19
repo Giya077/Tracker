@@ -1,0 +1,90 @@
+/*
+  LocalizableRU.strings
+  Tracker
+
+  Created by GiyaDev on 20.09.2024.
+  
+*/
+
+/* Localizable.strings (English) */
+
+/* General */
+"Add Category" = "Add Category";
+"Category" = "Category";
+"Schedule" = "Schedule";
+"New Category" = "New Category";
+"Enter category name" = "Enter category name";
+"Trackers" = "Trackers";
+"Tracker" = "Tracker";
+"Statistics" = "Statistics";
+"Habit" = "Habit";
+"Irregular event" = "Irregular event";
+"Creating tracker" = "Creating tracker";
+"New habit" = "New habit";
+"New event" = "New event";
+"Enter tracker name" = "Enter tracker name";
+"Character limit is 38" = "Character limit is 38";
+"Schedule" = "Schedule";
+"Search" = "Search";
+"Color" = "Color";
+"Edit" = "Edit";
+"Delete" = "Delete";
+"Cancel" = "Cancel";
+"Save" = "Save";
+"Done" = "Done";
+"Unpin" = "Unpin";
+"Pin" = "Pin";
+"Pinned" = "Pinned";
+"New Irregular Event" = "New Irregular Event";
+"Edit habit" = "Edit habit";
+"Edit event" = "Edit event";
+"What to track?" = "What to track?";
+"Habits and events can be\ncombined by meaning" = "Habits and events can be\ncombined by meaning";
+
+"Best Period" = "Best Period";
+"Ideal Days" = "Ideal Days";
+"Trackers Completed" = "Trackers Completed";
+"Average Completed" = "Average Completed";
+"No data" = "No data";
+"Filters" = "Filters";
+
+"All Trackers" = "All Trackers";
+"Trackers for Today" = "Trackers for Today";
+"Completed" = "Completed";
+"Not Completed" = "Not Completed";
+
+"Track only \n what you want" = "Track only \n what you want";
+"Even if it's not \n liters of water and yoga" = "Even if it's not \n liters of water and yoga";
+"These are technologies!" = "These are technologies!";
+
+"Statistics" = "Statistics";
+"Nothing to analyze yet" = "Nothing to analyze yet";
+"No data" = "No data";
+"Best Period" = "Best Period";
+"Ideal Days" = "Ideal Days";
+"Trackers Completed" = "Trackers Completed";
+"Average Completed" = "Average Completed";
+
+/* Alerts */
+"Are you sure you want to delete this category?" = "Are you sure you want to delete this category?";
+"Category deleted" = "Category deleted";
+"Tracker created" = "Tracker created";
+"Please enter a valid name" = "Please enter a valid name";
+"Character limit: 38" = "Character limit: 38";
+
+//SCHEDULE
+"Monday" = "Monday";
+"Tuesday" = "Tuesday";
+"Wednesday" = "Wednesday";
+"Thursday" = "Thursday";
+"Friday" = "Friday";
+"Saturday" = "Saturday";
+"Sunday" = "Sunday";
+
+"monday_short" = "Mon";
+"tuesday_short" = "Tue";
+"wednesday_short" = "Wed";
+"thursday_short" = "Thu";
+"friday_short" = "Fri";
+"saturday_short" = "Sat";
+"sunday_short" = "Sun";

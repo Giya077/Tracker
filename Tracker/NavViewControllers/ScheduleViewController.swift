@@ -12,14 +12,23 @@ final class ScheduleViewController: UIViewController {
     
     weak var delegate: TimetableDelegate?
     private let days: [Days] = [.monday,.tuesday,.wednesday,.thursday,.friday,.saturday,.sunday]
-    private let daysRu = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+    private let daysRu = [
+        NSLocalizedString("Monday", comment: "Понедельник"),
+        NSLocalizedString("Tuesday", comment: "Вторник"),
+        NSLocalizedString("Wednesday", comment: "Среда"),
+        NSLocalizedString("Thursday", comment: "Четверг"),
+        NSLocalizedString("Friday", comment: "Пятница"),
+        NSLocalizedString("Saturday", comment: "Суббота"),
+        NSLocalizedString("Sunday", comment: "Воскресенье")
+    ]
+    
     private var selectedDays: Set<Days>
     
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(TimetableTableViewCell.self, forCellReuseIdentifier: "DaysCell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.backgroundColor = .white
+        tableView.backgroundColor = ThemeManager.shared.backgroundColor()
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         return tableView
     }()
@@ -27,7 +36,6 @@ final class ScheduleViewController: UIViewController {
     init(delegate: TimetableDelegate? = nil, selectedDays: Set<Days>) {
         self.delegate = delegate
         self.selectedDays = selectedDays
-        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -37,12 +45,12 @@ final class ScheduleViewController: UIViewController {
     }
     
     lazy var label: UILabel = {
-        let label = BasicTextLabel(text: "Новая привычка")
+        let label = BasicTextLabel(text: NSLocalizedString("Schedule", comment: "Расписание"))
         return label
     }()
     
     private lazy var doneButton: UIButton = {
-        let doneButton = BasicButton(title: "Готово")
+        let doneButton = BasicButton(title: NSLocalizedString("Done", comment: "Готово"))
         doneButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         return doneButton
@@ -56,7 +64,7 @@ final class ScheduleViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(label)
         view.addSubview(doneButton)
         view.addSubview(tableView)
@@ -65,7 +73,7 @@ final class ScheduleViewController: UIViewController {
         tableView.dataSource = self
         
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 30),
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             doneButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
@@ -98,6 +106,7 @@ extension ScheduleViewController: UITableViewDelegate, UITableViewDataSource {
         cell.switchView.addTarget(self, action: #selector(switchValueChanged(_:)), for: .valueChanged)
         
         cell.selectionStyle = .none
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 17)
         
         return cell
     }

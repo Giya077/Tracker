@@ -8,7 +8,7 @@ enum TrackerStoreError: Error {
     case failedToFetchTrackers
 }
 
-final class TrackerStore: NSObject {
+ class TrackerStore: NSObject {
     
     // MARK: - Public Properties
     var trackers: [Tracker] {

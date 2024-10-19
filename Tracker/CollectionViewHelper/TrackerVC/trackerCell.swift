@@ -11,13 +11,18 @@ import UIKit
 
 class TrackerCell: UICollectionViewCell {
     
-    
     var isCompleted: Bool = false {
         didSet {
             updateButtonAppearance()
         }
     }
-
+    
+    var isPinned: Bool = false {
+        didSet {
+            pinIconImageView.isHidden = !isPinned
+        }
+    }
+    
     private var currentDate: Date = Date()
     
     private let emojiLabel: UILabel = {
@@ -31,7 +36,7 @@ class TrackerCell: UICollectionViewCell {
     private  let nameLabel: UILabel = {
         let nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.textColor = .white
+        nameLabel.textColor = UIColor.white
         nameLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         nameLabel.numberOfLines = 0
         return nameLabel
@@ -46,10 +51,18 @@ class TrackerCell: UICollectionViewCell {
         return placeholder
     }()
     
+    private let pinIconImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "pin"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.tintColor = .white
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     private let daysLabel: UILabel = {
         let daysLabel = UILabel()
         daysLabel.translatesAutoresizingMaskIntoConstraints = false
-        daysLabel.textColor = .black
+        daysLabel.textColor = UIColor.label
         daysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return daysLabel
     }()
@@ -103,9 +116,10 @@ class TrackerCell: UICollectionViewCell {
         return nil
     }
     
-    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int, currentDate: Date) {
+    func configure(with tracker: Tracker, isCompleted: Bool, completionCount: Int, currentDate: Date, isPinned: Bool) {
         self.tracker = tracker
         self.currentDate = currentDate
+        self.isPinned = isPinned
         nameLabel.text = tracker.name
         daysLabel.text = formatDaysString(completionCount)
         emojiLabel.text = String(tracker.emoji)
@@ -119,7 +133,11 @@ class TrackerCell: UICollectionViewCell {
     
     private func setupViews() {
         
+        self.layer.cornerRadius = 16
+        self.layer.masksToBounds = true
+        
         addSubview(contrainerViewCell)
+        addSubview(pinIconImageView)
         addSubview(nameLabel)
         addSubview(daysLabel)
         addSubview(buttonContainer)
@@ -146,8 +164,13 @@ class TrackerCell: UICollectionViewCell {
             
             nameLabel.leadingAnchor.constraint(equalTo: emojiPlaceholder.leadingAnchor),
             nameLabel.topAnchor.constraint(equalTo: emojiPlaceholder.topAnchor, constant: 40),
-            nameLabel.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: 10),
+            nameLabel.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: -10),
             nameLabel.bottomAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: -5),
+            
+            pinIconImageView.topAnchor.constraint(equalTo: contrainerViewCell.topAnchor, constant: 10),
+            pinIconImageView.trailingAnchor.constraint(equalTo: contrainerViewCell.trailingAnchor, constant: -10),
+            pinIconImageView.widthAnchor.constraint(equalToConstant: 8),
+            pinIconImageView.heightAnchor.constraint(equalToConstant: 12),
             
             daysLabel.topAnchor.constraint(equalTo: contrainerViewCell.bottomAnchor, constant: 16),
             daysLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
@@ -165,7 +188,7 @@ class TrackerCell: UICollectionViewCell {
             tapAreaButton.widthAnchor.constraint(equalToConstant: 44),
             tapAreaButton.heightAnchor.constraint(equalToConstant: 44)
         ])
-
+        
         updateButtonAppearance()
     }
     
@@ -175,20 +198,24 @@ class TrackerCell: UICollectionViewCell {
         actionButton.tintColor = isCompleted ? UIColor.white.withAlphaComponent(0.5) : UIColor.white
         let configuration = UIImage.SymbolConfiguration(pointSize: 20, weight: .bold)
         actionButton.setPreferredSymbolConfiguration(configuration, forImageIn: .normal)
+        
+        self.alpha = self.isCompleted ? 0.5 : 1.0
     }
     
     private func formatDaysString(_ count: Int) -> String {
-        switch count {
-        case 1:
-            return "\(count) день"
-        case 2...4:
-            return "\(count) дня"
-        default:
-            return "\(count) дней"
-        }
+        return String.localizedStringWithFormat(
+            NSLocalizedString("daysCount", comment: "Количество дней"), count
+        )
     }
     
     @objc private func actionButtonTapped() {
+        
+        AnalyticsService.shared.logEvent("click", parameters: [
+            "screen": "Main",
+            "item": "track"
+        ])
+        print("Отправлено событие: click, screen: Main, item: track")
+        
         guard let tracker = tracker else { return }
         
         let today = Calendar.current.startOfDay(for: Date())
@@ -204,6 +231,11 @@ class TrackerCell: UICollectionViewCell {
         updateButtonAppearance()
     }
     
+    override var isSelected: Bool {
+        didSet {
+            contrainerViewCell.layer.borderColor = isSelected ? UIColor.blue.cgColor : tracker?.color.withAlphaComponent(0.9).cgColor
+        }
+    }
 }
 
 class HeaderViewTrackerCollection: UICollectionReusableView {
@@ -214,7 +246,7 @@ class HeaderViewTrackerCollection: UICollectionReusableView {
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textColor = .black
+        titleLabel.textColor = UIColor.label
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),

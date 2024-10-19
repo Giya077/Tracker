@@ -10,25 +10,24 @@ import UIKit
 final class NewTrackerViewController: UIViewController {
         
     weak var delegate: NewTrackerDelegate?
-    
     private let trackerCategoryStore = TrackerCategoryStore()
     
     private lazy var habitButton: UIButton = {
-        let habitButton = BasicButton(title: "Привычка")
+        let habitButton = BasicButton(title: NSLocalizedString("Habit", comment: "Привычка"))
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         return habitButton
     }()
     
     private lazy var irregularEvent: UIButton = {
-        let irregularEvent = BasicButton(title: "Нерегулярные события")
+        let irregularEvent = BasicButton(title: NSLocalizedString("Irregular event", comment: "Нерегулярные события"))
         irregularEvent.addTarget(self, action: #selector(irregularEventTapped), for: .touchUpInside)
         irregularEvent.translatesAutoresizingMaskIntoConstraints = false
         return irregularEvent
     }()
     
     private lazy var label: UILabel = {
-        let label = BasicTextLabel(text: "Создание трекера")
+        let label = BasicTextLabel(text: NSLocalizedString("Creating tracker", comment: "Создание трекера"))
         return label
     }()
     
@@ -39,7 +38,7 @@ final class NewTrackerViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = ThemeManager.shared.backgroundColor()
         view.addSubview(label)
         
         NSLayoutConstraint.activate([

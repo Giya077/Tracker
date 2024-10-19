@@ -11,4 +11,5 @@ import UIKit
 enum Colors {
     static let systemCellColor = UIColor(named: "systemCellColor")
     static let systemSearchColor = UIColor(named: "systemSearchColor")
+    static let darkThemeColor = UIColor(named: "darkThemeColor")
 }
